@@ -1,0 +1,32 @@
+.head-hr{
+    border: none; /* 移除默认的边框 */
+    height: 2px; /* 设置高度 */
+    background-color:  #0BA1E4; /* 设置颜色 */
+    width: 100%; /* 设置宽度 */
+    position: absolute;
+    margin: 0 0 0 0;
+}
+
+.logoStyle{
+    font-size: 24px; 
+    font-family: monospace;
+    color: #0BA1E4;
+    font-weight:bold;
+}
+.hcqFont{
+    position:relative;
+    letter-spacing:.07em;
+    font-size:2em;
+    font-weight:normal;
+    margin:0 auto
+}
+.hcqStyle1{
+    color:hsl(184,80%,25%);
+    text-shadow:0 0 1px currentColor,/*highlight*/-1px -1px 1px hsl(184,80%,50%),0 -1px 1px hsl(184,80%,55%),1px -1px 1px hsl(184,80%,50%),/*light shadow*/1px 1px 1px hsl(184,80%,10%),0 1px 1px hsl(184,80%,10%),-1px 1px 1px hsl(184,80%,10%),/*outline*/-2px -2px 1px hsl(184,80%,15%),-1px -2px 1px hsl(184,80%,15%),0 -2px 1px hsl(184,80%,15%),1px -2px 1px hsl(184,80%,15%),2px -2px 1px hsl(184,80%,15%),2px -1px 1px hsl(184,80%,15%),2px 0 1px hsl(184,80%,15%),2px 1px 1px hsl(184,80%,15%),-2px 0 1px hsl(184,80%,15%),-2px -1px 1px hsl(184,80%,15%),-2px 1px 1px hsl(184,80%,15%),/*dark shadow*/2px 2px 2px hsl(184,80%,5%),1px 2px 2px hsl(184,80%,5%),0 2px 2px hsl(184,80%,5%),-1px 2px 2px hsl(184,80%,5%),-2px 2px 2px hsl(184,80%,5%)
+}
+
+.footer {
+    text-align: center;
+    background-color: #f7f7f7;
+    border-top: 1px solid #e8e8e8;
+}
