@@ -1,5 +1,5 @@
 import React,{FC} from "react";
-
+import {ArrowDownOutlined, ArrowUpOutlined, DollarCircleOutlined, FieldNumberOutlined, GiftOutlined, MailOutlined, PhoneOutlined, QqOutlined,UserOutlined,WarningOutlined,WechatOutlined} from '@ant-design/icons';
 
 const Home: FC = () => {
     return <>
@@ -9,7 +9,7 @@ const Home: FC = () => {
             <div className="card bg-primary text-white">
               <div className="card-body clearfix">
                 <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><i className="mdi mdi-currency-cny fs-22"></i></span>
+                  <span className="img-avatar img-avatar-48 bg-translucent"><FieldNumberOutlined style={{fontSize:'24px'}}/></span>
                   <span className="fs-22 lh-22">4</span>
                 </div>
                 <div className="text-right">质押池数量</div>
@@ -21,7 +21,7 @@ const Home: FC = () => {
             <div className="card bg-danger text-white">
               <div className="card-body clearfix">
                 <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><i className="mdi mdi-account fs-22"></i></span>
+                  <span className="img-avatar img-avatar-48 bg-translucent"><UserOutlined style={{fontSize:'24px'}}/></span>
                   <span className="fs-22 lh-22">156</span>
                 </div>
                 <div className="text-right">用户总数</div>
@@ -33,7 +33,7 @@ const Home: FC = () => {
             <div className="card bg-success text-white">
               <div className="card-body clearfix">
                 <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><i className="mdi mdi-currency-cny fs-22"></i></span>
+                  <span className="img-avatar img-avatar-48 bg-translucent"><DollarCircleOutlined style={{fontSize:'24px'}} /></span>
                   <span className="fs-22 lh-22">34,005,000</span>
                 </div>
                 <div className="text-right">质押总金额</div>
@@ -45,7 +45,7 @@ const Home: FC = () => {
             <div className="card bg-purple text-white">
               <div className="card-body clearfix">
                 <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><i className="mdi mdi-comment-outline fs-22"></i></span>
+                  <span className="img-avatar img-avatar-48 bg-translucent"><GiftOutlined style={{fontSize:'24px'}}/></span>
                   <span className="fs-22 lh-22">153</span>
                 </div>
                 <div className="text-right">总收益</div>
@@ -138,20 +138,17 @@ const Home: FC = () => {
                               <td>
                                 <span className="text-gray">Change 1h</span>
                                 <br/>
-                                <span className="text-danger" style={{fontSize:'16px'}}><strong>-0.28%</strong></span><i
-                                  className="mdi mdi-arrow-down text-danger"></i>
+                                <span className="text-success" style={{fontSize:'16px'}}><strong>-0.28%</strong></span><ArrowDownOutlined style={{color:'#15C377'}}/>
                               </td>
                               <td>
                                 <span className="text-gray">Change 24h</span>
                                 <br/>
-                                <span className="text-danger" style={{fontSize:'16px'}}> <strong>-2.75%</strong></span><i
-                                  className="mdi mdi-arrow-down text-danger"></i>
+                                <span className="text-success" style={{fontSize:'16px'}}> <strong>-2.75%</strong></span><ArrowDownOutlined  style={{color:'#15C377'}} />
                               </td>
                               <td>
                                 <span className="text-gray">Change 7d</span>
                                 <br/>
-                                <span className="text-success" style={{fontSize:'16px'}}><strong>12.02%</strong></span><i
-                                  className="mdi mdi-arrow-up text-success"></i>
+                                <span className="text-danger" style={{fontSize:'16px'}}><strong>12.02%</strong></span><ArrowUpOutlined style={{color:'#F76767'}}/>
                               </td>
                             </tr>
                           </tbody>
@@ -320,7 +317,7 @@ const Home: FC = () => {
                       </li>
         
                       <li className="media">
-                        <img className="mr-3" data-src="holder.js/180x250" alt="180x250" src="../../asserts/images/login-bg-3.jpg"
+                        <img className="mr-3" data-src="holder.js/180x250" alt="180x250" src="../assets/images/login-bg-3.jpg"
                           data-holder-rendered="true" style={{width:'180px',height:'250px',borderRadius:'5px'}} />
                         <div className="media-body">
                           <ul className="list-group">
@@ -512,7 +509,7 @@ const Home: FC = () => {
               <div className="card-body">
                 <div className="row">
                   <div className="col-1"> 
-                    <i className="mdi mdi-alert-outline mdi-48px text-warning"></i>
+                  <WarningOutlined style={{fontSize:'24px',color:'red'}}/>
                   </div>
                   <div className="col-10"> 
                     <ul className="list-group list-group-flush">
@@ -663,16 +660,16 @@ const Home: FC = () => {
               <div className="col w-80" style={{textAlign:'left',fontSize:'16px'}} >
                 <ul className="list-group list-group-flush">
                   <li className="list-group-item">
-                    <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><i className="mdi mdi-qqchat fs-22"></i>&nbsp;&nbsp;&nbsp;466830255</span></a>
+                    <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><QqOutlined />&nbsp;&nbsp;&nbsp;466830255</span></a>
                   </li>
                   <li className="list-group-item">
-                    <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><i className="mdi mdi-wechat fs-22"></i>&nbsp;&nbsp;&nbsp;mingdong1129</span></a>
+                    <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><WechatOutlined />&nbsp;&nbsp;&nbsp;mingdong1129</span></a>
                   </li>
                   <li className="list-group-item">
-                    <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><i className="mdi mdi-cellphone fs-22"></i>&nbsp;&nbsp;&nbsp;18710181258</span></a>
+                    <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><PhoneOutlined />&nbsp;&nbsp;&nbsp;18710181258</span></a>
                   </li>
                   <li className="list-group-item">
-                    <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><i className="mdi mdi-email-outline fs-22"></i>&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a>
+                    <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><MailOutlined />&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a>
                   </li>
                 </ul>
               </div>
