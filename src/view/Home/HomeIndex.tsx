@@ -1,7 +1,11 @@
 import React,{FC} from "react";
 import {ArrowDownOutlined, ArrowUpOutlined, DollarCircleOutlined, FieldNumberOutlined, GiftOutlined, MailOutlined, PhoneOutlined, QqOutlined,UserOutlined,WarningOutlined,WechatOutlined} from '@ant-design/icons';
+import { useTranslation  } from 'react-i18next';
+
 
 const Home: FC = () => {
+  const {t, i18n } = useTranslation();
+
     return <>
        <div className="container-fluid p-t-15">
         <div className="row">
@@ -12,7 +16,7 @@ const Home: FC = () => {
                   <span className="img-avatar img-avatar-48 bg-translucent"><FieldNumberOutlined style={{fontSize:'24px'}}/></span>
                   <span className="fs-22 lh-22">4</span>
                 </div>
-                <div className="text-right">质押池数量</div>
+                <div className="text-right">{t('body.stat.poolSize')}</div>
               </div>
             </div>
           </div>
@@ -24,7 +28,7 @@ const Home: FC = () => {
                   <span className="img-avatar img-avatar-48 bg-translucent"><UserOutlined style={{fontSize:'24px'}}/></span>
                   <span className="fs-22 lh-22">156</span>
                 </div>
-                <div className="text-right">用户总数</div>
+                <div className="text-right">{t('body.stat.users')}</div>
               </div>
             </div>
           </div>
@@ -36,7 +40,7 @@ const Home: FC = () => {
                   <span className="img-avatar img-avatar-48 bg-translucent"><DollarCircleOutlined style={{fontSize:'24px'}} /></span>
                   <span className="fs-22 lh-22">34,005,000</span>
                 </div>
-                <div className="text-right">质押总金额</div>
+                <div className="text-right">{t('body.stat.totalAmount')}</div>
               </div>
             </div>
           </div>
@@ -48,7 +52,7 @@ const Home: FC = () => {
                   <span className="img-avatar img-avatar-48 bg-translucent"><GiftOutlined style={{fontSize:'24px'}}/></span>
                   <span className="fs-22 lh-22">153</span>
                 </div>
-                <div className="text-right">总收益</div>
+                <div className="text-right">{t('body.stat.totalPrize')}</div>
               </div>
             </div>
           </div>
@@ -62,12 +66,12 @@ const Home: FC = () => {
                   <div className="card col-4">
                     <div className="card-body">
                       <h5 className="card-title">
-                        <strong>合约状态</strong>
+                        <strong>{t('body.contract.status')}</strong>
                       </h5>
           
                       <p>
                         <span style={{fontSize:'12px',color:'gray'}}>
-                          合约地址
+                        {t('body.contract.address')}
                         </span>
                         <br/>
                         <span style={{fontSize:'14px',color:'black'}}>
@@ -76,7 +80,7 @@ const Home: FC = () => {
                       </p>
                       <p>
                         <span style={{fontSize:'12px',color:'gray'}}>
-                          版本
+                        {t('body.contract.version')}
                         </span>
                         <br/>
                         <span style={{fontSize:'14px',color:'black'}} className="text-info">
@@ -86,7 +90,7 @@ const Home: FC = () => {
           
                       <p>
                         <span style={{fontSize:'12px',color:'gray'}}>
-                          ChanID
+                        {t('body.contract.chaninID')}
                         </span>
                         <br/>
                         <span style={{fontSize:'14px',color:'black'}} className="text-info">
@@ -95,7 +99,7 @@ const Home: FC = () => {
                       </p>
                       <p>
                         <span style={{fontSize:'12px',color:'gray'}}>
-                          部署时间
+                        {t('body.contract.pubtime')}
                         </span>
                         <br/>
                         <span style={{fontSize:'14px',color:'black'}} className="text-info">
@@ -107,7 +111,7 @@ const Home: FC = () => {
                   <div className="card col-8">
                     <div className="card-body">
                       <h5 className="card-title">
-                        <strong>最近收益</strong>
+                        <strong>{t('body.prize.name')}</strong>
                       </h5>
                       <div className="row">
                         <table className="table table-borderless table-hover">
@@ -160,13 +164,13 @@ const Home: FC = () => {
                       </div>
                       <div className="row row-2">
                         <div className="col-5">
-                          <span className="text-gray">历史总质押</span>
+                          <span className="text-gray">{t('body.prize.history.total.pledge')}</span>
                           <br/>
                           <span className="text-black" style={{fontSize:'16px'}}><strong>17334,123,000 ETH</strong></span>
                         </div>
                         <div className="col-5">
           
-                          <span className="text-gray">历史总收益</span>
+                          <span className="text-gray">{t('body.prize.history.total.prize')}</span>
                           <br/>
                           <span className="text-black" style={{fontSize:'16px'}}><strong>234,988,000 RC</strong></span>
                         </div>
@@ -183,12 +187,12 @@ const Home: FC = () => {
                   <header className="card-header">
                     <div className="card-title">
                       <label style={{fontSize:'20px',marginLeft:'0px'}}>
-                        <strong>质押池</strong>
+                        <strong>{t('body.pledge.pool.name')}</strong>
                       </label>
                     </div>
                     <div className="card-title">
                       <a style={{marginLeft:'0px'}} href="../pool/pool_index.html">
-                        <span className="text-primary">查看更多</span>
+                        <span className="text-primary">{t('body.pledge.pool.view.more')}</span>
                       </a>
                     </div>
                   </header>
@@ -214,20 +218,20 @@ const Home: FC = () => {
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-4">
-                                  目标金额：<span className="text-danger">2000,000</span>
+                                {t('body.pledge.pool.target.amount')}：<span className="text-danger">2000,000</span>
                                 </div>
                                 <div className="col-4">
-                                  已质押：<span className="text-danger">1020,000</span>
+                                {t('body.pledge.pool.pledged.amount')}：<span className="text-danger">1020,000</span>
                                 </div>
                                 <div className="col-4">
-                                  产生收益：<span className="text-danger">672,000</span>
+                                {t('body.pledge.pool.prize.amount')}：<span className="text-danger">672,000</span>
                                 </div>
                               </div>
                             </li>
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-2">
-                                  进&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;度：
+                                  {t('body.pledge.pool.prograss')}：
                                 </div>
                                 <div className="col-8" style={{textAlign:'left'}}>
                                   <div className="progress" style={{height:'auto'}}>
@@ -239,14 +243,14 @@ const Home: FC = () => {
                                 </div>
                               </div>
                             </li>
-                            <li className="list-group-item">开始时间：2024-12-01 11:00:00 </li>
+                            <li className="list-group-item">{t('body.pledge.pool.startTime')}：2024-12-01 11:00:00 </li>
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-6">
-                                  结束时间：2024-12-01 11:00:00
+                                {t('body.pledge.pool.endTime')}：2024-12-01 11:00:00
                                 </div>
                                 <div className="col-6" style={{textAlign:'right'}}>
-                                  <a className="btn  btn-outline-info" href="#!">查看详情</a>
+                                  <a className="btn  btn-outline-info" href="#!">{t('body.pledge.pool.view.details')}</a>
                                 </div>
                               </div>
                             </li>
@@ -274,20 +278,20 @@ const Home: FC = () => {
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-4">
-                                  目标金额：<span className="text-danger">3000,000</span>
+                                {t('body.pledge.pool.target.amount')}: <span className="text-danger">3000,000</span>
                                 </div>
                                 <div className="col-4">
-                                  已质押：<span className="text-danger">1020,000</span>
+                                {t('body.pledge.pool.pledged.amount')}：<span className="text-danger">1020,000</span>
                                 </div>
                                 <div className="col-4">
-                                  产生收益：<span className="text-danger">672,000</span>
+                                {t('body.pledge.pool.prize.amount')}：<span className="text-danger">672,000</span>
                                 </div>
                               </div>
                             </li>
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-2">
-                                  进&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;度：
+                                {t('body.pledge.pool.prograss')}：
                                 </div>
                                 <div className="col-8" style={{textAlign:'left'}}>
                                   <div className="progress" style={{height:'auto'}}>
@@ -300,14 +304,14 @@ const Home: FC = () => {
                                 </div>
                               </div>
                             </li>
-                            <li className="list-group-item">开始时间：2024-12-01 11:00:00 </li>
+                            <li className="list-group-item">{t('body.pledge.pool.startTime')}：2024-12-01 11:00:00 </li>
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-6">
-                                  结束时间：2024-12-01 11:00:00
+                                {t('body.pledge.pool.endTime')}：2024-12-01 11:00:00
                                 </div>
                                 <div className="col-6" style={{textAlign:'right'}}>
-                                  <a className="btn  btn-outline-info"  href="#!">查看详情</a>
+                                  <a className="btn  btn-outline-info"  href="#!">{t('body.pledge.pool.view.details')}</a>
                                 </div>
                               </div>
                             </li>
@@ -335,20 +339,20 @@ const Home: FC = () => {
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-4">
-                                  目标金额：<span className="text-danger">3000,000</span>
+                                  {t('body.pledge.pool.target.amount')}：<span className="text-danger">3000,000</span>
                                 </div>
                                 <div className="col-4">
-                                  已质押：<span className="text-danger">1020,000</span>
+                                  {t('body.pledge.pool.pledged.amount')}：<span className="text-danger">1020,000</span>
                                 </div>
                                 <div className="col-4">
-                                  产生收益：<span className="text-danger">672,000</span>
+                                {t('body.pledge.pool.prize.amount')}：<span className="text-danger">672,000</span>
                                 </div>
                               </div>
                             </li>
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-2 w-80">
-                                  进&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;度：
+                                {t('body.pledge.pool.prograss')}：
                                 </div>
                                 <div className="col-8" style={{textAlign:'left'}}>
                                   <div className="progress" style={{height:'auto'}}>
@@ -361,14 +365,14 @@ const Home: FC = () => {
                                 </div>
                               </div>
                             </li>
-                            <li className="list-group-item">开始时间：2024-12-01 11:00:00 </li>
+                            <li className="list-group-item"> {t('body.pledge.pool.startTime')}：2024-12-01 11:00:00 </li>
                             <li className="list-group-item">
                               <div className="row">
                                 <div className="col-6">
-                                  结束时间：2024-12-01 11:00:00
+                                {t('body.pledge.pool.endTime')}：2024-12-01 11:00:00
                                 </div>
                                 <div className="col-6" style={{textAlign:'right'}}>
-                                  <a className="btn  btn-outline-info"  href="#!">查看详情</a>
+                                  <a className="btn  btn-outline-info"  href="#!"> {t('body.pledge.pool.view.details')}</a>
                                 </div>
                               </div>
                             </li>
@@ -389,12 +393,12 @@ const Home: FC = () => {
                   <header className="card-header">
                     <div className="card-title">
                       <label style={{fontSize:'20px',marginLeft:'0px'}}>
-                        <strong>最近交易</strong>
+                        <strong> {t('body.transaction.name')}</strong>
                       </label>
                     </div>
                     <div className="card-title">
                       <a style={{marginLeft:'0px'}} href="#!">
-                        <span className="text-primary">查看更多</span>
+                        <span className="text-primary">{t('body.transaction.button.view.more')}</span>
                       </a>
                     </div>
                   </header>
@@ -404,13 +408,13 @@ const Home: FC = () => {
                     <table className="table table-borderless table-hover">
                       <thead>
                         <tr>
-                          <th>质押池</th>
-                          <th>交易地址</th>
-                          <th>日期</th>
-                          <th>金额</th>
-                          <th>类型</th>
-                          <th>质押天数</th>
-                          <th>收益</th>
+                          <th>{t('body.transaction.table.header.pledge')}</th>
+                          <th>{t('body.transaction.table.header.address')}</th>
+                          <th>{t('body.transaction.table.header.date')}</th>
+                          <th>{t('body.transaction.table.header.amount')}</th>
+                          <th>{t('body.transaction.table.header.type')}</th>
+                          <th>{t('body.transaction.table.header.pledge.days')}</th>
+                          <th>{t('body.transaction.table.headerer.prize')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -514,13 +518,13 @@ const Home: FC = () => {
                   <div className="col-10"> 
                     <ul className="list-group list-group-flush">
                       <li className="list-group-item">
-                        <span className="text-danger">风险提示： </span>防范以“虚拟货币”“区块链”名义进行非法集资的风险
+                        <span className="text-danger">{t('body.right.describe.risk.warning.title')}： </span>{t('body.right.describe.risk.warning.content')}
                           <div style={{float:'right',marginTop:'10px'}}>
-                            <span style={{color:'#1383C6'}}> <a href="#!"></a>——银保监会等五部门</span>
+                            <span style={{color:'#1383C6'}}> <a href="#!"></a>{t('body.right.describe.risk.warning.author')}</span>
                           </div>
                       </li>
                       <li className="list-group-item">
-                        <span className="text-danger">免责声明：</span>本站数据，合约地址以及相关源码仅在测试链使用，并且全部开源，本站不做任何盈利行为，仅供交流使用。任何人和组织不得以本项目从事非法行为，否则一切后果与本站无关
+                        <span className="text-danger">{t('body.right.describe.disclaimer')}：</span>{t('body.right.describe.disclaimer.content')}
                       </li>
                     </ul>
                   </div>
@@ -531,15 +535,15 @@ const Home: FC = () => {
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title" style={{textAlign:'left'}}>
-                  <strong>每周收益榜</strong>
+                  <strong>{t('body.right.weekly.prize.top')}</strong>
                 </h5>
                 <div className="col" style={{textAlign:'left'}}>
                   <table className="table table-borderless table-hover">
                       <thead>
                         <tr>
-                          <th>排行</th>
-                          <th>账户</th>
-                          <th>收益</th>
+                          <th>{t('body.right.weekly.prize.top.header.top')}</th>
+                          <th>{t('body.right.weekly.prize.top.header.account')}</th>
+                          <th>{t('body.right.weekly.prize.top.header.prize')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -603,20 +607,20 @@ const Home: FC = () => {
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title" style={{textAlign:'left'}}>
-                  <strong>热门标签</strong>
+                  <strong>{t('body.right.hot.tag')}</strong>
                 </h5>
                 <div className="col w-80" style={{textAlign:'left',fontSize:'18px',padding:'5px'}}>
                   <table className="table table-borderless">
                     <tr>
-                      <td><a href="#!" className="badge badge-pill badge-success">进行中</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-warning">人数最多</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-danger">收益最高</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-dark">已结束</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-success">{t('body.right.hot.tag.running')}</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-warning">{t('body.right.hot.tag.most.user')}</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-danger">{t('body.right.hot.tag.most.prize')}</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-dark">{t('body.right.hot.tag.end')}</a></td>
                     </tr>
                     <tr>
-                      <td><a href="#!" className="badge badge-pill badge-secondary">未开始</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-purple">ETH</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-info">USDT</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-secondary">{t('body.right.hot.tag.no.start')}</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-purple">{t('body.right.hot.tag.no.eth')}</a></td>
+                      <td><a href="#!" className="badge badge-pill badge-info">{t('body.right.hot.tag.no.usdt')}</a></td>
                       <td></td>
                     </tr>
                   </table>
@@ -628,25 +632,23 @@ const Home: FC = () => {
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title" style={{textAlign:'left'}}>
-                  <strong>常见问题</strong>
+                  <strong>{t('body.right.requesttions')}</strong>
                 </h5>
                 <div className="col w-80" style={{textAlign:'left',fontSize:'14px'}}>
                   <ul className="list-group list-group-flush p-t-5">
                   <li className="list-group-item">
-                    <a href="#!"><span className="text-black">1. 什么是代币质押？</span></a>
+                    <a href="#!"><span className="text-black">{t('body.right.requesttions.q1')}</span></a>
                   </li>
                   <li className="list-group-item">
-                    <a href="#!">2. 如何获取收益？</a>
+                    <a href="#!">{t('body.right.requesttions.q2')}</a>
                   </li>
                   <li className="list-group-item">
-                    <a href="#!">3. 中途退出怎么办？</a>
+                    <a href="#!">{t('body.right.requesttions.q3')}</a>
                   </li>
                   <li className="list-group-item">
-                    <a href="#!">4. 质押的代币有风险吗？</a>
+                    <a href="#!">{t('body.right.requesttions.q4')}</a>
                   </li>
-                  <li className="list-group-item">
-                    <a href="#!">5. 收益计算规则？</a>
-                  </li>
+                 
                   </ul>
                 </div>
               </div>
@@ -655,7 +657,7 @@ const Home: FC = () => {
             <div className="card">
               <div className="card-body">
               <h5 className="card-title" style={{textAlign:'left'}}>
-                <strong>联系我们</strong>
+                <strong>{t('body.right.contact.us')}</strong>
               </h5>
               <div className="col w-80" style={{textAlign:'left',fontSize:'16px'}} >
                 <ul className="list-group list-group-flush">

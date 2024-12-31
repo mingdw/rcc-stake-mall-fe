@@ -8,7 +8,7 @@ import zhTranslation from './locales/zh-CN.json';
 
 i18next.init({
   interpolation: { escapeValue: false },  // React 已经处理了 XSS
-  lng: 'en',  // 默认语言
+  lng: 'zh',  // 默认语言
   resources: {
     en: { translation: enTranslation },
     zh: { translation: zhTranslation },

@@ -22,37 +22,6 @@ export const PRIZE_PATH_NAME = "prize"
 
 export const ABOUT_PATH_NAME = "about"
 
-type MenuItem = Required<MenuProps>['items'][number];
-
-const items: MenuItem[] = [
-  {
-    label: '首页',
-    key: HOME_PATH_NAME,
-    icon:<HomeOutlined />,
-  },
-  {
-    label: '质押池',
-    key: POOL_PATH_NAME,
-    icon: <ShoppingOutlined />,
-  },
-  {
-    label: '质押',
-    key: PlEDGE_PATH_NAME,
-    icon: <AppstoreOutlined />,
-  },
-
- {
-    label: '领奖',
-    key: PRIZE_PATH_NAME,
-    icon: <TransactionOutlined />,
-  },
-  {
-    label: '关于我们',
-    key: ABOUT_PATH_NAME,
-    icon: <TeamOutlined />
-  },
-
-];
 
 const languges = [{
   value: 'zh',
@@ -67,9 +36,43 @@ const languges = [{
 
 
 const MainLayout: FC = () => {
-  const [current, setCurrent] = useState('home');
-  const navigate = useNavigate()
-  const { i18n } = useTranslation();
+
+
+type MenuItem = Required<MenuProps>['items'][number];
+const [current, setCurrent] = useState('home');
+const navigate = useNavigate()
+
+const {t, i18n } = useTranslation();
+const items: MenuItem[] = [
+  {
+    label: t('header.nav.home'),
+    key: HOME_PATH_NAME,
+    icon:<HomeOutlined />,
+  },
+  {
+    label:  t('header.nav.pool'),
+    key: POOL_PATH_NAME,
+    icon: <ShoppingOutlined />,
+  },
+  {
+    label:  t('header.nav.pledge'),
+    key: PlEDGE_PATH_NAME,
+    icon: <AppstoreOutlined />,
+  },
+
+ {
+    label:  t('header.nav.prize'),
+    key: PRIZE_PATH_NAME,
+    icon: <TransactionOutlined />,
+  },
+  {
+    label:  t('header.nav.about'),
+    key: ABOUT_PATH_NAME,
+    icon: <TeamOutlined />
+  },
+
+];
+
 
   const onClick: MenuProps['onClick'] = (e) => {
     console.log('click ', e);
@@ -78,6 +81,7 @@ const MainLayout: FC = () => {
   };
 
   const handleChange = (value: string) => {
+    console.info("选择语言： ",value)
     i18n.changeLanguage(value)
   };
 
@@ -87,23 +91,23 @@ const MainLayout: FC = () => {
   return (
     <Layout>
       <Header style={{ display: 'flex',backgroundColor:'white',height:'15%' }}>
-        <Row justify="space-around" style={{width:'100%'}}>
-          <Col span={6}>
-            <a href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle,mainCss.hcqFont,mainCss.hcqStyle1)}>RCC代币质押</span> </a>
+        <Row justify="space-around" style={{width:'100%',alignItems:'center'}}>
+          <Col>
+            <a href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle,mainCss.hcqFont,mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
 
           </Col>
-          <Col span={10}>
-            <Space size={100}>
-              <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
-            </Space>
+          <Col span={10} style={{backgroundColor:'green',textAlign:'center'}}>
+          <div style={{width:'100%'}}>
+            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>
+          </div>
            
           </Col>
           
-          <Col span={8} style={{display:'flex',justifyContent:'center',alignItems:'center',fontSize:'8px'}}>
-          <Search placeholder="请输入交易地址/账户" onSearch={onSearch} enterButton='搜索' />&nbsp;&nbsp;&nbsp;&nbsp;
+          <Col style={{display:'flex',justifyContent:'center',alignItems:'center',fontSize:'8px'}}>
+          <Search placeholder={t('header.placeholder.title')} onSearch={onSearch} enterButton={t('header.nav.search')} />&nbsp;&nbsp;&nbsp;&nbsp;
             <Space direction='horizontal' size="large" align='center'>
-              <Select  defaultValue="简体中文"   style={{ width: 100 }} onChange={handleChange} options={languges} />
-              <Button style={{backgroundColor:'#15C377',color:'white'}}>{i18n('walletconnect')}</Button>
+              <Select  defaultValue="简体中文"  onChange={handleChange} options={languges} />
+              <Button style={{backgroundColor:'#15C377',color:'white'}}>{t('walletconnect')}</Button>
             </Space>
           </Col>
         </Row>
