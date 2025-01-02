@@ -1,10 +1,49 @@
 import React,{FC} from "react";
 import {ArrowDownOutlined, ArrowUpOutlined, DollarCircleOutlined, FieldNumberOutlined, GiftOutlined, MailOutlined, PhoneOutlined, QqOutlined,UserOutlined,WarningOutlined,WechatOutlined} from '@ant-design/icons';
 import { useTranslation  } from 'react-i18next';
-
-
+import {PledgePoolType} from "../../components/pledgePool/PledgePoolInfo";
+import PledgePoolComponents from "../../components/pledgePool/PledgePoolInfo";
 const Home: FC = () => {
   const {t, i18n } = useTranslation();
+
+  const pledgePoolDatas:PledgePoolType[] = [{
+    name: 'ETH01 Pool',
+    status:0,
+    targetAmount:'10 ETH',
+    pledgedAmount:'2.76354 ETH',
+    prize:'563 RCC',
+    progress:25,
+    startTime:'2024-04-12',
+    endTime:'2025-01-31',
+    imgUrl:'../../assets/images/login-bg-1.jpg'
+  },
+  {
+    name: 'ETH02 Pool',
+    status:1,
+    targetAmount:'10 ETH',
+    pledgedAmount:'3.76354 ETH',
+    prize:'300 RCC',
+    progress:50,
+    startTime:'2024-04-12',
+    endTime:'2025-01-26',
+    imgUrl:'../../assets/images/login-bg-2.jpg'
+  },
+  {
+    name: 'ETH03 Pool',
+    status:2,
+    targetAmount:'25 ETH',
+    pledgedAmount:'10.76354 ETH',
+    prize:'500 RCC',
+    progress:75,
+    startTime:'2024-04-12',
+    endTime:'2025-01-26',
+    imgUrl:'../../assets/images/login-bg-3.jpg'
+  }
+  
+]
+
+
+
 
     return <>
        <div className="container-fluid p-t-15">
@@ -199,186 +238,11 @@ const Home: FC = () => {
         
                   <div className="card-body">
                     <ul className="list-unstyled">
-                      <li className="media">
-                        <img className="mr-3" data-src="holder.js/180x250" alt="180x250" src="../../asserts/images/login-bg-1.jpg"
-                          data-holder-rendered="true" style={{width:'180px',height:'250px',borderRadius:'5px'}}/>
-                        <div className="media-body">
-                          <ul className="list-group">
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-6">
-                                  <h5 className="mt-0 mb-1"><a href="!#">ETH质押池</a></h5>
-                                </div>
-                                <div className="col-6" style={{textAlign:'right'}}>
-                                  <span className="text-gray">未开始</span>
-                                </div>
-                              </div>
-                            </li>
-        
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-4">
-                                {t('body.pledge.pool.target.amount')}：<span className="text-danger">2000,000</span>
-                                </div>
-                                <div className="col-4">
-                                {t('body.pledge.pool.pledged.amount')}：<span className="text-danger">1020,000</span>
-                                </div>
-                                <div className="col-4">
-                                {t('body.pledge.pool.prize.amount')}：<span className="text-danger">672,000</span>
-                                </div>
-                              </div>
-                            </li>
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-2">
-                                  {t('body.pledge.pool.prograss')}：
-                                </div>
-                                <div className="col-8" style={{textAlign:'left'}}>
-                                  <div className="progress" style={{height:'auto'}}>
-                                    <div className="progress-bar" role="progressbar" style={{width:'25%'}} >25%</div>
-                                  </div>
-                                </div>
-                                <div className="col-3">
-        
-                                </div>
-                              </div>
-                            </li>
-                            <li className="list-group-item">{t('body.pledge.pool.startTime')}：2024-12-01 11:00:00 </li>
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-6">
-                                {t('body.pledge.pool.endTime')}：2024-12-01 11:00:00
-                                </div>
-                                <div className="col-6" style={{textAlign:'right'}}>
-                                  <a className="btn  btn-outline-info" href="#!">{t('body.pledge.pool.view.details')}</a>
-                                </div>
-                              </div>
-                            </li>
-        
-                          </ul>
-                        </div>
-                      </li>
-        
-                      <li className="media">
-                        <img className="mr-3" data-src="holder.js/180x250" alt="180x250" src="../../asserts/images/login-bg-2.jpg"
-                          data-holder-rendered="true" style={{width:'180px',height:'250px',borderRadius:'5px'}} />
-                        <div className="media-body">
-                          <ul className="list-group">
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-6">
-                                  <h5 className="mt-0 mb-1"><a href="!#">USDT质押池</a></h5>
-                                </div>
-                                <div className="col-6" style={{textAlign:'right'}}>
-                                  <span className="text-success">进行中</span>
-                                </div>
-                              </div>
-                            </li>
-        
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-4">
-                                {t('body.pledge.pool.target.amount')}: <span className="text-danger">3000,000</span>
-                                </div>
-                                <div className="col-4">
-                                {t('body.pledge.pool.pledged.amount')}：<span className="text-danger">1020,000</span>
-                                </div>
-                                <div className="col-4">
-                                {t('body.pledge.pool.prize.amount')}：<span className="text-danger">672,000</span>
-                                </div>
-                              </div>
-                            </li>
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-2">
-                                {t('body.pledge.pool.prograss')}：
-                                </div>
-                                <div className="col-8" style={{textAlign:'left'}}>
-                                  <div className="progress" style={{height:'auto'}}>
-                                    <div className="progress-bar bg-yellow" role="progressbar" style={{width:'55%'}}
-                                    >25%</div>
-                                  </div>
-                                </div>
-                                <div className="col-3">
-        
-                                </div>
-                              </div>
-                            </li>
-                            <li className="list-group-item">{t('body.pledge.pool.startTime')}：2024-12-01 11:00:00 </li>
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-6">
-                                {t('body.pledge.pool.endTime')}：2024-12-01 11:00:00
-                                </div>
-                                <div className="col-6" style={{textAlign:'right'}}>
-                                  <a className="btn  btn-outline-info"  href="#!">{t('body.pledge.pool.view.details')}</a>
-                                </div>
-                              </div>
-                            </li>
-        
-                          </ul>
-                        </div>
-                      </li>
-        
-                      <li className="media">
-                        <img className="mr-3" data-src="holder.js/180x250" alt="180x250" src="../assets/images/login-bg-3.jpg"
-                          data-holder-rendered="true" style={{width:'180px',height:'250px',borderRadius:'5px'}} />
-                        <div className="media-body">
-                          <ul className="list-group">
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-6">
-                                  <h5 className="mt-0 mb-1"><a href="!#">USDT质押池</a></h5>
-                                </div>
-                                <div className="col-6" style={{textAlign:'right'}}>
-                                  <span className="text-danger">已结束</span>
-                                </div>
-                              </div>
-                            </li>
-        
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-4">
-                                  {t('body.pledge.pool.target.amount')}：<span className="text-danger">3000,000</span>
-                                </div>
-                                <div className="col-4">
-                                  {t('body.pledge.pool.pledged.amount')}：<span className="text-danger">1020,000</span>
-                                </div>
-                                <div className="col-4">
-                                {t('body.pledge.pool.prize.amount')}：<span className="text-danger">672,000</span>
-                                </div>
-                              </div>
-                            </li>
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-2 w-80">
-                                {t('body.pledge.pool.prograss')}：
-                                </div>
-                                <div className="col-8" style={{textAlign:'left'}}>
-                                  <div className="progress" style={{height:'auto'}}>
-                                    <div className="progress-bar bg-yellow" role="progressbar" style={{width:'55%'}}
-                                    >25%</div>
-                                  </div>
-                                </div>
-                                <div className="col-2">
-        
-                                </div>
-                              </div>
-                            </li>
-                            <li className="list-group-item"> {t('body.pledge.pool.startTime')}：2024-12-01 11:00:00 </li>
-                            <li className="list-group-item">
-                              <div className="row">
-                                <div className="col-6">
-                                {t('body.pledge.pool.endTime')}：2024-12-01 11:00:00
-                                </div>
-                                <div className="col-6" style={{textAlign:'right'}}>
-                                  <a className="btn  btn-outline-info"  href="#!"> {t('body.pledge.pool.view.details')}</a>
-                                </div>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
+                      {
+                        pledgePoolDatas.map((pool,index) => (
+                          <PledgePoolComponents key={index} {...pool} />                        ))
+                      }
+                     
                     </ul>
         
                   </div>

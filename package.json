@@ -11,16 +11,19 @@
     "prettier": "prettier --write ."
   },
   "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.1",
     "antd": "^5.22.7",
     "classnames": "^2.5.1",
     "i18next": "^24.2.0",
     "node-sass": "^9.0.0",
     "normalize.css": "^8.0.1",
+    "rainbowkit": "^0.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^15.3.0",
     "react-router-dom": "^7.1.1",
-    "sass-loader": "^16.0.4"
+    "sass-loader": "^16.0.4",
+    "wagmi": "^2.14.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

@@ -1,6 +1,6 @@
 {
     "welcome": "欢迎使用 React 和 react-i18next",
-    "walletconnect": "Conn Wallet",
+    "walletconnect": "Login",
     "header.logo":"RCC Token Pledge",
     "header.nav.home":"Home",
     "header.nav.pool":"Pledge Pool",
@@ -9,7 +9,8 @@
     "header.nav.about":"About US",
     "header.nav.search":"Search",
     "header.walletconnect": "Conn Wallet",
-    "header.placeholder.title": "account/transaction address",
+    "header.search.placeholder": "account/transaction address",
+    "header.search.title": "please input account or transaction address",
     "body.stat.poolSize":"Pool Size",
     "body.stat.users":"Users",
     "body.stat.totalAmount":"Pledge Total Amount",

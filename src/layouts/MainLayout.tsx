@@ -1,5 +1,5 @@
 import React,{FC,useState} from 'react';
-import { HomeOutlined,ShoppingOutlined,AppstoreOutlined,TransactionOutlined,TeamOutlined } from '@ant-design/icons';
+import { HomeOutlined,ShoppingOutlined,AppstoreOutlined,TransactionOutlined,TeamOutlined,UserOutlined } from '@ant-design/icons';
 import type { MenuProps,Input } from 'antd';
 import {  Col, Row, Layout, Menu, theme, Space,Select, Button  } from 'antd';
 import { Outlet,useNavigate   } from 'react-router-dom';
@@ -104,10 +104,11 @@ const items: MenuItem[] = [
           </Col>
           
           <Col style={{display:'flex',justifyContent:'center',alignItems:'center',fontSize:'8px'}}>
-          <Search placeholder={t('header.placeholder.title')} onSearch={onSearch} enterButton={t('header.nav.search')} />&nbsp;&nbsp;&nbsp;&nbsp;
-            <Space direction='horizontal' size="large" align='center'>
-              <Select  defaultValue="简体中文"  onChange={handleChange} options={languges} />
-              <Button style={{backgroundColor:'#15C377',color:'white'}}>{t('walletconnect')}</Button>
+            <Search size={"middle"} placeholder={t('header.search.placeholder')} title={t('header.search.title')} allowClear onSearch={onSearch}  style={{ width: 200 }} />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Space direction='horizontal' align='center'>
+              <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
+              <Button size={"middle"} icon={<UserOutlined />} >{t('walletconnect')}</Button>
             </Space>
           </Col>
         </Row>

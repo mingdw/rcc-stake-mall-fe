@@ -1,6 +1,5 @@
 {
-    "welcome": "欢迎使用 React 和 react-i18next",
-    "walletconnect": "连接钱包",
+    "walletconnect": "登录",
     "header.logo":"RCC代币质押",
     "header.nav.home":"首页",
     "header.nav.pool":"质押池",
@@ -9,7 +8,9 @@
     "header.nav.about":"关于我们",
     "header.nav.search":"搜索",
     "header.walletconnect": "连接钱包",
-    "header.placeholder.title": "请输入账户/交易地址",
+    "header.search.placeholder": "账户/交易地址",
+    "header.search.title": "请输入账户/交易地址",
+    
     "body.stat.poolSize":"质押池数量",
     "body.stat.users":"用户数量",
     "body.stat.totalAmount":"质押总金额",
