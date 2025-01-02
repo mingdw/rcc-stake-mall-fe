@@ -86,7 +86,7 @@ const items: MenuItem[] = [
   };
 
   const onSearch = (value: string) => {
-    console.log(`selected ${value}`);
+    navigate('/transactionList')
   };
   return (
     <Layout>
@@ -99,16 +99,17 @@ const items: MenuItem[] = [
           <Col span={10} style={{backgroundColor:'green',textAlign:'center'}}>
           <div style={{width:'100%'}}>
             <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>
-          </div>
            
+          </div>
+        
           </Col>
-          
           <Col style={{display:'flex',justifyContent:'center',alignItems:'center',fontSize:'8px'}}>
             <Search size={"middle"} placeholder={t('header.search.placeholder')} title={t('header.search.title')} allowClear onSearch={onSearch}  style={{ width: 200 }} />
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Space direction='horizontal' align='center'>
               <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
               <Button size={"middle"} icon={<UserOutlined />} >{t('walletconnect')}</Button>
+
             </Space>
           </Col>
         </Row>
