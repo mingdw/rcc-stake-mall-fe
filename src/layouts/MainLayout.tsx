@@ -93,6 +93,7 @@ const items: MenuItem[] = [
       <Header style={{ display: 'flex',backgroundColor:'white',height:'15%' }}>
         <Row justify="space-around" style={{width:'100%',alignItems:'center'}}>
           <Col>
+            <img src='../assets/image.png'></img>
             <a href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle,mainCss.hcqFont,mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
 
           </Col>
