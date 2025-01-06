@@ -1,13 +1,14 @@
 import React,{FC,useState} from 'react';
 import { HomeOutlined,ShoppingOutlined,AppstoreOutlined,TransactionOutlined,TeamOutlined,UserOutlined } from '@ant-design/icons';
 import type { MenuProps,Input } from 'antd';
-import {  Col, Row, Layout, Menu, theme, Space,Select, Button  } from 'antd';
+import {  Col, Row, Layout, Menu, theme, Space,Select, Button,Image  } from 'antd';
 import { Outlet,useNavigate   } from 'react-router-dom';
 import classnames from 'classnames';
 
 import mainCss from './MainLayout.module.scss'
 import Search from 'antd/es/input/Search';
 import { useTranslation  } from 'react-i18next';
+
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -92,10 +93,8 @@ const items: MenuItem[] = [
     <Layout>
       <Header style={{ display: 'flex',backgroundColor:'white',height:'15%' }}>
         <Row justify="space-around" style={{width:'100%',alignItems:'center'}}>
-          <Col>
-            <img src='../assets/image.png'></img>
+          <Col style={{textAlign:'center'}}>
             <a href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle,mainCss.hcqFont,mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
-
           </Col>
           <Col span={10} style={{backgroundColor:'green',textAlign:'center'}}>
           <div style={{width:'100%'}}>
@@ -110,7 +109,6 @@ const items: MenuItem[] = [
             <Space direction='horizontal' align='center'>
               <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
               <Button size={"middle"} icon={<UserOutlined />} >{t('walletconnect')}</Button>
-
             </Space>
           </Col>
         </Row>
