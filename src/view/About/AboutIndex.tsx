@@ -134,6 +134,7 @@ const About = () => {
         <Header style={{ background: '#F5F5F5', padding: '0 0', display: 'flex', alignItems: 'center', justifyContent: 'start', height: '40px' }}>
           {renderBreadcrumb()}
         </Header>
+        
         {/* 页面主体部分，分为左右布局 */}
         <Layout style={{ padding: '0 0', flex: 1 }}>
           {/* 左侧二级导航菜单 */}
