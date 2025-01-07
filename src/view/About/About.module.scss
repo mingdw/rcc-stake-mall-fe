@@ -1,0 +1,18 @@
+.layout{
+    width: 80%;
+    position: relative;
+    margin-left: 10%;
+    background-color: antiquewhite;
+}
+
+.content {
+    overflow-y: scroll; /* 允许垂直滚动 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 和 Edge */
+    height: 100%;
+  }
+  
+  /* 针对 Webkit 内核的浏览器（Chrome, Safari） */
+  .content::-webkit-scrollbar {
+    display: none;
+  }

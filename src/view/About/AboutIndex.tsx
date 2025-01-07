@@ -1,57 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Breadcrumb, Divider, List, Typography } from 'antd';
+import {ArrowDownOutlined, ArrowUpOutlined, DollarCircleOutlined, FieldNumberOutlined, GiftOutlined, MailOutlined, PhoneOutlined, QqOutlined,UserOutlined,WarningOutlined,WechatOutlined} from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom'; 
 import Item from 'antd/es/list/Item';
 const { Header, Content, Sider } = Layout;
 const { Text } = Typography;
-const data = [
-  'Racing car sprays burning fuel into crowd.',
-  'Japanese princess to wed commoner.',
-  'Australian walks 100km after outback crash.',
-  'Man charged over missing wedding girl.',
-  'Los Angeles battles huge wildfires.',
-];
+import classnames from 'classnames';
+import css from './About.module.scss'
 const menuData = [
   {
     key: 'about',
     title: '关于我们',
     children: [
-      { key: 'about-1', title: '简介', anchor: 'section1', content:
-          '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 北京中岚旅行社有限公司是北京领先的大型签证服务公司之一，十来年专注办理各国各类别的签证，并为客户提供全面、体贴的“一站式”出境便捷服务。北京中岚旅行社有限公司团队均来自各大签证机构，与多国领馆长期保持良好渠道关系，选择我们办理签证，将会有资深签证专员为您审核签证资料，签证成功率近100%，个别国家更是可以达到零拒签率，全年365天无间断，为客户提供丰富的后续服务和保障。</p>'+
-         
-          '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;北京中岚旅行社有限公司前身是某国旅签证中心，其核心团队专注出国签证代送业务十多年。现公司组织架构主要由北京中岚旅行社有限公司总部（位于北京市三里屯使馆区），以及分布在北京南北使馆区的7个签证部构成，呈卫星状环绕使馆中心。分别为：签证1-2分部位于北京光华路使馆南区，签证3-2分部位于北京三里屯使馆北区中心，签证6-7分布位于燕莎美国使馆片区，确保材料递交的时效性以及时时掌握使馆政策变化，各分部由经验丰富的带头人组织工作，均拥有一支资深签证专家队伍，针对签证办理遇到的各种问题，集北京各领使馆良好渠道资源，应对上已做到行之有效，游刃有余。</p>'+
-         
-          '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;北京中岚旅行社有限公司团队熟悉全球各国的签证申请条款、掌握相关签证政策的变化，具有丰富的行业从业经验和专业水准，与出入境和各省外办关系良好；针对出国、入境签证问题，我咨询人员均免费提供专业、快捷和贴心的咨询服务。过往丰富的签证个案证明，北京中岚旅行社有限公司咨询人员在应对各种疑难签证上已做到行之有效，游刃有余；对于具体签证个案，北京中岚旅行社有限公司咨询人员为您量身定做，制定解决方案，出签率高，为您省时、省力、省心，轻松获得签证，让您的出行更加便捷！</p>'
-       },
-      { key: 'about-2', title: '为什么选择我们', anchor: 'section2', content: '<List'+
-      'size="large"'+
-       'bordered >'+
-            '<div style={{marginLeft:\'50px\'}}>'+
-                  '</br>'+
-                  '<Item>'+
-                    '<p><span><strong>签证丰富:</strong>覆盖全球各国多类型签证，精心筛选出性价比高的特价签证，满足您出国需求。</span></p>'+
-                '</Item>'+
-                '<Item>'+
-                    '<p><span><strong>签证丰富:</strong>覆盖全球各国多类型签证，精心筛选出性价比高的特价签证，满足您出国需求。</span></p>'+
-                '</Item>'+
-                '<Item>'+
-                    '<p><span><strong>签证丰富:</strong>覆盖全球各国多类型签证，精心筛选出性价比高的特价签证，满足您出国需求。</span></p>'+
-                '</Item>'+
-                '<Item>'+
-                    '<p><span><strong>签证丰富:</strong>覆盖全球各国多类型签证，精心筛选出性价比高的特价签证，满足您出国需求。</span></p>'+
-                '</Item>'+
-                '<Item>'+
-                    '<p><span><stong>签证丰富:</stong>覆盖全球各国多类型签证，精心筛选出性价比高的特价签证，满足您出国需求。</span></p>'+
-                '</Item>'+
-            '</div>'+
-            
-         '</List>'
-    },
-      { key: 'about-3', title: '联系我们', anchor: 'section3',content:'<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 北京中岚旅行社有限公司是北京领先的大型签证服务公司之一，十来年专注办理各国各类别的签证，并为客户提供全面、体贴的“一站式”出境便捷服务。北京中岚旅行社有限公司团队均来自各大签证机构，与多国领馆长期保持良好渠道关系，选择我们办理签证，将会有资深签证专员为您审核签证资料，签证成功率近100%，个别国家更是可以达到零拒签率，全年365天无间断，为客户提供丰富的后续服务和保障。</p>'+
-         
-          '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;北京中岚旅行社有限公司前身是某国旅签证中心，其核心团队专注出国签证代送业务十多年。现公司组织架构主要由北京中岚旅行社有限公司总部（位于北京市三里屯使馆区），以及分布在北京南北使馆区的7个签证部构成，呈卫星状环绕使馆中心。分别为：签证1-2分部位于北京光华路使馆南区，签证3-2分部位于北京三里屯使馆北区中心，签证6-7分布位于燕莎美国使馆片区，确保材料递交的时效性以及时时掌握使馆政策变化，各分部由经验丰富的带头人组织工作，均拥有一支资深签证专家队伍，针对签证办理遇到的各种问题，集北京各领使馆良好渠道资源，应对上已做到行之有效，游刃有余。</p>'+
-         
-          '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;北京中岚旅行社有限公司团队熟悉全球各国的签证申请条款、掌握相关签证政策的变化，具有丰富的行业从业经验和专业水准，与出入境和各省外办关系良好；针对出国、入境签证问题，我咨询人员均免费提供专业、快捷和贴心的咨询服务。过往丰富的签证个案证明，北京中岚旅行社有限公司咨询人员在应对各种疑难签证上已做到行之有效，游刃有余；对于具体签证个案，北京中岚旅行社有限公司咨询人员为您量身定做，制定解决方案，出签率高，为您省时、省力、省心，轻松获得签证，让您的出行更加便捷！</p>'
+      { key: 'about-1', title: '简介', anchor: 'section1'},
+      { key: 'about-2', title: '为什么选择我们', anchor: 'section2'},
+      { key: 'about-3', title: '联系我们', anchor: 'section3',content:
+      
+        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><QqOutlined />&nbsp;&nbsp;&nbsp;466830255</span></a></p>'+
+        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><WechatOutlined />&nbsp;&nbsp;&nbsp;mingdong1129</span></a></p>'+
+        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><PhoneOutlined />&nbsp;&nbsp;&nbsp;18710181258</span></a></p>'+
+        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><MailOutlined />&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a></p>'
        },
     ],
   },
@@ -59,9 +27,9 @@ const menuData = [
     key: 'copyright',
     title: '版权申明',
     children: [
-      { key: 'copyright-1', title: '风险提示', anchor: 'section4' ,content:''},
-      { key: 'copyright-2', title: '免责申明', anchor: 'section5' ,content:''},
-      { key: 'copyright-3', title: '版权说明', anchor: 'section6' ,content:''},
+      { key: 'copyright-1', title: '风险提示', anchor: 'section4',content:''},
+      { key: 'copyright-2', title: '免责申明', anchor: 'section5',content:''},
+      { key: 'copyright-3', title: '版权说明', anchor: 'section6',content:''},
       { key: 'copyright-4', title: '开源协议', anchor: 'section7',content:''},
     ],
   },
@@ -77,11 +45,11 @@ const menuData = [
     key: 'questions',
     title: '常见问题',
     children: [
-      { key: 'questions-1', title: '什么是代币质押？', anchor: 'section10' ,content:''},
-      { key: 'questions-2', title: '如何获取收益？', anchor: 'section11' ,content:''},
-      { key: 'questions-3', title: '中途退出怎么办？', anchor: 'section12' ,content:''},
+      { key: 'questions-1', title: '什么是代币质押？', anchor: 'section10',content:''},
+      { key: 'questions-2', title: '如何获取收益？', anchor: 'section11',content:''},
+      { key: 'questions-3', title: '中途退出怎么办？', anchor: 'section12',content:''},
       { key: 'questions-4', title: '质押的代币有风险吗？', anchor: 'section13',content:'' },
-      { key: 'questions-5', title: '质押的代币用来干什么？', anchor: 'section14' ,content:''},
+      { key: 'questions-5', title: '质押的代币用来干什么？', anchor: 'section14',content:''},
     ],
   }
 ];
@@ -116,6 +84,11 @@ const About = () => {
           if(subItem.key == key){
             setSelectedKey(itm.key);
             setSubSelectedKey(subItem.key);
+            // 新增：滚动到相应的锚点位置
+            const anchorElement = document.getElementById(key);
+            if (anchorElement) {
+              anchorElement.scrollIntoView({ behavior: 'smooth' });
+            }
           }
         })
       }
@@ -128,25 +101,81 @@ const About = () => {
     if(cur){
       setSelectedKey(cur.key)
       setSubSelectedKey(cur.children[0].key)
+
     }
     
   };
 
   const renderBreadcrumb = () => {
-    return (
-      <Breadcrumb>
-        <Breadcrumb.Item><Link to="/home">首页</Link></Breadcrumb.Item>
-        <Breadcrumb.Item><Link to="/about" onClick={(event) => handleBreadcrumbClick(event, 'about')}>关于我们</Link></Breadcrumb.Item>
-        {menuData.map((item) => (
-          item.key === selectedKey && (
-            <Breadcrumb.Item key={item.key}>
-              <Link to={`/${item.key}`} onClick={(event) => handleBreadcrumbClick(event, item.key)}>{item.title}</Link>
-            </Breadcrumb.Item>
-          )
-        ))}
-      </Breadcrumb>
-    );
+    const curMenu =  menuData.find( item => item.key===selectedKey)
+    const itemDatas = [
+      {
+        title:<Link to="/home">首页</Link>
+      },{
+        title:<Link to="/about" onClick={(event) => handleBreadcrumbClick(event, 'about')}>关于我们</Link>,
+      }
+    ]
+   
+    if(curMenu){
+      console.info("curMenu:"+curMenu.title)
+      itemDatas.push({
+        title:<Link to={curMenu.key} onClick={(event) => handleBreadcrumbClick(event, curMenu.key)}>{curMenu.title}</Link>
+      })
+    }
+    return ( <Breadcrumb items={itemDatas}/>);
   };
+
+  //根据key生成实际内容组件页面
+  const creatContent = (key:string) =>{
+      if(key==="about-1"){
+        return (<><div><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在当今数字化浪潮蓬勃发展的时代，加密货币领域不断涌现出创新的金融模式，RCC 代币质押平台应运而生，为广大投资者提供了一个极具潜力的财富增值渠道。</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RCC 代币质押平台专注于比特币质押服务，致力于打造高效、透明、安全的一站式体验。首先，说到高效，平台依托先进的区块链技术架构，实现了质押流程的极速处理。用户只需简单几步操作，即可完成比特币的质押，瞬间开启收益之旅，无需繁琐的等待与复杂的审核环节，节省了大量时间成本，让资金快速流转产生价值</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;透明性更是平台的核心亮点之一。所有的质押数据、收益明细都清晰地记录在区块链上，不可篡改且面向所有用户公开。投资者能够实时追踪自己质押比特币的状态，了解每一笔 R 币收益的来源，这种高度透明给予用户十足的信任感，使其在投资过程中心中有数。</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;而安全保障方面，平台采用了多重加密技术，从钱包存储到交易验证，全方位守护用户资产安全。同时，配备专业的安全团队，24 小时监控系统，及时应对任何潜在风险，确保比特币资产固若金汤，让投资者毫无后顾之忧。</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;质押比特币后，用户将按一定比例赢取 R 币。随着加密市场的动态变化，R 币展现出强劲的升值潜力。当 R 币价值攀升，用户便可在本平台便捷地兑换丰厚奖金，实现资产的稳健增长。无论是追求短期收益，还是布局长期财富规划，RCC 代币质押平台都凭借其独特优势，成为投资者在数字金融海洋中的可靠领航员，助力开启全新的财富篇章</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;未来，RCC 代币质押平台还将持续优化升级，紧跟行业趋势，为用户创造更多价值，携手共赴加密财富的璀璨未来。</p></div></>)
+      }else if(key ==="about-2"){
+        return (<><div><List size="large">
+                  <Item>
+                   <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;技术领先，高效便捷: </strong>依托前沿的区块链技术架构，简化质押流程至极致。用户仅需简单几步，就能闪电般完成比特币质押，快速开启收益，彻底告别繁琐等待与复杂审核，让资金时刻保持高效运转，不错过任何增值机会。</span>
+                  </Item>
+                  <Item>
+                     <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;极致透明，安心托付: </strong>所有质押相关数据、收益细节均如实记录于区块链之上，不可篡改且面向全体用户公开，<span className="text-danger">并且可以随时退出</span>。投资者能实时掌握质押比特币动态，清楚知晓每一笔 R 币收益来源，如同将资产置于阳光之下，给予您满满的安全感与信任感</span>
+                  </Item>
+                  <Item>
+                     <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;多重防护，资产无忧: </strong>深知资产安全至关重要，平台采用多重加密技术，从钱包存储到每一笔交易验证，层层设防。搭配专业的 24 小时安全监控团队，时刻警惕潜在风险，确保比特币资产稳如泰山，让您投资无后顾之忧</span>
+                  </Item>
+                <Item>
+                   <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;潜力币种，丰厚回报: </strong>质押比特币可赢取具有强劲升值潜力的 R 币。随着加密市场的风云变幻，R 币价值一路看涨，为您开启财富增长新通道，凭借其增值红利，让资产实现稳健上扬。</span>
+                </Item>
+                <Item>
+                  <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;便捷兑换，落袋为安: </strong>当 R 币价值攀升，平台提供便捷流畅的奖金兑换服务。无需复杂手续，轻松一点，即可将升值收益兑换成丰厚奖金，让您的财富增长实实在在看得见、摸得着</span>
+                </Item>
+                <Item>
+                   <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;专业团队，护航全程: </strong>背后拥有一支由加密领域资深专家组成的专业团队，他们精通市场趋势、技术运维、风险管控。无论是日常运营，还是面对复杂多变的市场行情，都能为您的投资之旅保驾护航。</span>
+                </Item>
+                <Item>
+                 <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;持续创新，紧跟潮流: </strong>深知加密行业瞬息万变，平台始终保持敏锐嗅觉，持续投入研发，不断优化升级服务与功能，确保您始终站在行业前沿，享受最新、最优的投资体验，携手共赴财富新征程。</span>
+                </Item>
+                <Item>
+                  <span><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用户至上，贴心服务: </strong>将用户需求放在首位，打造全方位、多层次的客户服务体系。无论您是初涉加密领域的新手，还是经验丰富的老手，遇到任何问题，专业客服团队都能随时为您答疑解惑，提供贴心、周到的服务支持。</span>
+                </Item>
+         </List>
+          </div></>)
+      }else if(key==="about-3"){
+        return(<>
+          <List size='small'>
+              <Item>
+                <a href="#!"><QqOutlined />&nbsp;&nbsp;&nbsp;466830255</a>
+              </Item>
+              <Item>
+              <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><WechatOutlined />&nbsp;&nbsp;&nbsp;mingdong1129</span></a>
+              </Item>
+              <Item>
+              <a><span className="img-avatar img-avatar-48 bg-translucent text-warning"><PhoneOutlined />&nbsp;&nbsp;&nbsp;18710181258</span></a>
+              </Item>
+              <Item>
+              <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><MailOutlined />&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a>
+              </Item>
+          </List>
+          </>)
+      }
+  }
 
 
   const renderContent = () => {
@@ -168,9 +197,9 @@ const About = () => {
        {
         selectedItem && selectedItem.children.map(subItm => {
           return (
-            <div>
+            <div id={subItm.key} key={subItm.key}>
               <div><span className="text-info" style={{fontSize:'20px'}}><strong>{subItm.title}</strong></span></div>
-              {subItm.content? <div dangerouslySetInnerHTML={{ __html: subItm.content }}></div>:''}
+              {creatContent(subItm.key)}
               <Divider dashed />
             </div>
           );
@@ -192,7 +221,7 @@ const About = () => {
         {/* 页面主体部分，分为左右布局 */}
         <Layout style={{ padding: '0 0', flex: 1 }}>
           {/* 左侧二级导航菜单 */}
-          <Sider width={300} style={{ background: '#fff' }}>
+          <Sider width={300} style={{ background: '#fff'}}> {/* 添加 position: fixed */}
             <Menu
               mode="inline"
               defaultSelectedKeys={[menuData[0].key]}
@@ -200,21 +229,22 @@ const About = () => {
               onClick={handleMenuClick}
               selectedKeys={[selectedKey]}
               style={{ backgroundColor: '#fff' }}
-            >
-              {menuData.map((menuItem) => (
-                <Menu.SubMenu key={menuItem.key} title={menuItem.title}>
-                  {menuItem.children.map((subMenuItem) => (
-                    <Menu.Item key={subMenuItem.key} style={{ backgroundColor: selectedKey === menuItem.key && subSelectedKey === subMenuItem.key? '#E6F4FF' : '#fff' }}>
-                      {subMenuItem.title}
-                    </Menu.Item>
-                  ))}
-                </Menu.SubMenu>
-              ))}
-            </Menu>
+              items={menuData.map(menuItem =>({
+                key:menuItem.key,
+                label:menuItem.title,
+                children:menuItem.children.map(subMenuItem =>({
+                  key:subMenuItem.key,
+                  label:subMenuItem.title,
+                  style: {
+                     backgroundColor: selectedKey === menuItem.key && subSelectedKey === subMenuItem.key? '#E6F4FF' : '#fff' 
+                    }
+                }))
+              }))}
+            />
           </Sider>
           {/* 右侧内容区域 */}
-          <Content style={{ padding: '24px 0', backgroundColor: '#fff',overflowY:'auto' }}>
-          <div style={{ overflow: '-moz-scrollbars-none', '-ms-overflow-style': 'none', overflowY: 'scroll', scrollbarWidth: 'none' }}>
+          <Content style={{ padding: '24px 0', backgroundColor: '#fff', height: 'auto' }}>
+            <div className={classnames(css.content)}>
               {renderContent()}
             </div>
           </Content>
