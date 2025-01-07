@@ -159,18 +159,18 @@ const About = () => {
           </div></>)
       }else if(key==="about-3"){
         return(<>
-          <List size='small'>
-              <Item>
-                <a href="#!"><QqOutlined />&nbsp;&nbsp;&nbsp;466830255</a>
+          <List size='small' style={{fontSize:'18px'}} className="text-success">
+              <Item >
+                <QqOutlined />&nbsp;&nbsp;&nbsp;<span>466830255</span>
               </Item>
               <Item>
-              <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><WechatOutlined />&nbsp;&nbsp;&nbsp;mingdong1129</span></a>
+              <WechatOutlined />&nbsp;&nbsp;&nbsp;<span>mingdong1129</span>
               </Item>
               <Item>
-              <a><span className="img-avatar img-avatar-48 bg-translucent text-warning"><PhoneOutlined />&nbsp;&nbsp;&nbsp;18710181258</span></a>
+              <PhoneOutlined />&nbsp;&nbsp;&nbsp;<span>18710181258</span>
               </Item>
               <Item>
-              <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><MailOutlined />&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a>
+              <MailOutlined />&nbsp;&nbsp;&nbsp;<span>7023302@qq.com</span>
               </Item>
           </List>
           </>)
