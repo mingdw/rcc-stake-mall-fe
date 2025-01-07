@@ -14,42 +14,36 @@ const menuData = [
     children: [
       { key: 'about-1', title: '简介', anchor: 'section1'},
       { key: 'about-2', title: '为什么选择我们', anchor: 'section2'},
-      { key: 'about-3', title: '联系我们', anchor: 'section3',content:
-      
-        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><QqOutlined />&nbsp;&nbsp;&nbsp;466830255</span></a></p>'+
-        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><WechatOutlined />&nbsp;&nbsp;&nbsp;mingdong1129</span></a></p>'+
-        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><PhoneOutlined />&nbsp;&nbsp;&nbsp;18710181258</span></a></p>'+
-        '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><MailOutlined />&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a></p>'
-       },
+      { key: 'about-3', title: '联系我们', anchor: 'section3'},
     ],
   },
   {
     key: 'copyright',
     title: '版权申明',
     children: [
-      { key: 'copyright-1', title: '风险提示', anchor: 'section4',content:''},
-      { key: 'copyright-2', title: '免责申明', anchor: 'section5',content:''},
-      { key: 'copyright-3', title: '版权说明', anchor: 'section6',content:''},
-      { key: 'copyright-4', title: '开源协议', anchor: 'section7',content:''},
+      { key: 'copyright-1', title: '风险提示', anchor: 'section4'},
+      { key: 'copyright-2', title: '免责申明', anchor: 'section5'},
+      { key: 'copyright-3', title: '版权说明', anchor: 'section6'},
+      { key: 'copyright-4', title: '开源协议', anchor: 'section7'},
     ],
   },
   {
     key: 'service',
     title: '服务协议',
     children: [
-      { key: 'service-1', title: '子菜单2-1', anchor: 'section8',content:'' },
-      { key: 'service-2', title: '子菜单2-2', anchor: 'section9',content:'' },
+      { key: 'service-1', title: '子菜单2-1', anchor: 'section8' },
+      { key: 'service-2', title: '子菜单2-2', anchor: 'section9' },
     ],
   },
   {
     key: 'questions',
     title: '常见问题',
     children: [
-      { key: 'questions-1', title: '什么是代币质押？', anchor: 'section10',content:''},
-      { key: 'questions-2', title: '如何获取收益？', anchor: 'section11',content:''},
-      { key: 'questions-3', title: '中途退出怎么办？', anchor: 'section12',content:''},
-      { key: 'questions-4', title: '质押的代币有风险吗？', anchor: 'section13',content:'' },
-      { key: 'questions-5', title: '质押的代币用来干什么？', anchor: 'section14',content:''},
+      { key: 'questions-1', title: '什么是代币质押？', anchor: 'section10'},
+      { key: 'questions-2', title: '如何获取收益？', anchor: 'section11'},
+      { key: 'questions-3', title: '中途退出怎么办？', anchor: 'section12'},
+      { key: 'questions-4', title: '质押的代币有风险吗？', anchor: 'section13' },
+      { key: 'questions-5', title: '质押的代币用来干什么？', anchor: 'section14'},
     ],
   }
 ];
@@ -174,6 +168,8 @@ const About = () => {
               </Item>
           </List>
           </>)
+      }else if(key ===""){
+
       }
   }
 
