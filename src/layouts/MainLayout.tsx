@@ -8,7 +8,7 @@ import classnames from 'classnames';
 import mainCss from './MainLayout.module.scss'
 import Search from 'antd/es/input/Search';
 import { useTranslation  } from 'react-i18next';
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { type BaseError } from 'viem'
 import { injected } from 'wagmi/connectors'
@@ -44,12 +44,14 @@ const MainLayout: FC = () => {
   const { address, isConnected } = useAccount()
   const { connectAsync, error, isPending } = useConnect()
   const { disconnect } = useDisconnect()
+  const { openConnectModal } = useConnectModal()
 
   // 处理连接钱包
   const handleConnectWallet = async () => {
     try {
-      await connectAsync({ connector: injected() })
-      console.info(address+"; "+isConnected)
+      if (openConnectModal) {
+        openConnectModal()
+      }
     } catch (error) {
       console.error('Failed to connect:', error)
       if ((error as Error).message.includes('Provider not found')) {
