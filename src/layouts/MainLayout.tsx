@@ -1,7 +1,7 @@
 import React,{FC,useState} from 'react';
 import { HomeOutlined,ShoppingOutlined,AppstoreOutlined,TransactionOutlined,TeamOutlined,UserOutlined } from '@ant-design/icons';
 import type { MenuProps,Input } from 'antd';
-import {  Col, Row, Layout, Menu, theme, Space,Select, Button,Image  } from 'antd';
+import {  Col, Row, Layout, Menu, theme, Space,Select, Button,Image, Dropdown, Typography  } from 'antd';
 import { Outlet,useNavigate   } from 'react-router-dom';
 import classnames from 'classnames';
 
@@ -9,9 +9,10 @@ import mainCss from './MainLayout.module.scss'
 import Search from 'antd/es/input/Search';
 import { useTranslation  } from 'react-i18next';
 import { useConnectModal } from '@rainbow-me/rainbowkit'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { useAccount, useDisconnect, useBalance, useChainId, useConfig } from 'wagmi'
 import { type BaseError } from 'viem'
 import { injected } from 'wagmi/connectors'
+import { mainnet, sepolia } from 'wagmi/chains';
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -38,29 +39,54 @@ const languges = [{
 },
 
 ]
-
+type MenuItem = Required<MenuProps>['items'][number];
 
 const MainLayout: FC = () => {
   const { address, isConnected } = useAccount()
-  const { connectAsync, error, isPending } = useConnect()
   const { disconnect } = useDisconnect()
+  const chainId = useChainId()
+  const config = useConfig()
   const { openConnectModal } = useConnectModal()
+  const { data: balance } = useBalance({
+    address: address,
+    chainId: chainId
+  })
+  
+  const currentChain = config.chains.find(chain => chain.id === chainId)
+  // 支持的网络列表
+  const supportedChains = [mainnet, sepolia]
 
   // 处理连接钱包
-  const handleConnectWallet = async () => {
-    try {
-      if (openConnectModal) {
-        openConnectModal()
-      }
-    } catch (error) {
-      console.error('Failed to connect:', error)
-      if ((error as Error).message.includes('Provider not found')) {
-        alert('请先安装 MetaMask 钱包！')
-      }
+  const handleConnectWallet = () => {
+    if (openConnectModal) {
+      openConnectModal()
     }
   }
 
-  type MenuItem = Required<MenuProps>['items'][number];
+  // 钱包菜单项
+  const walletItems: MenuItem[] = [
+    {
+      key: 'disconnect',
+      label: '断开连接',
+      onClick: () => disconnect()
+    }
+  ]
+
+  // 网络切换菜单项
+  const networkItems: MenuItem[] = supportedChains.map((item) => ({
+    key: item.id.toString(),
+    label: item.name,
+    onClick: () => {
+      if (window.ethereum) {
+        window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${item.id.toString(16)}` }],
+        }).catch((error: any) => {
+          console.error('切换网络失败:', error)
+        })
+      }
+    }
+  }))
   const [current, setCurrent] = useState('home');
   const navigate = useNavigate()
 
@@ -110,7 +136,38 @@ const MainLayout: FC = () => {
     const onSearch = (value: string) => {
       navigate('/transactionList')
     };
-
+   
+  
+    const WalletContent = () => (
+      <Dropdown 
+        menu={{ items: walletItems }} 
+        trigger={['click']} 
+        placement="bottomRight"
+      >
+        <Button>
+          <Space>
+            <Dropdown 
+              menu={{ items: networkItems }} 
+              trigger={['click']} 
+              placement="bottomLeft"
+            >
+              <Typography.Text>
+                {currentChain?.name || '选择网络'}
+              </Typography.Text>
+            </Dropdown>
+            <span>
+              {address?.slice(0, 6)}...{address?.slice(-4)}
+            </span>
+            {balance && (
+              <span>
+                {parseFloat(balance.formatted).toFixed(4)} {balance.symbol}
+              </span>
+            )}
+          </Space>
+        </Button>
+      </Dropdown>
+    
+    )
   return (
     <Layout>
       <Header style={{ display: 'flex',backgroundColor:'white',height:'15%' }}>
@@ -130,11 +187,18 @@ const MainLayout: FC = () => {
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Space direction='horizontal' align='center'>
               <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
-              <Button size={"middle"} icon={<UserOutlined />}   onClick={handleConnectWallet}>{t('walletconnect')}</Button>
+              {isConnected ? (
+                <WalletContent />
+              ) : (
+                <Button size={"middle"} icon={<UserOutlined />} onClick={handleConnectWallet}>
+                  {t('walletconnect')}
+                </Button>
+              )}
             </Space>
           </Col>
+         
         </Row>
-       
+
       
       </Header>
       <Content style={{ padding: '0 48px' }}>
