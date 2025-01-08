@@ -8,6 +8,7 @@ import classnames from 'classnames';
 import mainCss from './MainLayout.module.scss'
 import Search from 'antd/es/input/Search';
 import { useTranslation  } from 'react-i18next';
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -109,6 +110,7 @@ const items: MenuItem[] = [
             <Space direction='horizontal' align='center'>
               <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
               <Button size={"middle"} icon={<UserOutlined />} >{t('walletconnect')}</Button>
+              <ConnectButton />
             </Space>
           </Col>
         </Row>

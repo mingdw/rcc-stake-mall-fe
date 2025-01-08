@@ -5,6 +5,8 @@ import i18next from 'i18next';
 import { I18nextProvider } from 'react-i18next';
 import enTranslation from './locales/en-US.json'
 import zhTranslation from './locales/zh-CN.json';
+import '@rainbow-me/rainbowkit/styles.css'
+import { Providers } from './providers'
 
 i18next.init({
   interpolation: { escapeValue: false },  // React 已经处理了 XSS
@@ -18,7 +20,10 @@ i18next.init({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
   <I18nextProvider i18n={i18next}>
-    <App />
+  <Providers>
+      <App />
+    </Providers>
+   
   </I18nextProvider>,
   </StrictMode>,
 )

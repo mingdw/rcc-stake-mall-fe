@@ -12,37 +12,38 @@ const menuData = [
     key: 'about',
     title: '关于我们',
     children: [
-      { key: 'about-1', title: '简介', anchor: 'section1'},
-      { key: 'about-2', title: '为什么选择我们', anchor: 'section2'},
-      { key: 'about-3', title: '联系我们', anchor: 'section3'},
+      { key: 'about-1', title: '简介'},
+      { key: 'about-2', title: '为什么选择我们'},
+      { key: 'about-3', title: '联系我们'},
     ],
   },
   {
     key: 'copyright',
     title: '版权申明',
     children: [
-      { key: 'copyright-1', title: '风险提示', anchor: 'section4'},
-      { key: 'copyright-2', title: '免责申明', anchor: 'section5'},
-      { key: 'copyright-3', title: '版权说明', anchor: 'section6'},
-      { key: 'copyright-4', title: '开源协议', anchor: 'section7'},
+      { key: 'copyright-1', title: '风险提示'},
+      { key: 'copyright-2', title: '免责申明'},
+      { key: 'copyright-3', title: '版权说明'},
+      { key: 'copyright-4', title: '开源协议'},
     ],
   },
   {
     key: 'service',
     title: '服务协议',
     children: [
-      { key: 'service-1', title: '服务与协议详情', anchor: 'section8' }
+      { key: 'service-1', title: '服务与协议详情'}
     ],
   },
   {
     key: 'questions',
     title: '常见问题',
     children: [
-      { key: 'questions-1', title: '什么是代币质押？', anchor: 'section10'},
-      { key: 'questions-2', title: '如何获取收益？', anchor: 'section11'},
-      { key: 'questions-3', title: '中途退出怎么办？', anchor: 'section12'},
-      { key: 'questions-4', title: '质押的代币有风险吗？', anchor: 'section13' },
-      { key: 'questions-5', title: '质押的代币用来干什么？', anchor: 'section14'},
+      { key: 'questions-1', title: 'Q1.什么是RCC代币质押？'},
+      { key: 'questions-2', title: 'Q2.如何获取收益？'},
+      { key: 'questions-3', title: 'Q3.中途退出怎么办？'},
+      { key: 'questions-4', title: 'Q4.质押的代币有风险吗？'},
+      { key: 'questions-5', title: 'Q5.质押的代币用来干什么？'},
+      { key: 'questions-6', title: 'Q6.平台如何盈利？'},
     ],
   }
 ];
@@ -56,7 +57,7 @@ const About = () => {
 
   useEffect(() => {
     const hash = location.hash.replace('#', '');
-    const foundItem = menuData.flatMap(item => item.children).find(child => child.anchor === hash);
+    const foundItem = menuData.flatMap(item => item.children).find(child => child.key === hash);
     if (foundItem) {
       setSubSelectedKey(foundItem.key);
       // 滚动到对应的锚点位置
@@ -112,7 +113,6 @@ const About = () => {
     ]
    
     if(curMenu){
-      console.info("curMenu:"+curMenu.title)
       itemDatas.push({
         title:<Link to={curMenu.key} onClick={(event) => handleBreadcrumbClick(event, curMenu.key)}>{curMenu.title}</Link>
       })
@@ -480,7 +480,49 @@ const About = () => {
             </div>
           </div>
         </>)
-      }
+      }else if(key==="questions-1"){
+          return(<>
+            <div>
+              <br/>
+                <div>RCC代币质押支持ERC20、ERC271、以太坊等币种的质押，平台收取部分手续费作为平台运营使用，用户通过质押代币可以获取平台R币作为回报，R币作为平台币可以换取平台奖励</div>
+            </div>
+          </>)
+      }else if(key==="questions-2"){
+        return(<>
+          <div>
+            <br/>
+              <div>选中喜欢的质押池，质押获取收益，中途随时可以解除质押</div>
+          </div>
+        </>)
+    }else if(key==="questions-3"){
+      return(<>
+        <div>
+          <br/>
+            <div>如果中途退出，返回用户本金（扣除少量手续费）</div>
+        </div>
+      </>)
+  }else if(key==="questions-4"){
+    return(<>
+      <div>
+        <br/>
+          <div>用户每币质押资金去向透明可查，随时可以解除质押，不做任何限制</div>
+      </div>
+    </>)
+}else if(key==="questions-5"){
+  return(<>
+    <div>
+      <br/>
+        <div>质押的代币平台不做任何投资，纯属技术交流</div>
+    </div>
+  </>)
+} else if(key==="questions-6"){
+  return(<>
+    <div>
+      <br/>
+        <div>平台收取少量手续费作为日常维护</div>
+    </div>
+  </>)
+} 
   }
 
 
@@ -515,7 +557,6 @@ const About = () => {
     );
   };
 
-
   return (
     <div style={{marginLeft:'5%'}}>
       <Layout style={{ height: '100vh', width: '100%' }}>
@@ -531,9 +572,10 @@ const About = () => {
             <Menu
               mode="inline"
               defaultSelectedKeys={[menuData[0].key]}
-              defaultOpenKeys={menuData.map((item) => item.key)}
+              defaultOpenKeys={[selectedKey]}
               onClick={handleMenuClick}
               selectedKeys={[selectedKey]}
+            
               items={menuData.map(menuItem =>({
                 key:menuItem.key,
                 label:menuItem.title,
@@ -541,7 +583,7 @@ const About = () => {
                   key:subMenuItem.key,
                   label:subMenuItem.title,
                   style: {
-                     backgroundColor: selectedKey === menuItem.key && subSelectedKey === subMenuItem.key? '#E6F4FF' : '#fff' 
+                     backgroundColor: selectedKey === menuItem.key && subSelectedKey === subMenuItem.key? '#E6F4FF' :'#fff' 
                     }
                 }))
               }))}
@@ -559,6 +601,7 @@ const About = () => {
     
   );
 };
+
 
 
 export default About;

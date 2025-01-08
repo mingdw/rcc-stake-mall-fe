@@ -475,6 +475,7 @@ const Home: FC = () => {
                 </h5>
                 <div className="col w-80" style={{textAlign:'left',fontSize:'18px',padding:'5px'}}>
                   <table className="table table-borderless">
+                    <tbody>
                     <tr>
                       <td><a href="#!" className="badge badge-pill badge-success">{t('body.right.hot.tag.running')}</a></td>
                       <td><a href="#!" className="badge badge-pill badge-warning">{t('body.right.hot.tag.most.user')}</a></td>
@@ -487,6 +488,8 @@ const Home: FC = () => {
                       <td><a href="#!" className="badge badge-pill badge-info">{t('body.right.hot.tag.no.usdt')}</a></td>
                       <td></td>
                     </tr>
+                    </tbody>
+                    
                   </table>
                 </div>
               
