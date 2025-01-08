@@ -9,6 +9,9 @@ import mainCss from './MainLayout.module.scss'
 import Search from 'antd/es/input/Search';
 import { useTranslation  } from 'react-i18next';
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { type BaseError } from 'viem'
+import { injected } from 'wagmi/connectors'
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -38,58 +41,74 @@ const languges = [{
 
 
 const MainLayout: FC = () => {
+  const { address, isConnected } = useAccount()
+  const { connectAsync, error, isPending } = useConnect()
+  const { disconnect } = useDisconnect()
+
+  // 处理连接钱包
+  const handleConnectWallet = async () => {
+    try {
+      await connectAsync({ connector: injected() })
+      console.info(address+"; "+isConnected)
+    } catch (error) {
+      console.error('Failed to connect:', error)
+      if ((error as Error).message.includes('Provider not found')) {
+        alert('请先安装 MetaMask 钱包！')
+      }
+    }
+  }
+
+  type MenuItem = Required<MenuProps>['items'][number];
+  const [current, setCurrent] = useState('home');
+  const navigate = useNavigate()
+
+  const {t, i18n } = useTranslation();
+  const items: MenuItem[] = [
+    {
+      label: t('header.nav.home'),
+      key: HOME_PATH_NAME,
+      icon:<HomeOutlined />,
+    },
+    {
+      label:  t('header.nav.pool'),
+      key: POOL_PATH_NAME,
+      icon: <ShoppingOutlined />,
+    },
+    {
+      label:  t('header.nav.pledge'),
+      key: PlEDGE_PATH_NAME,
+      icon: <AppstoreOutlined />,
+    },
+
+   {
+      label:  t('header.nav.prize'),
+      key: PRIZE_PATH_NAME,
+      icon: <TransactionOutlined />,
+    },
+    {
+      label:  t('header.nav.about'),
+      key: ABOUT_PATH_NAME,
+      icon: <TeamOutlined />
+    },
+
+  ];
 
 
-type MenuItem = Required<MenuProps>['items'][number];
-const [current, setCurrent] = useState('home');
-const navigate = useNavigate()
+    const onClick: MenuProps['onClick'] = (e) => {
+      console.log('click ', e);
+      setCurrent(e.key);
+      navigate('/'+e.key)
+    };
 
-const {t, i18n } = useTranslation();
-const items: MenuItem[] = [
-  {
-    label: t('header.nav.home'),
-    key: HOME_PATH_NAME,
-    icon:<HomeOutlined />,
-  },
-  {
-    label:  t('header.nav.pool'),
-    key: POOL_PATH_NAME,
-    icon: <ShoppingOutlined />,
-  },
-  {
-    label:  t('header.nav.pledge'),
-    key: PlEDGE_PATH_NAME,
-    icon: <AppstoreOutlined />,
-  },
+    const handleChange = (value: string) => {
+      console.info("选择语言： ",value)
+      i18n.changeLanguage(value)
+    };
 
- {
-    label:  t('header.nav.prize'),
-    key: PRIZE_PATH_NAME,
-    icon: <TransactionOutlined />,
-  },
-  {
-    label:  t('header.nav.about'),
-    key: ABOUT_PATH_NAME,
-    icon: <TeamOutlined />
-  },
+    const onSearch = (value: string) => {
+      navigate('/transactionList')
+    };
 
-];
-
-
-  const onClick: MenuProps['onClick'] = (e) => {
-    console.log('click ', e);
-    setCurrent(e.key);
-    navigate('/'+e.key)
-  };
-
-  const handleChange = (value: string) => {
-    console.info("选择语言： ",value)
-    i18n.changeLanguage(value)
-  };
-
-  const onSearch = (value: string) => {
-    navigate('/transactionList')
-  };
   return (
     <Layout>
       <Header style={{ display: 'flex',backgroundColor:'white',height:'15%' }}>
@@ -109,8 +128,7 @@ const items: MenuItem[] = [
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Space direction='horizontal' align='center'>
               <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
-              <Button size={"middle"} icon={<UserOutlined />} >{t('walletconnect')}</Button>
-              <ConnectButton />
+              <Button size={"middle"} icon={<UserOutlined />}   onClick={handleConnectWallet}>{t('walletconnect')}</Button>
             </Space>
           </Col>
         </Row>
