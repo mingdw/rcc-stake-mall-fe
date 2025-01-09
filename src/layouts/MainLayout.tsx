@@ -1,6 +1,6 @@
 import React,{FC,useState} from 'react';
-import { HomeOutlined,ShoppingOutlined,AppstoreOutlined,TransactionOutlined,TeamOutlined,UserOutlined } from '@ant-design/icons';
-import type { MenuProps,Input } from 'antd';
+import { HomeOutlined,ShoppingOutlined,AppstoreOutlined,TransactionOutlined,TeamOutlined,UserOutlined, CopyFilled, CopyOutlined } from '@ant-design/icons';
+import { MenuProps,Input, Avatar, List, Divider } from 'antd';
 import {  Col, Row, Layout, Menu, theme, Space,Select, Button,Image, Dropdown, Typography  } from 'antd';
 import { Outlet,useNavigate   } from 'react-router-dom';
 import classnames from 'classnames';
@@ -13,6 +13,10 @@ import { useAccount, useDisconnect, useBalance, useChainId, useConfig } from 'wa
 import { type BaseError } from 'viem'
 import { injected } from 'wagmi/connectors'
 import { mainnet, sepolia } from 'wagmi/chains';
+import Compact from 'antd/es/space/Compact';
+import Item from 'antd/es/list/Item';
+import Paragraph from 'antd/es/typography/Paragraph';
+
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -40,9 +44,15 @@ const languges = [{
 
 ]
 type MenuItem = Required<MenuProps>['items'][number];
+const defaultAddeess = "qc502sd...Kj52"
 
+
+
+
+const { useToken } = theme;
 const MainLayout: FC = () => {
   const { address, isConnected } = useAccount()
+  const [tconnect, setTconnect] = useState(false); //
   const { disconnect } = useDisconnect()
   const chainId = useChainId()
   const config = useConfig()
@@ -54,12 +64,14 @@ const MainLayout: FC = () => {
   
   const currentChain = config.chains.find(chain => chain.id === chainId)
   // 支持的网络列表
-  const supportedChains = [mainnet, sepolia]
+  const supportedChains = [  { label: mainnet.name, value: mainnet.id },
+    { label: sepolia.name, value: sepolia.id }]
 
   // 处理连接钱包
   const handleConnectWallet = () => {
+    setTconnect(true); // 默认设置为已连接
     if (openConnectModal) {
-      openConnectModal()
+      //openConnectModal()
     }
   }
 
@@ -74,13 +86,13 @@ const MainLayout: FC = () => {
 
   // 网络切换菜单项
   const networkItems: MenuItem[] = supportedChains.map((item) => ({
-    key: item.id.toString(),
-    label: item.name,
+    key: item.value.toString(),
+    label: item.label,
     onClick: () => {
       if (window.ethereum) {
         window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: `0x${item.id.toString(16)}` }],
+          params: [{ chainId: `0x${item.value.toString(16)}` }],
         }).catch((error: any) => {
           console.error('切换网络失败:', error)
         })
@@ -120,8 +132,30 @@ const MainLayout: FC = () => {
     },
 
   ];
-
-
+  const items2: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <Avatar icon={<UserOutlined />} />
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <Paragraph copyable>{defaultAddeess}</Paragraph>
+      ),
+     
+    },
+    {
+      key: '3',
+      label: (
+        <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+          3rd menu item (disabled)
+        </a>
+      ),
+      disabled: true,
+    },
+  ];
     const onClick: MenuProps['onClick'] = (e) => {
       console.log('click ', e);
       setCurrent(e.key);
@@ -139,62 +173,76 @@ const MainLayout: FC = () => {
    
   
     const WalletContent = () => (
-      <Dropdown 
-        menu={{ items: walletItems }} 
-        trigger={['click']} 
-        placement="bottomRight"
-      >
-        <Button>
-          <Space>
-            <Dropdown 
-              menu={{ items: networkItems }} 
-              trigger={['click']} 
-              placement="bottomLeft"
-            >
-              <Typography.Text>
-                {currentChain?.name || '选择网络'}
-              </Typography.Text>
-            </Dropdown>
-            <span>
-              {address?.slice(0, 6)}...{address?.slice(-4)}
-            </span>
-            {balance && (
-              <span>
-                {parseFloat(balance.formatted).toFixed(4)} {balance.symbol}
-              </span>
-            )}
-          </Space>
-        </Button>
-      </Dropdown>
-    
+      <div style={{textAlign:'right'}}>
+        <Space direction="vertical" size="small">
+          <Space.Compact>
+            
+          </Space.Compact>
+        </Space>
+      </div>
     )
+    const { Option } = Select;
+    const selectBefore = (
+      <Select defaultValue={supportedChains[1].value}>
+        {supportedChains.map((item) => (
+          <Option value={item.value}>{item.label}</Option>
+        ))}
+       
+      </Select>
+    );
+    const { useToken } = theme;
+    const { token } = useToken();
+    const contentStyle: React.CSSProperties = {
+      backgroundColor: token.colorBgElevated,
+      borderRadius: token.borderRadiusLG,
+      boxShadow: token.boxShadowSecondary,
+    };
+  
+    const menuStyle: React.CSSProperties = {
+      boxShadow: 'none',
+    };
   return (
     <Layout>
       <Header style={{ display: 'flex',backgroundColor:'white',height:'15%' }}>
-        <Row justify="space-around" style={{width:'100%',alignItems:'center'}}>
-          <Col style={{textAlign:'center'}}>
+        <Row style={{width:'100%',alignItems:'center'}}>
+          <Col style={{textAlign:'center'}} span={4}>
             <a href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle,mainCss.hcqFont,mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
           </Col>
-          <Col span={10} style={{backgroundColor:'green',textAlign:'center'}}>
-          <div style={{width:'100%'}}>
-            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}/>
-           
-          </div>
-        
+          <Col>
+            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} style={{marginLeft:'55px' }}/>
           </Col>
-          <Col style={{display:'flex',justifyContent:'center',alignItems:'center',fontSize:'8px'}}>
-            <Search size={"middle"} placeholder={t('header.search.placeholder')} title={t('header.search.title')} allowClear onSearch={onSearch}  style={{ width: 200 }} />
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <Space direction='horizontal' align='center'>
-              <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} />
-              {isConnected ? (
-                <WalletContent />
+        
+          <Col span={10} style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}}>
+              <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center'}}>
+                <Search size={"middle"} placeholder={t('header.search.placeholder')} title={t('header.search.title')} onSearch={onSearch}  style={{ width: 200 }} />
+                <Select   size={"middle"} defaultValue="简体中文"  onChange={handleChange} options={languges} style={{marginLeft:'10px'}}/>
+              {tconnect ? (
+                <Dropdown
+                menu={{items:items2 }}
+                dropdownRender={(menu) => (
+                  <div style={contentStyle}>
+                    {React.cloneElement(
+                      menu as React.ReactElement<{
+                        style: React.CSSProperties;
+                      }>,
+                      { style: menuStyle },
+                    )}
+                    <Divider style={{ margin: 0 }} />
+                    <Space style={{ padding: 8 }}>
+                      <Button type="primary">Click me!</Button>
+                    </Space>
+                  </div>
+                )}
+              > <Input addonBefore={selectBefore}  defaultValue={defaultAddeess} style={{width:'200px',marginLeft:'10px'}}/></Dropdown>
+                
+                 
               ) : (
-                <Button size={"middle"} icon={<UserOutlined />} onClick={handleConnectWallet}>
+                <Button size={"middle"} icon={<UserOutlined />} onClick={handleConnectWallet} style={{marginLeft:'10px'}}>
                   {t('walletconnect')}
                 </Button>
               )}
-            </Space>
+            </div>
+               
           </Col>
          
         </Row>
