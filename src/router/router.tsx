@@ -11,6 +11,10 @@ import Prize from "../view/Prize/PrizeIndex";
 import NotFount from "../view/404";
 import TransactionList from "../view/Transaction/TransactionList";
 import Home from "../view/Home/HomeIndex";
+import AdminHome from "../view/Admin/AdminHome";
+import AdminPledge from "../view/Admin/AdminPledge";
+import AdminAccount from "../view/Admin/AdminAccount";
+import AdminContract from "../view/Admin/AdminContract";
 
 const router = createBrowserRouter([
     {
@@ -46,16 +50,42 @@ const router = createBrowserRouter([
                 path: '/transactionList',
                 element:<TransactionList/>
             },
+           
+            {
+                path: '/admin',
+                element: <AdminLayout/>,
+                children:[
+                    {
+                        path: '/admin',
+                        element: <AdminHome />
+                    },
+                    {
+                        path: '/admin/home',
+                        element: <AdminHome />
+                    },  
+                    {
+                        path: '/admin/pledge',
+                        element: <AdminPledge/>
+                    },
+                    {
+                        path: '/admin/account',
+                        element: <AdminAccount/>
+                    },
+                    {
+                        path: '/admin/contract',
+                        element: <AdminContract/>
+                    },
+                    
+                    
+                ]
+            },
             {
                 path: '*',
                 element:<NotFount/>
-            }
+            },
         ]
-    },
-    {
-        path: '/admin',
-        element: <AdminLayout/>
     }
+    
 ])
 
 export default router

@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
-import { LogoutOutlined, CheckOutlined, HomeOutlined, ShoppingOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyFilled, CopyOutlined, RightOutlined } from '@ant-design/icons';
-import { MenuProps, Input, Avatar, List, Divider, Tooltip, Tabs, Card } from 'antd';
+import {QuestionOutlined , LogoutOutlined, CheckOutlined, HomeOutlined, ShoppingOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined } from '@ant-design/icons';
+import { MenuProps, Input, Avatar, List, Divider, Tooltip, Tabs, Card, message } from 'antd';
 import { Col, Row, Layout, Menu, theme, Space, Select, Button, Image, Dropdown, Typography } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
@@ -116,7 +116,7 @@ const MainLayout: FC = () => {
   const walletStyle: React.CSSProperties = {
     width: '250px',
     height: 'auto',
-    textAlign: 'center',
+    textAlign: 'left',
     backgroundColor: '#fff',
     borderRadius: '10px',
     marginBottom: '20px'
@@ -128,60 +128,87 @@ const MainLayout: FC = () => {
     console.info("select key: " + key);
     if (key == 'disconnect' && tconnect) {
       setTconnect(false)
+    }else if(key == 'faqs'){
+        navigate('/about')
+    }else{
+      navigate('/admin')
     }
   }
 
   //登录成功后，显示钱包相关信息
   const WalletInfo = () => {
-  const { Option } = Select;
-  const [isCopy, setIsCopy] = useState(false);
-  const handleCopy = () => {
-    setIsCopy(true)
-  }
-  const accountMenu = [
-    {
-      key: 'account',
-      title: <Typography onClick={() => handleMenuClick('account')}>个人中心</Typography>,
-      icon: <UserOutlined className='text-info'/>,
-      children: [],
-    },
+    const { Option } = Select;
+    const [isCopy, setIsCopy] = useState(false);
 
-    {
-      key: 'pledge',
-      title: <Typography onClick={() => handleMenuClick('pledge')}>质押管理</Typography>,
-      icon: <AppstoreOutlined className='text-info'/>,
-      children: [],
-    },
-    {
-      key: 'contract',
-      title: <Typography onClick={() => handleMenuClick('contract')}>合约管理</Typography>,
-      icon: <TransactionOutlined className='text-info'/>,
-      children: [],
-    },
-    {
-      key: 'disconnect2',
-      title: '',
+    const handleCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(defaultAddeess);
+        setIsCopy(true);
+        message.success('地址复制成功！');
 
-    },
-    {
-      key: 'disconnect',
-      title: <Typography onClick={() => handleMenuClick('disconnect')}>退出登录</Typography>,
-      icon: <LogoutOutlined className='text-danger'/>,
-      children: [],
-    },
-    
-  ]
+        // 2秒后重置复制图标状态
+        setTimeout(() => {
+          setIsCopy(false);
+        }, 2000);
+      } catch (err) {
+        message.error('复制失败，请重试');
+      }
+    };
+    const accountMenu = [
+      {
+        key: 'account',
+        title: <Typography onClick={() => handleMenuClick('account')}>个人中心</Typography>,
+        icon: <UserOutlined className='text-info' />,
+        children: [],
+      },
+
+      {
+        key: 'pledge',
+        title: <Typography onClick={() => handleMenuClick('pledge')}>质押管理</Typography>,
+        icon: <AppstoreOutlined className='text-info' />,
+        children: [],
+      },
+      {
+        key: 'contract',
+        title: <Typography onClick={() => handleMenuClick('contract')}>合约管理</Typography>,
+        icon: <TransactionOutlined className='text-info' />,
+        children: [],
+      },
+      {
+        key: 'faqs',
+        title: <Typography onClick={() => handleMenuClick('faqs')}>常见问题</Typography>,
+        icon: <QuestionOutlined   className='text-info' />,
+        children: [],
+      },
+      {
+        key: 'disconnect2',
+        title: '',
+
+      },
+      {
+        key: 'disconnect',
+        title: <Typography onClick={() => handleMenuClick('disconnect')}>退出登录</Typography>,
+        icon: <LogoutOutlined className='text-danger' />,
+        children: [],
+      },
+
+    ]
 
     return (
       <Space direction="vertical" style={walletStyle} size={10}>
-        <div style={{marginTop:'20px'}}>
-            <Typography.Text>{defaultAddeess}</Typography.Text>&nbsp;&nbsp;&nbsp;
-            {isCopy ? <CheckOutlined  className='text-success'/> : <a href='#' onClick={handleCopy}><CopyOutlined className='text-defult'/></a>}
+        <div style={{ marginTop: '20px' }}>
+          <Avatar style={{ backgroundColor: '#87d068', fontSize: '16px', marginLeft: '20px' }} icon={<UserOutlined />} />&nbsp;&nbsp;&nbsp;<Typography.Text>{defaultAddeess}</Typography.Text>&nbsp;&nbsp;&nbsp;
+          {isCopy ?
+            <CheckOutlined className='text-success' /> :
+            <a onClick={handleCopy} style={{ cursor: 'pointer' }}>
+              <CopyOutlined className='text-defult' />
+            </a>
+          }
         </div>
-        <div>
+        <div style={{ textAlign: 'center' }}>
           <Row>
             <Col span={8}>
-              <span className='text-danger' style={{ fontSize: '12px'}}>
+              <span className='text-danger' style={{ fontSize: '12px' }}>
                 1.34 ETH
               </span><br />
               <span style={{ fontSize: '10px', color: 'gray' }}>
@@ -197,7 +224,7 @@ const MainLayout: FC = () => {
               </span>
             </Col>
             <Col span={8}>
-              <span className='text-danger' style={{ fontSize: '12px'}}>
+              <span className='text-danger' style={{ fontSize: '12px' }}>
                 126 R
               </span><br />
               <span style={{ fontSize: '10px', color: 'gray' }}>
@@ -230,7 +257,7 @@ const MainLayout: FC = () => {
       <Header style={{ display: 'flex', backgroundColor: 'white', height: '15%' }}>
         <Row style={{ width: '100%', alignItems: 'center' }}>
           <Col style={{ textAlign: 'left', width: '30%' }} >
-            <a style={{marginLeft:'10px'}} href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
+            <a style={{ marginLeft: '10px' }} href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
           </Col>
           <Col style={{ width: '40%' }}>
             <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
