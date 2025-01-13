@@ -11,10 +11,11 @@ import Prize from "../view/Prize/PrizeIndex";
 import NotFount from "../view/404";
 import TransactionList from "../view/Transaction/TransactionList";
 import Home from "../view/Home/HomeIndex";
-import AdminHome from "../view/Admin/AdminHome";
-import AdminPledge from "../view/Admin/AdminPledge";
-import AdminAccount from "../view/Admin/AdminAccount";
-import AdminContract from "../view/Admin/AdminContract";
+import ProfileInfo from "../view/Admin/Profile/ProfileInfo";
+import ProfileBalance from "../view/Admin/Profile/ProfileBalance";
+import SecuritySettings from "../view/Admin/Profile/SecuritySettings";
+import NotificationSettings from "../view/Admin/Profile/NotificationSettings";
+
 
 const router = createBrowserRouter([
     {
@@ -56,26 +57,26 @@ const router = createBrowserRouter([
                 element: <AdminLayout/>,
                 children:[
                     {
-                        path: '/admin',
-                        element: <AdminHome />
+                        path: '/admin/profile/info',
+                        element: <ProfileInfo />
                     },
                     {
-                        path: '/admin/home',
-                        element: <AdminHome />
+                        path: '/admin/profile/balance',
+                        element: <ProfileBalance />
                     },  
                     {
-                        path: '/admin/pledge',
-                        element: <AdminPledge/>
+                        path: '/admin/profile/security',
+                        element: <SecuritySettings/>
+                    },
+                   
+                    {
+                        path: '/admin/profile/history',
+                        element: <TransactionList/>
                     },
                     {
-                        path: '/admin/account',
-                        element: <AdminAccount/>
+                        path: '/admin/profile/notifications',
+                        element: <NotificationSettings/>
                     },
-                    {
-                        path: '/admin/contract',
-                        element: <AdminContract/>
-                    },
-                    
                     
                 ]
             },
