@@ -3,7 +3,6 @@ import { Layout } from 'antd';
 import { UserOutlined, DatabaseOutlined, MoneyCollectOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-
 const { Sider, Content } = Layout;
 
 const cardStyle = {
@@ -47,22 +46,8 @@ const iconStyle = {
 interface MenuItemProps {
     to: string; // 链接的路径
     children: React.ReactNode; // 子元素的类型
-    isSelected: boolean; // 是否选中
-    onClick: () => void; // 点击事件
 }
 
-// 菜单项组件
-const MenuItem: React.FC<MenuItemProps> = ({ to, children, isSelected, onClick }) => (
-    <div
-        style={itemStyle}
-        className="menu-item"
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
-        onClick={onClick}
-    >
-        <Link style={{marginLeft:'40px',fontSize:'12px'}} to={to}>{children}</Link>
-    </div>
-);
 
 // 定义链接项的类型
 interface LinkItem {
@@ -75,63 +60,54 @@ interface CardComponentProps {
     icon: React.ReactNode; // 图标的类型
     title: string;         // 标题的类型
     links: LinkItem[];    // 链接项的数组
-    isSelected: boolean;   // 是否选中
-    onSelect: () => void;  // 选中事件
 }
 
-// 卡片组件
-const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links, isSelected, onSelect }) => (
-    <div style={cardStyle} onClick={onSelect}>
-        <div style={titleStyle}>
-            <span style={{marginLeft:'20px' }}> {icon} {title}</span>
-        </div>
-        <div style={contentStyle}>
-            {links.map((link, index) => (
-                <MenuItem key={index} to={link.path} isSelected={false} onClick={onSelect}>
-                    {link.label}
-                </MenuItem>
-            ))}
-        </div>
-    </div>
-);
+
 
 
 const AdminLayout: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [selectedCard, setSelectedCard] = useState<string | null>(null);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
-    const [isActive, setIsActive] = useState(false); // 新增状态管理字体颜色
+    
     
     useEffect(() => {
         navigate("/admin/profile/info");
     }, [navigate]);
 
     useEffect(() => {
-        const path = location.pathname;
-        if (path.startsWith("/profile")) {
-            setSelectedCard("profile");
-        } else if (path.startsWith("/stake")) {
-            setSelectedCard("stake");
-        } else if (path.startsWith("/lending")) {
-            setSelectedCard("lending");
-        } else if (path.startsWith("/contracts")) {
-            setSelectedCard("contracts");
-        } else {
-            setSelectedCard(null);
-        }
+        
     }, [location]);
 
-    const handleCardSelect = (card: string) => {
-        setSelectedCard(card);
-        setSelectedItem(null); // 重置选中的菜单项
-        setIsActive(true); // 
-    };
 
-    const handleMenuItemSelect = (item: string) => {
-        setSelectedItem(item);
-    };
 
+
+    // 菜单项组件
+const MenuItem: React.FC<MenuItemProps> = ({ to, children }) => (
+    <div
+        style={itemStyle}
+        className="menu-item"
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
+    >
+        <Link style={{marginLeft:'40px',fontSize:'12px'}} to={to} >{children}</Link>
+    </div>
+);
+// 卡片组件
+const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links }) => (
+    <div style={cardStyle}>
+        <div style={titleStyle}>
+            <span style={{marginLeft:'20px' }}> {icon} {title}</span>
+        </div>
+        <div style={contentStyle}>
+            {links.map((link, index) => (
+                <MenuItem key={index} to={link.path}>
+                    {link.label}
+                </MenuItem>
+            ))}
+        </div>
+    </div>
+);
 
     return (
         <Layout style={{ width: '65%', margin: '0 auto' ,backgroundColor:'yellow'}}>
@@ -146,8 +122,6 @@ const AdminLayout: React.FC = () => {
                         { path: "/admin/profile/history", label: "交易历史" },
                         { path: "/admin/profile/notifications", label: "通知设置" },
                     ]}
-                    isSelected={selectedCard === "profile"}
-                    onSelect={() => handleCardSelect("profile")}
                 />
                 <CardComponent
                     icon={<DatabaseOutlined style={iconStyle} />}
@@ -156,8 +130,7 @@ const AdminLayout: React.FC = () => {
                         { path: "/admin/suply", label: "概览" },
                         { path: "/admin/history", label: "历史记录" },
                     ]}
-                    isSelected={selectedCard === "stake"}
-                    onSelect={() => handleCardSelect("stake")}
+                  
                 />
                 <CardComponent
                     icon={<MoneyCollectOutlined style={iconStyle} />}
@@ -166,8 +139,7 @@ const AdminLayout: React.FC = () => {
                         { path: "/admin/boorrow", label: "概览" },
                         { path: "/lending/transactions", label: "交易记录" },
                     ]}
-                    isSelected={selectedCard === "lending"}
-                    onSelect={() => handleCardSelect("lending")}
+                  
                 />
                 <CardComponent
                     icon={<FileTextOutlined style={iconStyle} />}
@@ -176,8 +148,6 @@ const AdminLayout: React.FC = () => {
                         { path: "/admin/contract", label: "合约" },
                         { path: "/admin/contract/templates", label: "合同模板" },
                     ]}
-                    isSelected={selectedCard === "contracts"}
-                    onSelect={() => handleCardSelect("contracts")}
                 />
             </Sider>
 
