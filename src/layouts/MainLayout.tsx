@@ -123,10 +123,8 @@ const MainLayout: FC = () => {
     console.info("select key: " + key);
     if (key == 'disconnect' && tconnect) {
       setTconnect(false)
-    }else if(key == 'faqs'){
-        navigate('/about')
     }else{
-      navigate('/admin')
+      navigate(key)
     }
   }
 
@@ -152,20 +150,20 @@ const MainLayout: FC = () => {
     const accountMenu = [
       {
         key: 'account',
-        title: <Typography onClick={() => handleMenuClick('account')}>个人中心</Typography>,
+        title: <Typography onClick={() => handleMenuClick('/admin/profile/info')}>个人中心</Typography>,
         icon: <UserOutlined className='text-info' />,
         children: [],
       },
 
       {
         key: 'contract',
-        title: <Typography onClick={() => handleMenuClick('contract')}>合约管理</Typography>,
+        title: <Typography onClick={() => handleMenuClick('/admin/profile/balance')}>合约管理</Typography>,
         icon: <TransactionOutlined className='text-info' />,
         children: [],
       },
       {
         key: 'faqs',
-        title: <Typography onClick={() => handleMenuClick('faqs')}>常见问题</Typography>,
+        title: <Typography onClick={() => handleMenuClick('/about?key=faqs')}>常见问题</Typography>,
         icon: <QuestionOutlined   className='text-info' />,
         children: [],
       },

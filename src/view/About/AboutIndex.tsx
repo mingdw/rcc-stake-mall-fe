@@ -56,16 +56,21 @@ const About = () => {
 
 
   useEffect(() => {
-    const hash = location.hash.replace('#', '');
-    const foundItem = menuData.flatMap(item => item.children).find(child => child.key === hash);
-    if (foundItem) {
-      setSubSelectedKey(foundItem.key);
-      // 滚动到对应的锚点位置
-      const element = document.getElementById(hash);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
+   //根据跳转的key值，设置selectedKey和subSelectedKey
+   const key = location.search.split('=')[1];
+   console.log("key: "+key);
+   if(key){
+    menuData.forEach(itm =>{ 
+      itm.children.forEach(subItem =>{
+        if(subItem.key == key){
+          console.log("itm: "+itm.key);
+          console.log("subItem: "+subItem.key);
+          setSelectedKey(itm.key);
+          setSubSelectedKey(subItem.key);
+        }
+      })
+    })
+   }
   }, [location]);
 
 
@@ -572,7 +577,7 @@ const About = () => {
             <Menu
               mode="inline"
               defaultSelectedKeys={[menuData[0].key]}
-              defaultOpenKeys={[selectedKey]}
+              defaultOpenKeys={menuData.map(menuItem => menuItem.key)}
               onClick={handleMenuClick}
               selectedKeys={[selectedKey]}
             

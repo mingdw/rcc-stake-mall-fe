@@ -69,6 +69,44 @@ interface CardComponentProps {
     links: LinkItem[];    // 链接项的数组
 }
 
+const menuDatas = [
+    {
+        key: "profile",
+        title: "个人中心",
+        links: [
+            { path: "/admin/profile/info", label: "个人信息" },
+            { path: "/admin/profile/balance", label: "账户余额" },
+            { path: "/admin/profile/security", label: "安全设置" },
+            { path: "/admin/profile/history", label: "交易历史" },
+            { path: "/admin/profile/notifications", label: "通知设置" },
+        ]
+    },
+    {
+        key: "suply",
+        title: "质押管理",
+        links: [
+            { path: "/admin/suply", label: "概览" },
+            { path: "/admin/history", label: "历史记录" },
+        ]
+    },
+    {
+        key: "boorrow",
+        title: "借贷管理",
+        links: [
+            { path: "/admin/boorrow", label: "概览" },
+            { path: "/lending/transactions", label: "交易记录" },
+        ]
+    },
+    {
+        key: "contract",
+        title: "合约管理",
+        links: [
+            { path: "/admin/contract", label: "合约管理"},
+            { path: "/admin/contract/templates", label: "授权审核" },
+        ]
+    }
+]
+
 const AdminLayout: React.FC = () => {
 
     const location = useLocation();
@@ -81,7 +119,14 @@ const AdminLayout: React.FC = () => {
     }, [navigate]);
 
     useEffect(() => {
-        
+        const menuData = menuDatas.find(item => 
+            item.links.some(link => link.path === location.pathname)
+        );
+    
+        const currentLink = menuData?.links.find(link => link.path === location.pathname); // 找到对应的 link 对象
+        if (currentLink) {
+            setSelectedItem(currentLink.label);
+        }
     }, [location]);
 
     // 菜单项组件
@@ -116,40 +161,25 @@ const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links }) => 
             <Sider width={250} style={{ background: 'rgb(245,245,245)' }}>
             <CardComponent
                     icon={<UserOutlined  />}
-                    title="个人中心"
-                    links={[
-                        { path: "/admin/profile/info", label: "个人信息" },
-                        { path: "/admin/profile/balance", label: "账户余额" },
-                        { path: "/admin/profile/security", label: "安全设置" },
-                        { path: "/admin/profile/history", label: "交易历史" },
-                        { path: "/admin/profile/notifications", label: "通知设置" },
-                    ]}
+                    title={menuDatas.find(item => item.key === 'profile')?.title || "个人中心"}
+                    links={menuDatas.find(item => item.key === 'profile')?.links || []}
                 />
                 <CardComponent
                     icon={<DatabaseOutlined style={iconStyle} />}
-                    title="质押管理"
-                    links={[
-                        { path: "/admin/suply", label: "概览" },
-                        { path: "/admin/history", label: "历史记录" },
-                    ]}
+                    title={menuDatas.find(item => item.key === 'suply')?.title || "质押管理"}
+                    links={menuDatas.find(item => item.key === 'suply')?.links || []}
                   
                 />
                 <CardComponent
                     icon={<MoneyCollectOutlined style={iconStyle} />}
-                    title="借贷管理"
-                    links={[
-                        { path: "/admin/boorrow", label: "概览" },
-                        { path: "/lending/transactions", label: "交易记录" },
-                    ]}
+                    title={menuDatas.find(item => item.key === 'boorrow')?.title || "借贷管理"}
+                    links={menuDatas.find(item => item.key === 'boorrow')?.links || []} 
                   
                 />
                 <CardComponent
                     icon={<FileTextOutlined style={iconStyle} />}
-                    title="合约管理"
-                    links={[
-                        { path: "/admin/contract", label: "合约管理"},
-                        { path: "/admin/contract/templates", label: "授权审核" },
-                    ]}
+                    title={menuDatas.find(item => item.key === 'contract')?.title || "合约管理"}
+                    links={menuDatas.find(item => item.key === 'contract')?.links || []}
                 />
             </Sider>
 

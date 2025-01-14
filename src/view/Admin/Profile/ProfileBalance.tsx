@@ -10,7 +10,7 @@ const Balance: React.FC = () => {
 
     return (
         <div>
-            <AdminContentCard title="账户余额" icon={<MoneyCollectOutlined />}>
+            <AdminContentCard title="账户余额" icon={<MoneyCollectOutlined />} reqKey="questions-1">
                 <p>稳定币余额: ${stableCoinBalance}</p>
                 <p>质押资产: ${stakedAssets}</p>
                 <p>借贷资产: ${borrowedAssets}</p>
