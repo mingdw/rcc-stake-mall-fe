@@ -4,17 +4,17 @@ import {createBrowserRouter} from 'react-router-dom';
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-import About from "../view/About/AboutIndex";
-import Pledge from "../view/Pledge/PledgeIndex";
-import Pool from "../view/Pool/PoolIndex";
-import Prize from "../view/Prize/PrizeIndex";
+import About from "../view/about/AboutIndex";
 import NotFount from "../view/404";
-import TransactionList from "../view/Transaction/TransactionList";
-import Home from "../view/Home/HomeIndex";
-import ProfileInfo from "../view/Admin/Profile/ProfileInfo";
-import ProfileBalance from "../view/Admin/Profile/ProfileBalance";
-import SecuritySettings from "../view/Admin/Profile/SecuritySettings";
-import NotificationSettings from "../view/Admin/Profile/NotificationSettings";
+import TransactionList from "../view/transaction/TransactionList";
+import Home from "../view/home/HomeIndex";
+import Home2 from "../view/home/HomeIndex2";
+import ProfileInfo from "../view/admin/profile/ProfileInfo";
+import ProfileBalance from "../view/admin/profile/ProfileBalance";
+import SecuritySettings from "../view/admin/profile/SecuritySettings";
+import NotificationSettings from "../view/admin/profile/NotificationSettings";
+
+import Borrow from "../view/borrow/BorrowIndex";
 
 
 const router = createBrowserRouter([
@@ -31,18 +31,14 @@ const router = createBrowserRouter([
                 element:<Home/>
             },
             {
-                path: '/pool',
-                element:<Pool/>
+                path: '/suply',
+                element:<Home2/>
             },
             {
-                path: '/pledge',
-                element:<Pledge/>
+                path: '/borrow',
+                element:<Borrow/>
             },
 
-            {
-                path: '/prize',
-                element:<Prize/>
-            },
             {
                 path: '/about',
                 element:<About/>

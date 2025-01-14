@@ -1,12 +1,12 @@
 import React,{FC} from "react";
 
 
-const Pledge: FC = () => {
+const Suply: FC = () => {
     return <>
         <div>
-         质押/解质押
+            质押服务首页
         </div>
     </>
 }
 
-export default Pledge
+export default Suply

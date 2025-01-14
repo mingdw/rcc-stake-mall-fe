@@ -1,12 +1,12 @@
 import React,{FC} from "react";
 
 
-const Prize: FC = () => {
+const Borrow: FC = () => {
     return <>
         <div>
-        领奖
+        借贷服务首页
         </div>
     </>
 }
 
-export default Prize
+export default Borrow

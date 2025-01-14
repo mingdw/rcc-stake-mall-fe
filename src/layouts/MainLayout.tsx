@@ -17,9 +17,8 @@ import Link from 'antd/es/typography/Link';
 
 const { Header, Content, Footer, Sider } = Layout;
 export const HOME_PATH_NAME = "home"
-export const POOL_PATH_NAME = "pool"
-export const PlEDGE_PATH_NAME = "pledge"
-export const PRIZE_PATH_NAME = "prize"
+export const SUPLY_PATH_NAME = "suply"
+export const BORROW_PATH_NAME = "borrow"
 export const ABOUT_PATH_NAME = "about"
 
 const languges = [{
@@ -73,20 +72,16 @@ const MainLayout: FC = () => {
       key: HOME_PATH_NAME,
       icon: <HomeOutlined />,
     },
+   
     {
-      label: t('header.nav.pool'),
-      key: POOL_PATH_NAME,
-      icon: <ShoppingOutlined />,
-    },
-    {
-      label: t('header.nav.pledge'),
-      key: PlEDGE_PATH_NAME,
+      label: t('header.nav.suply'),
+      key: SUPLY_PATH_NAME,
       icon: <AppstoreOutlined />,
     },
 
     {
-      label: t('header.nav.prize'),
-      key: PRIZE_PATH_NAME,
+      label: t('header.nav.borrow'),
+      key: BORROW_PATH_NAME,
       icon: <TransactionOutlined />,
     },
     {
@@ -162,12 +157,6 @@ const MainLayout: FC = () => {
         children: [],
       },
 
-      {
-        key: 'pledge',
-        title: <Typography onClick={() => handleMenuClick('pledge')}>质押管理</Typography>,
-        icon: <AppstoreOutlined className='text-info' />,
-        children: [],
-      },
       {
         key: 'contract',
         title: <Typography onClick={() => handleMenuClick('contract')}>合约管理</Typography>,
@@ -260,7 +249,7 @@ const MainLayout: FC = () => {
             <a style={{ marginLeft: '10px' }} href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
           </Col>
           <Col style={{ width: '40%' }}>
-            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
+            <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items}  />
           </Col>
 
           <Col style={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
@@ -289,7 +278,14 @@ const MainLayout: FC = () => {
         <Outlet />
       </Content>
       <Footer style={{ textAlign: 'center' }}>
-        Ant Design ©{new Date().getFullYear()} Created by Ant UED
+        <div style={{ marginBottom: 10 }}>
+          <a href="#">服务条款</a>
+          <span style={{ margin: '0 10px' }}>|</span>
+          <a href="#">隐私政策</a>
+          <span style={{ margin: '0 10px' }}>|</span>
+          <a href="#">联系我们</a>
+        </div>
+        <div>版权所有 &copy; 2025 RCC 平台</div>
       </Footer>
     </Layout>
   );

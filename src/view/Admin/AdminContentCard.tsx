@@ -17,7 +17,7 @@ const AdminContentCard: React.FC<CustomCardProps> = ({ title, icon, children }) 
                     {icon}
                     <span style={{ marginLeft: '8px' }}>{title}</span>
                 </div>
-                <Link to="/about" style={{ color: '#1890ff' ,marginRight:'20px'}}>
+                <Link to="/about" style={{ color: '#1890ff' ,marginRight:'20px',fontSize:'12px'}}>
                     <QuestionCircleOutlined /> 常见问题
                 </Link>
             </div>

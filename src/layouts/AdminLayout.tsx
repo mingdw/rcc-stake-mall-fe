@@ -37,6 +37,14 @@ const hoverStyle = {
     backgroundColor: '#f0f0f0',
 };
 
+const hoverLeve = {
+    backgroundColor: 'gray',
+};
+
+const hoverDown = {
+    color: 'blue',
+};
+
 const iconStyle = {
     fontSize: '12px', 
     marginRight: '8px' 
@@ -46,9 +54,8 @@ const iconStyle = {
 interface MenuItemProps {
     to: string; // 链接的路径
     children: React.ReactNode; // 子元素的类型
+    name: string;
 }
-
-
 // 定义链接项的类型
 interface LinkItem {
     path: string;
@@ -62,13 +69,11 @@ interface CardComponentProps {
     links: LinkItem[];    // 链接项的数组
 }
 
-
-
-
 const AdminLayout: React.FC = () => {
+
     const location = useLocation();
     const navigate = useNavigate();
-    const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [selectedItem, setSelectedItem] = useState("个人信息");
     
     
     useEffect(() => {
@@ -79,18 +84,15 @@ const AdminLayout: React.FC = () => {
         
     }, [location]);
 
-
-
-
     // 菜单项组件
-const MenuItem: React.FC<MenuItemProps> = ({ to, children }) => (
+const MenuItem: React.FC<MenuItemProps> = ({ to, children ,name}) => (
     <div
         style={itemStyle}
         className="menu-item"
         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor}
         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
-    >
-        <Link style={{marginLeft:'40px',fontSize:'12px'}} to={to} >{children}</Link>
+   >
+        <Link onClick={() => setSelectedItem(name)} style={{marginLeft:'40px',fontSize:'12px',color:selectedItem === name?'#15C377':'gray'}} to={to} >{children}</Link>
     </div>
 );
 // 卡片组件
@@ -101,7 +103,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links }) => 
         </div>
         <div style={contentStyle}>
             {links.map((link, index) => (
-                <MenuItem key={index} to={link.path}>
+                <MenuItem key={index} to={link.path} name={link.label}>
                     {link.label}
                 </MenuItem>
             ))}
@@ -145,8 +147,8 @@ const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links }) => 
                     icon={<FileTextOutlined style={iconStyle} />}
                     title="合约管理"
                     links={[
-                        { path: "/admin/contract", label: "合约" },
-                        { path: "/admin/contract/templates", label: "合同模板" },
+                        { path: "/admin/contract", label: "合约管理"},
+                        { path: "/admin/contract/templates", label: "授权审核" },
                     ]}
                 />
             </Sider>
