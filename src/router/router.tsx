@@ -8,13 +8,14 @@ import About from "../view/about/AboutIndex";
 import NotFount from "../view/404";
 import TransactionList from "../view/transaction/TransactionList";
 import Home from "../view/home/HomeIndex";
-import Home2 from "../view/home/HomeIndex2";
+
 import ProfileInfo from "../view/admin/profile/ProfileInfo";
 import ProfileBalance from "../view/admin/profile/ProfileBalance";
 import SecuritySettings from "../view/admin/profile/SecuritySettings";
 import NotificationSettings from "../view/admin/profile/NotificationSettings";
 
 import Borrow from "../view/borrow/BorrowIndex";
+import Suply from "../view/suply/SuplyIndex";
 
 
 const router = createBrowserRouter([
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/suply',
-                element:<Home2/>
+                element:<Suply/>
             },
             {
                 path: '/borrow',

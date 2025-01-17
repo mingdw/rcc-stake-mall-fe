@@ -4,6 +4,8 @@ import router from "./router/router";
 import  './assets/css/bootstrap.min.css'
 import  './assets/css/materialdesignicons.min.css'
 import  './assets/css/style.min.css'
+import  './assets/fonts/iconfont.css'
+import './assets/fonts/iconfont.js'
 import { WagmiProvider } from 'wagmi'
 import {
   RainbowKitProvider,

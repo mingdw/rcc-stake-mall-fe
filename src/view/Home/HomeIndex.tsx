@@ -1,554 +1,285 @@
-import React,{FC} from "react";
-import {ArrowDownOutlined, ArrowUpOutlined, DollarCircleOutlined, FieldNumberOutlined, GiftOutlined, MailOutlined, PhoneOutlined, QqOutlined,UserOutlined,WarningOutlined,WechatOutlined} from '@ant-design/icons';
-import { useTranslation  } from 'react-i18next';
-import {PledgePoolType} from "../../components/pledgePool/PledgePoolInfo";
-import PledgePoolComponents from "../../components/pledgePool/PledgePoolInfo";
-const Home: FC = () => {
-  const {t, i18n } = useTranslation();
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { Button, Col, Row, Typography, Carousel, Timeline, Space, Divider } from 'antd';
+import { GithubOutlined, TaobaoCircleOutlined, SafetyCertificateOutlined, DollarOutlined, LikeOutlined, SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import img01 from '../../assets/images/login-bg-4.jpg';
+import img02 from '../../assets/images/login-bg-2.jpg';
+import img03 from '../../assets/images/login-bg-3.jpg';
+import styles from './Home.module.scss';
+import classnames from 'classnames';
+import { Link } from 'react-router';
 
-  const pledgePoolDatas:PledgePoolType[] = [{
-    name: 'ETH01 Pool',
-    status:0,
-    targetAmount:'10 ETH',
-    pledgedAmount:'2.76354 ETH',
-    prize:'563 RCC',
-    progress:25,
-    startTime:'2024-04-12',
-    endTime:'2025-01-31',
-    imgUrl:'../../assets/images/login-bg-1.jpg'
-  },
-  {
-    name: 'ETH02 Pool',
-    status:1,
-    targetAmount:'10 ETH',
-    pledgedAmount:'3.76354 ETH',
-    prize:'300 RCC',
-    progress:50,
-    startTime:'2024-04-12',
-    endTime:'2025-01-26',
-    imgUrl:'../../assets/images/login-bg-2.jpg'
-  },
-  {
-    name: 'ETH03 Pool',
-    status:2,
-    targetAmount:'25 ETH',
-    pledgedAmount:'10.76354 ETH',
-    prize:'500 RCC',
-    progress:75,
-    startTime:'2024-04-12',
-    endTime:'2025-01-26',
-    imgUrl:'../../assets/images/login-bg-3.jpg'
-  }
-  
-]
+const Home: React.FC = () => {
+    const collateralDatas = useMemo(() => [
+        { key: '1', icon1: <GithubOutlined className={styles.icon1} />, icon2: <TaobaoCircleOutlined className={styles.icon2} />, collateral: 'BTC', collateralRate: '5%', loan: '91', loanRate: '5%', minStake: '1000', maxLoan: '10000', duration: '10天', status: '0' },
+        { key: '2', icon1: <GithubOutlined className={styles.icon1} />, icon2: <TaobaoCircleOutlined className={styles.icon2} />, collateral: 'ETH', collateralRate: '4%', loan: '123', loanRate: '5%', minStake: '1000', maxLoan: '10000', duration: '10天', status: '0' },
+        { key: '3', icon1: <GithubOutlined className={styles.icon1} />, icon2: <TaobaoCircleOutlined className={styles.icon2} />, collateral: 'USDT', collateralRate: '3%', loan: '876', loanRate: '5%', minStake: '1000', maxLoan: '10000', duration: '10天', status: '0' },
+        { key: '4', icon1: <GithubOutlined className={styles.icon1} />, icon2: <TaobaoCircleOutlined className={styles.icon2} />, collateral: 'ETC', collateralRate: '5%', loan: '133', loanRate: '5%', minStake: '1000', maxLoan: '10000', duration: '10天', status: '0' },
+        { key: '5', icon1: <GithubOutlined className={styles.icon1} />, icon2: <TaobaoCircleOutlined className={styles.icon2} />, collateral: 'DAI', collateralRate: '4%', loan: '1354', loanRate: '5%', minStake: '1000', maxLoan: '10000', duration: '10天', status: '0' },
+        { key: '6', icon1: <GithubOutlined className={styles.icon1} />, icon2: <TaobaoCircleOutlined className={styles.icon2} />, collateral: 'AVVA', collateralRate: '3%', loan: '244', loanRate: '5%', minStake: '1000', maxLoan: '10000', duration: '10天', status: '0' },
+    ], []);
 
+    const carouselData = [
+        { image: img01, title: '质押简单快捷', description: '安全高收益，轻松获取稳定收益' },
+        { image: img02, title: '低抵押率', description: '安全快捷的借贷操作' },
+        { image: img03, title: '参与我们的社区', description: '共享未来的金融生态' },
+    ];
 
+    interface CardContentProps {
+        key: string;
+        title: string;
+        des?: string;
+        bgColor?: string;
+        children: React.ReactNode;
+    }
 
+    interface CardbBrrageProps {
+        icon1?: React.ReactNode;
+        icon2?: React.ReactNode;
+        collateral?: string;
+        collateralRate?: string;
+        loan?: string;
+        loanRate?: string;
+        minStake?: string;
+        maxLoan?: string;
+        duration?: string;
+        status?: string;
+    }
 
-    return <>
-       <div className="container-fluid p-t-15">
-        <div className="row">
-          <div className="col-md-6 col-xl-3">
-            <div className="card bg-primary text-white">
-              <div className="card-body clearfix">
-                <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><FieldNumberOutlined style={{fontSize:'24px'}}/></span>
-                  <span className="fs-22 lh-22">4</span>
-                </div>
-                <div className="text-right">{t('body.stat.poolSize')}</div>
-              </div>
+    const CardContentComponent: React.FC<CardContentProps> = ({ key,title, des, bgColor, children }) => {
+        return (
+            <div key={key} className={styles.cardContent} style={{ backgroundColor: bgColor? bgColor : '#fff' }}>
+                <div className={styles.cardTitle}>{title}</div>
+                <hr className={styles.cardHr} />
+                {des && <p className={styles.cardDes}>{des}</p>}
+                {children}
             </div>
-          </div>
+        );
+    }
 
-          <div className="col-md-6 col-xl-3">
-            <div className="card bg-danger text-white">
-              <div className="card-body clearfix">
-                <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><UserOutlined style={{fontSize:'24px'}}/></span>
-                  <span className="fs-22 lh-22">156</span>
-                </div>
-                <div className="text-right">{t('body.stat.users')}</div>
-              </div>
+    const CardBarrageComponent: React.FC<CardbBrrageProps> = ({ icon1, icon2, collateral, collateralRate, loan, loanRate, minStake, maxLoan, duration, status }) => {
+        return (
+            <div
+                className={styles.barrageCardFlow}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <p className={styles.p1}>{icon1} {icon2}<span style={{ marginLeft: '10px', fontSize: '18px', color: 'black' }}><strong>{collateral}</strong></span> &nbsp; &nbsp;<span style={{ color: 'gray' }}>|  Base</span></p>
+                <p>抵押率：{collateralRate}</p>
+                <p>借贷利率：{loanRate}</p>
+                <p>质押期限：{duration}</p>
+                <p>质押金额：{loan}</p>
+                <Space style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button type="primary">质押</Button>
+                    <Button type="primary">借贷</Button>
+                </Space>
             </div>
-          </div>
+        );
+    };
 
-          <div className="col-md-6 col-xl-3">
-            <div className="card bg-success text-white">
-              <div className="card-body clearfix">
-                <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><DollarCircleOutlined style={{fontSize:'24px'}} /></span>
-                  <span className="fs-22 lh-22">34,005,000</span>
-                </div>
-                <div className="text-right">{t('body.stat.totalAmount')}</div>
-              </div>
-            </div>
-          </div>
+    const handleMouseEnter = () => {
+        console.info("鼠标移入");
+        const marquee = document.getElementById('marquee');
+        if (marquee) {
+            marquee.style.animationPlayState = 'paused'; // 暂停动画
+        }
+    };
 
-          <div className="col-md-6 col-xl-3">
-            <div className="card bg-purple text-white">
-              <div className="card-body clearfix">
-                <div className="flex-box">
-                  <span className="img-avatar img-avatar-48 bg-translucent"><GiftOutlined style={{fontSize:'24px'}}/></span>
-                  <span className="fs-22 lh-22">153</span>
-                </div>
-                <div className="text-right">{t('body.stat.totalPrize')}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+    const handleMouseLeave = () => {
+        console.info("鼠标离开");
+        const marquee = document.getElementById('marquee');
+        if (marquee) {
+            marquee.style.animationPlayState = 'running'; // 恢复动画
+        }
+    };
 
-        <div className="row">
-          <div className="col-8">
-            <div className="row">
-              <div className="col-12">
-                <div className="card-group">
-                  <div className="card col-4">
-                    <div className="card-body">
-                      <h5 className="card-title">
-                        <strong>{t('body.contract.status')}</strong>
-                      </h5>
-          
-                      <p>
-                        <span style={{fontSize:'12px',color:'gray'}}>
-                        {t('body.contract.address')}
-                        </span>
-                        <br/>
-                        <span style={{fontSize:'14px',color:'black'}}>
-                          <a href="#!">husw79Qzi81Hgsnu12jzq0MLaa75j4X</a>
-                        </span>
-                      </p>
-                      <p>
-                        <span style={{fontSize:'12px',color:'gray'}}>
-                        {t('body.contract.version')}
-                        </span>
-                        <br/>
-                        <span style={{fontSize:'14px',color:'black'}} className="text-info">
-                          V 1.0.0.1
-                        </span>
-                      </p>
-          
-                      <p>
-                        <span style={{fontSize:'12px',color:'gray'}}>
-                        {t('body.contract.chaninID')}
-                        </span>
-                        <br/>
-                        <span style={{fontSize:'14px',color:'black'}} className="text-info">
-                          1165511
-                        </span>
-                      </p>
-                      <p>
-                        <span style={{fontSize:'12px',color:'gray'}}>
-                        {t('body.contract.pubtime')}
-                        </span>
-                        <br/>
-                        <span style={{fontSize:'14px',color:'black'}} className="text-info">
-                          2024-06-13
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="card col-8">
-                    <div className="card-body">
-                      <h5 className="card-title">
-                        <strong>{t('body.prize.name')}</strong>
-                      </h5>
-                      <div className="row">
-                        <table className="table table-borderless table-hover">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <span className="text-gray">Price</span>
-                                <br/>
-                                <span className="text-black" style={{fontSize:'16px'}}><strong>$3.7</strong></span> <span
-                                      className="text-gray">USD</span>
-                              </td>
-                            
-                              <td>
-                                <span className="text-gray">Volumn 24h</span>
-                                <br/>
-                                <span className="text-black" style={{fontSize:'16px'}}><strong>$32.7M</strong></span> <span
-                                  className="text-gray">USD</span>
-                              </td>
-                              <td>
-                                <span className="text-gray">Market Cap</span>
-                                <br/>
-                                <span className="text-black" style={{fontSize:'16px'}}><strong>$32.7B</strong></span> <span
-                                  className="text-gray">USD</span>
-          
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <span className="text-gray">Change 1h</span>
-                                <br/>
-                                <span className="text-success" style={{fontSize:'16px'}}><strong>-0.28%</strong></span><ArrowDownOutlined style={{color:'#15C377'}}/>
-                              </td>
-                              <td>
-                                <span className="text-gray">Change 24h</span>
-                                <br/>
-                                <span className="text-success" style={{fontSize:'16px'}}> <strong>-2.75%</strong></span><ArrowDownOutlined  style={{color:'#15C377'}} />
-                              </td>
-                              <td>
-                                <span className="text-gray">Change 7d</span>
-                                <br/>
-                                <span className="text-danger" style={{fontSize:'16px'}}><strong>12.02%</strong></span><ArrowUpOutlined style={{color:'#F76767'}}/>
-                              </td>
-                            </tr>
-                          </tbody>
-          
-                        </table>
-                      </div>
-                      <div className="row row-5">
-                        <canvas id="chart-line-4" width="100%" height="40%"></canvas>
-                      </div>
-                      <div className="row row-2">
-                        <div className="col-5">
-                          <span className="text-gray">{t('body.prize.history.total.pledge')}</span>
-                          <br/>
-                          <span className="text-black" style={{fontSize:'16px'}}><strong>17334,123,000 ETH</strong></span>
+    const [userCount, setUserCount] = useState(0);
+    const [stakeAmount, setStakeAmount] = useState(0);
+    const [totalEarnings, setTotalEarnings] = useState(0);
+    const [platformRate, setPlatformRate] = useState(0);
+
+    // 模拟数据
+    const targetUserCount = 1500;
+    const targetStakeAmount = 12444;
+    const targetTotalEarnings = 28737;
+    const targetPlatformRate = 5; // 5%~10% 可以根据需要调整
+
+    // 计数器效果
+    useEffect(() => {
+        const duration = 1000; // 动画持续时间为1秒
+        const startTime = Date.now();
+
+        const updateCounts = () => {
+            const elapsedTime = Date.now() - startTime;
+            const progress = Math.min(elapsedTime / duration, 1); // 计算进度
+
+            // 更新状态
+            setUserCount(Math.floor(progress * targetUserCount));
+            setStakeAmount(Math.floor(progress * targetStakeAmount));
+            setTotalEarnings(Math.floor(progress * targetTotalEarnings));
+
+            if (progress < 1) {
+                requestAnimationFrame(updateCounts); // 继续更新
+            }
+        };
+
+        requestAnimationFrame(updateCounts); // 开始动画
+
+        return () => {
+            // 清理
+        };
+    }, []);
+
+    return (
+        <div style={{ padding: '20px' }}>
+            <Row className={styles.announcementBar}>
+              <Space>
+               <span> 📢 新功能上线！现在用户可以通过手机应用进行质押操作。点击</span> <Link to="/#" > 了解更多。</Link>
+              </Space>
+            </Row>
+            <Carousel arrows autoplay autoplaySpeed={2000} style={{ marginBottom: '20px' }}>
+                {carouselData.map((item, index) => (
+                    <div key={index} style={{ position: 'relative' }}>
+                        <div style={{ width: '100%', height: '300px', backgroundImage: `url(${item.image})`, backgroundPosition: 'center' }}>
+                            <span className={styles.imgFontStlye}>
+                                <strong>{item.title}</strong><br />
+                                {item.description}
+                            </span>
                         </div>
-                        <div className="col-5">
-          
-                          <span className="text-gray">{t('body.prize.history.total.prize')}</span>
-                          <br/>
-                          <span className="text-black" style={{fontSize:'16px'}}><strong>234,988,000 RC</strong></span>
+                    </div>
+                ))}
+            </Carousel>
+            <CardContentComponent key="chenji" title="我们的成绩" des="2018至今，平台完成的数据" bgColor="#fff">
+                <Row style={{ marginTop: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
+                    <Col span={5} className={styles.dashCard}>
+                        <p className={styles.p1}>{userCount}+</p>
+                        <p className={styles.p2}>用户总数</p>
+                    </Col>
+                    <Col span={5} className={styles.dashCard}>
+                        <p className={styles.p1}>${stakeAmount}</p>
+                        <p className={styles.p2}>质押资产总额</p>
+                    </Col>
+                    <Col span={5} className={styles.dashCard}>
+                        <p className={styles.p1}>${totalEarnings}</p>
+                        <p className={styles.p2}>历史总收益</p>
+                    </Col>
+                    <Col span={5} className={styles.dashCard}>
+                        <p className={styles.p1}>{platformRate}%~10%</p>
+                        <p className={styles.p2}>平台收益率</p>
+                    </Col>
+                </Row>
+            </CardContentComponent >
+
+            <CardContentComponent key="zichan" title="支持质押借贷的加密资产" des="支持主流的稳定币ETH、USDT、USDC、DAI等数十种加密资产" bgColor="#F5F5F5">
+                <div className={styles.marqueeContainer} id="marqueeContainer">
+                    <div className={styles.marquee} id="marquee">
+                        {collateralDatas.map((item, index) => (
+                            <div key={index} style={{ display: 'inline-block', marginRight: '20px' }}>
+                                <CardBarrageComponent
+                                    icon1={item.icon1}
+                                    icon2={item.icon2}
+                                    collateral={item.collateral}
+                                    collateralRate={item.collateralRate}
+                                    loan={item.loan}
+                                    loanRate={item.loanRate}    
+                                    minStake={item.minStake}
+                                    maxLoan={item.maxLoan}
+                                    duration={item.duration}
+                                    status={item.status}
+                                />
+                            </div>
+                        ))}
+                        {collateralDatas.map((item, index) => (
+                            <div key={`clone-${index}`} style={{ display: 'inline-block', marginRight: '20px' }}>
+                                <CardBarrageComponent
+                                    icon1={item.icon1}
+                                    icon2={item.icon2}
+                                    collateral={item.collateral}
+                                    collateralRate={item.collateralRate}
+                                    loan={item.loan}
+                                    loanRate={item.loanRate}    
+                                    minStake={item.minStake}
+                                    maxLoan={item.maxLoan}
+                                    duration={item.duration}
+                                    status={item.status}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </CardContentComponent>
+
+            <CardContentComponent key="youshi" title="我们的优势" des="每一份质押都能获取收益，每一份借贷都用心服务。" bgColor="#F5F5F5">
+                <Row style={{ width: '80%', margin: '0 auto', marginTop: '40px', marginBottom: '20px', display: 'flex', justifyContent: 'space-around' }}>
+                    <Col span={5} className={styles.cardAdvantage}>
+                        <div style={{ width: '95%', textAlign: 'center' }}>
+                            <div className={styles.icon}><SafetyCertificateOutlined /></div>
+                            <div className={styles.p1}>平台安全性</div>
+                            <Typography className={styles.p2}>采用严格的智能合约审计，为您的资金安全保驾护航。</Typography>
                         </div>
-          
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="row" style={{marginTop:'20px'}}>
-              <div className="col-12">
-                <div className="card">
-                  <header className="card-header">
-                    <div className="card-title">
-                      <label style={{fontSize:'20px',marginLeft:'0px'}}>
-                        <strong>{t('body.pledge.pool.name')}</strong>
-                      </label>
-                    </div>
-                    <div className="card-title">
-                      <a style={{marginLeft:'0px'}} href="../pool/pool_index.html">
-                        <span className="text-primary">{t('body.pledge.pool.view.more')}</span>
-                      </a>
-                    </div>
-                  </header>
-        
-                  <div className="card-body">
-                    <ul className="list-unstyled">
-                      {
-                        pledgePoolDatas.map((pool,index) => (
-                          <PledgePoolComponents key={index} {...pool} />                        ))
-                      }
-                     
-                    </ul>
-        
-                  </div>
-        
-                </div>
-              </div>
-              
-            </div>
-            <div className="row">
-              <div className="col-12">
-                <div className="card">
-                  <header className="card-header">
-                    <div className="card-title">
-                      <label style={{fontSize:'20px',marginLeft:'0px'}}>
-                        <strong> {t('body.transaction.name')}</strong>
-                      </label>
-                    </div>
-                    <div className="card-title">
-                      <a style={{marginLeft:'0px'}} href="#!">
-                        <span className="text-primary">{t('body.transaction.button.view.more')}</span>
-                      </a>
-                    </div>
-                  </header>
-        
-                  <div className="card-body">
-                    
-                    <table className="table table-borderless table-hover">
-                      <thead>
-                        <tr>
-                          <th>{t('body.transaction.table.header.pledge')}</th>
-                          <th>{t('body.transaction.table.header.address')}</th>
-                          <th>{t('body.transaction.table.header.date')}</th>
-                          <th>{t('body.transaction.table.header.amount')}</th>
-                          <th>{t('body.transaction.table.header.type')}</th>
-                          <th>{t('body.transaction.table.header.pledge.days')}</th>
-                          <th>{t('body.transaction.table.headerer.prize')}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>ETH质押池</td>
-                          <td><a href="#!">dfe2L****2Axs</a></td>
-                          <td>2024-12-10 12:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-warning">质押</span></td>
-                          <td></td>
-                          <td><span className="text-danger"></span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                        <tr>
-                          <td>BTC质押池</td>
-                          <td><a href="#!">AOm2x****22Bn</a></td>
-                          <td>2024-12-09 02:12:43</td>
-                          <td>0.4 ETH</td>
-                          <td><span className="text-success">解质押</span></td>
-                          <td>12 天</td>
-                          <td><span className="text-danger">25RC</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-        
-                </div>
-              </div>
-            </div>
-          </div>
+                    </Col>
+                    <Col span={5} className={styles.cardAdvantage}>
+                        <div style={{ width: '95%', textAlign: 'center' }}>
+                            <div className={styles.icon}><DollarOutlined /></div>
+                            <div className={styles.p1}>操作便捷性</div>
+                            <Typography className={styles.p2}>只需一个钱包，质押借贷操作简单，无需繁琐的手续，轻松实现资产增值。</Typography>
+                        </div>
+                    </Col>
+                    <Col span={5} className={styles.cardAdvantage}>
+                        <div style={{ width: '95%', textAlign: 'center' }}>
+                            <div className={styles.icon}><SyncOutlined /></div>
+                            <div className={styles.p1}>高效率</div>
+                            <Typography className={styles.p2}> 24小时客服在线，随时解答您的疑问，确保您的质押借贷体验无忧。</Typography>
+                        </div>
+                    </Col>
+                    <Col span={5} className={styles.cardAdvantage}>
+                        <div style={{ width: '95%', textAlign: 'center' }}>
+                            <div className={styles.icon}><LikeOutlined /></div>
+                            <div className={styles.p1}>精益求精</div>
+                            <Typography className={styles.p2}>死磕风险把控，对质押借贷流程细节一丝不苟，力争最高方便快捷安全的通过率。</Typography>
+                        </div>
+                    </Col>
+                </Row>
+            </CardContentComponent>
 
-          <div className="col-4">
-            <div className="card">
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-1"> 
-                  <WarningOutlined style={{fontSize:'24px',color:'red'}}/>
-                  </div>
-                  <div className="col-10"> 
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item">
-                        <span className="text-danger">{t('body.right.describe.risk.warning.title')}： </span>{t('body.right.describe.risk.warning.content')}
-                          <div style={{float:'right',marginTop:'10px'}}>
-                            <span style={{color:'#1383C6'}}> <a href="#!"></a>{t('body.right.describe.risk.warning.author')}</span>
-                          </div>
-                      </li>
-                      <li className="list-group-item">
-                        <span className="text-danger">{t('body.right.describe.disclaimer')}：</span>{t('body.right.describe.disclaimer.content')}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <CardContentComponent key="fuwu" title="我们的服务" des="借贷、质押相关的服务我们都支持，高效快捷安全服务好每一个客户" bgColor="#f5f5f5">
+                <Row style={{ width: '70%', margin: '0 auto', marginTop: '40px', marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+                    <Col span={5} className={styles.cardService}>
+                        <p className={styles.title}>质押服务</p>
+                        <p>安全快捷</p>
+                        <Divider />
+                        <p>24小时客服</p>
+                        <p>安全无忧</p>
+                        <p><Button className={styles.button}>查看详情</Button></p>
+                    </Col>
+                    <Col span={5} className={styles.cardService}>
+                        <p className={styles.title}>借贷服务</p>
+                        <p>安全快捷</p>
+                        <Divider />
+                        <p>24小时客服</p>
+                        <p>安全无忧</p>
+                        <p><Button className={styles.button}>查看详情</Button></p>
+                    </Col>
+                    <Col span={5} className={styles.cardService}>
+                        <p className={styles.title}>自动清算</p>
+                        <p>安全快捷</p>
+                        <Divider />
+                        <p>24小时客服</p>
+                        <p>安全无忧</p>
+                        <p><Button className={styles.button}>查看详情</Button></p>
+                    </Col>
+                    <Col span={5} className={styles.cardService}>
+                        <p className={styles.title}>订单追踪</p>
+                        <p>安全快捷</p>
+                        <Divider />
+                        <p>24小时客服</p>
+                        <p>安全无忧</p>
+                        <p><Button className={styles.button}>查看详情</Button></p>
+                    </Col>
+                </Row>
+            </CardContentComponent>
 
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title" style={{textAlign:'left'}}>
-                  <strong>{t('body.right.weekly.prize.top')}</strong>
-                </h5>
-                <div className="col" style={{textAlign:'left'}}>
-                  <table className="table table-borderless table-hover">
-                      <thead>
-                        <tr>
-                          <th>{t('body.right.weekly.prize.top.header.top')}</th>
-                          <th>{t('body.right.weekly.prize.top.header.account')}</th>
-                          <th>{t('body.right.weekly.prize.top.header.prize')}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td><span className="badge badge-danger badge-pill">1</span></td>
-                          <td>asdf****1d3A</td>
-                          <td><span className="text-danger">25 RC</span></td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-warning badge-pill">2</span></td>
-                          <td>Bgfx****iu7M</td>
-                          <td><span className="text-warning">24 RC</span></td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-success badge-pill">3</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td><span className="text-success">20 RC</span></td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">4</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">5</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">6</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">7</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">8</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">9</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                        <tr>
-                          <td><span className="badge badge-secondary badge-pill">10</span></td>
-                          <td>H8ss****50Bs</td>
-                          <td>19 RC</td>
-                        </tr>
-                      </tbody>
-                  </table>
-                </div>
-              
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title" style={{textAlign:'left'}}>
-                  <strong>{t('body.right.hot.tag')}</strong>
-                </h5>
-                <div className="col w-80" style={{textAlign:'left',fontSize:'18px',padding:'5px'}}>
-                  <table className="table table-borderless">
-                    <tbody>
-                    <tr>
-                      <td><a href="#!" className="badge badge-pill badge-success">{t('body.right.hot.tag.running')}</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-warning">{t('body.right.hot.tag.most.user')}</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-danger">{t('body.right.hot.tag.most.prize')}</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-dark">{t('body.right.hot.tag.end')}</a></td>
-                    </tr>
-                    <tr>
-                      <td><a href="#!" className="badge badge-pill badge-secondary">{t('body.right.hot.tag.no.start')}</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-purple">{t('body.right.hot.tag.no.eth')}</a></td>
-                      <td><a href="#!" className="badge badge-pill badge-info">{t('body.right.hot.tag.no.usdt')}</a></td>
-                      <td></td>
-                    </tr>
-                    </tbody>
-                    
-                  </table>
-                </div>
-              
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title" style={{textAlign:'left'}}>
-                  <strong>{t('body.right.requesttions')}</strong>
-                </h5>
-                <div className="col w-80" style={{textAlign:'left',fontSize:'14px'}}>
-                  <ul className="list-group list-group-flush p-t-5">
-                  <li className="list-group-item">
-                    <a href="#!"><span className="text-black">{t('body.right.requesttions.q1')}</span></a>
-                  </li>
-                  <li className="list-group-item">
-                    <a href="#!">{t('body.right.requesttions.q2')}</a>
-                  </li>
-                  <li className="list-group-item">
-                    <a href="#!">{t('body.right.requesttions.q3')}</a>
-                  </li>
-                  <li className="list-group-item">
-                    <a href="#!">{t('body.right.requesttions.q4')}</a>
-                  </li>
-                 
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-              <h5 className="card-title" style={{textAlign:'left'}}>
-                <strong>{t('body.right.contact.us')}</strong>
-              </h5>
-              <div className="col w-80" style={{textAlign:'left',fontSize:'16px'}} >
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item">
-                    <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><QqOutlined />&nbsp;&nbsp;&nbsp;466830255</span></a>
-                  </li>
-                  <li className="list-group-item">
-                    <a href="#!"><span className="img-avatar img-avatar-48 bg-translucent text-warning"><WechatOutlined />&nbsp;&nbsp;&nbsp;mingdong1129</span></a>
-                  </li>
-                  <li className="list-group-item">
-                    <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><PhoneOutlined />&nbsp;&nbsp;&nbsp;18710181258</span></a>
-                  </li>
-                  <li className="list-group-item">
-                    <a href="#!"> <span className="img-avatar img-avatar-48 bg-translucent text-warning"><MailOutlined />&nbsp;&nbsp;&nbsp;7023302@qq.com</span></a>
-                  </li>
-                </ul>
-              </div>
-              
-            </div>
-          </div>
-          </div>
         </div>
-       </div>
-    </>
-}
+    );
+};
 
-export default Home
+export default Home;

@@ -95,7 +95,6 @@
     margin: 10px;
     width: 200px;
     text-align: center;
-    transition: all 0.3s ease;
     background-color: #fff;
     .p1{
         text-align: left;
@@ -112,12 +111,13 @@
             color: rgb(49, 6, 135);
         }
     }
+    &:hover{
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        transform: scale(1.1);
+        background-color: #ecf0f1;
+    }
 }
 
-barrageCardFlow:hover {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    background-color: #e8e8e8;
-}
 
 .cardService{
     text-align: center;
@@ -152,26 +152,64 @@ barrageCardFlow:hover {
     }
 }
 
-.marquee {
+.marqueeContainer {
     overflow: hidden;
     white-space: nowrap;
-    box-sizing: border-box;
-    animation: marquee 10s linear infinite;
-
-    margin-top: 20px;
-    margin-bottom: 20px;
+    width: 100%; /* 设置容器宽度 */
+    position: relative;
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    transform: translateX(0px);
-    transition: transform 0.1s linear;
+    justify-content: space-around;
+}
+
+.marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 20s linear infinite; 
+   
 }
 
 @keyframes marquee {
     0% {
-        transform: translateX(100%);
+        transform: translateX(0) /* 从右侧开始 */
     }
     100% {
-        transform: translateX(-100%);
+        transform: translateX(-50%); /* 向左移动到完全离开视口 */
+    }
+}
+
+ //web3网络icon样式
+  .iconfont1 {
+    font-family: "iconfont" !important;
+    font-size: 24px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: gray;
+  }
+
+
+  
+ //web3币种icon样式
+ .iconfont2 {
+    font-family: "iconfont" !important;
+    font-size: 24px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #fff;
+  }
+
+
+  // src/view/home/Home.module.scss
+.announcementBar {
+    background-color: #f8f9fa; // 背景色
+    color: #333; // 字体颜色
+    padding: 10px 20px; // 内边距
+    border-bottom: 1px solid #e8e8e8; // 底部边框
+    font-size: 16px; // 字体大小
+    display: flex; // 使用 flexbox 布局
+    align-items: center; // 垂直居中
+    p {
+        margin: 0; // 去掉默认的外边距
     }
 }
