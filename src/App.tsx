@@ -22,6 +22,7 @@ function App() {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
+        
         <RainbowKitProvider  theme={darkTheme()}>
           <RouterProvider router={router}></RouterProvider>
         </RainbowKitProvider>

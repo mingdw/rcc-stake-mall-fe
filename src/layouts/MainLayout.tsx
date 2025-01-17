@@ -249,7 +249,6 @@ const MainLayout: FC = () => {
       <Header style={{ display: 'flex', backgroundColor: 'white', height: '15%' }}>
         <Row style={{ width: '100%', alignItems: 'center' }}>
           <Col style={{ textAlign: 'left', width: '30%' }} >
-          <IconFont type="icon-facebook" style={{ color: '#1877F2' }} />
             <a style={{ marginLeft: '10px' }} href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
           </Col>
           <Col style={{ width: '40%' }}>
