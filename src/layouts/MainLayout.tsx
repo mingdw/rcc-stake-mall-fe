@@ -31,11 +31,6 @@ const languges = [{
 },
 ]
 
-import { createFromIconfontCN } from '@ant-design/icons';
-const IconFont  = createFromIconfontCN({
-    
-  scriptUrl: '//at.alicdn.com/t/c/font_4812078_z6m9lnzon6r.js', // 在 iconfont.cn 上生成
-});
 
 const MainLayout: FC = () => {
 

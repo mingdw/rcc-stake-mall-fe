@@ -25,7 +25,7 @@ const Home: React.FC = () => {
     ];
 
     interface CardContentProps {
-        key: string;
+        id: string;
         title: string;
         des?: string;
         bgColor?: string;
@@ -45,9 +45,9 @@ const Home: React.FC = () => {
         status?: string;
     }
 
-    const CardContentComponent: React.FC<CardContentProps> = ({ key,title, des, bgColor, children }) => {
+    const CardContentComponent: React.FC<CardContentProps> = ({ id,title, des, bgColor, children }) => {
         return (
-            <div key={key} className={styles.cardContent} style={{ backgroundColor: bgColor? bgColor : '#fff' }}>
+            <div key={id} className={styles.cardContent} style={{ backgroundColor: bgColor? bgColor : '#fff' }}>
                 <div className={styles.cardTitle}>{title}</div>
                 <hr className={styles.cardHr} />
                 {des && <p className={styles.cardDes}>{des}</p>}
@@ -148,7 +148,7 @@ const Home: React.FC = () => {
                     </div>
                 ))}
             </Carousel>
-            <CardContentComponent key="chenji" title="我们的成绩" des="2018至今，平台完成的数据" bgColor="#fff">
+            <CardContentComponent id="chenji" title="我们的成绩" des="2018至今，平台完成的数据" bgColor="#fff">
                 <Row style={{ marginTop: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
                     <Col span={5} className={styles.dashCard}>
                         <p className={styles.p1}>{userCount}+</p>
@@ -169,7 +169,7 @@ const Home: React.FC = () => {
                 </Row>
             </CardContentComponent >
 
-            <CardContentComponent key="zichan" title="支持质押借贷的加密资产" des="支持主流的稳定币ETH、USDT、USDC、DAI等数十种加密资产" bgColor="#F5F5F5">
+            <CardContentComponent id="zichan" title="支持质押借贷的加密资产" des="支持主流的稳定币ETH、USDT、USDC、DAI等数十种加密资产" bgColor="#F5F5F5">
                 <div className={styles.marqueeContainer} id="marqueeContainer">
                     <div className={styles.marquee} id="marquee">
                         {collateralDatas.map((item, index) => (
@@ -208,7 +208,7 @@ const Home: React.FC = () => {
                 </div>
             </CardContentComponent>
 
-            <CardContentComponent key="youshi" title="我们的优势" des="每一份质押都能获取收益，每一份借贷都用心服务。" bgColor="#F5F5F5">
+            <CardContentComponent id="youshi" title="我们的优势" des="每一份质押都能获取收益，每一份借贷都用心服务。" bgColor="#F5F5F5">
                 <Row style={{ width: '80%', margin: '0 auto', marginTop: '40px', marginBottom: '20px', display: 'flex', justifyContent: 'space-around' }}>
                     <Col span={5} className={styles.cardAdvantage}>
                         <div style={{ width: '95%', textAlign: 'center' }}>
@@ -241,7 +241,7 @@ const Home: React.FC = () => {
                 </Row>
             </CardContentComponent>
 
-            <CardContentComponent key="fuwu" title="我们的服务" des="借贷、质押相关的服务我们都支持，高效快捷安全服务好每一个客户" bgColor="#f5f5f5">
+            <CardContentComponent id="fuwu" title="我们的服务" des="借贷、质押相关的服务我们都支持，高效快捷安全服务好每一个客户" bgColor="#f5f5f5">
                 <Row style={{ width: '70%', margin: '0 auto', marginTop: '40px', marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
                     <Col span={5} className={styles.cardService}>
                         <p className={styles.title}>质押服务</p>
