@@ -47,6 +47,7 @@ const MainLayout: FC = () => {
   const { data: balance } = useBalance({
     address: address,
     chainId: chainId
+                     
   })
 
   const currentChain = config.chains.find(chain => chain.id === chainId)

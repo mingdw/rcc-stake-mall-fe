@@ -1,19 +1,49 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit'
-import { sepolia } from 'viem/chains'
 import { http } from 'viem'
+import { mainnet, sepolia } from 'viem/chains'
+import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 
-// 打印环境变量用于调试
-console.log('WalletConnect Project ID:', import.meta.env.VITE_PUBLIC_WALLET_CONNECT_PROJECT_ID)
+// WalletConnect projectId 和 Infura projectId
+const walletConnectProjectId = import.meta.env.VITE_PUBLIC_WALLET_CONNECT_PROJECT_ID
+const infuraApiKey = import.meta.env.VITE_PUBLIC_INFURA_API_KEY
 
-export const config = getDefaultConfig({
-  appName: 'RCC Stake Pool',
-  projectId: import.meta.env.VITE_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'c1054524b1fc46c4f876bd10a1fc4d08',
-  chains: [sepolia],
-  transports: {
-    [sepolia.id]: http(
-      `https://sepolia.infura.io/v3/${import.meta.env.VITE_PUBLIC_INFURA_API_KEY}`
-    ),
+console.info(walletConnectProjectId+": "+infuraApiKey)
+// 自定义 RPC URLs
+const customChains = [
+  {
+    ...mainnet,
+    rpcUrls: {
+      ...mainnet.rpcUrls,
+      default: { 
+        http: [`https://mainnet.infura.io/v3/${infuraApiKey}`] 
+      },
+      public: { 
+        http: [`https://mainnet.infura.io/v3/${infuraApiKey}`] 
+      }
+    }
+  },
+  {
+    ...sepolia,
+    rpcUrls: {
+      ...sepolia.rpcUrls,
+      default: { 
+        http: [`https://sepolia.infura.io/v3/${infuraApiKey}`] 
+      },
+      public: { 
+        http: [`https://sepolia.infura.io/v3/${infuraApiKey}`] 
+      }
+    }
   }
+]
+
+// 配置 RainbowKit 和 wagmi
+const config = getDefaultConfig({
+  appName: 'RCC token pledge',
+  projectId: walletConnectProjectId,
+  chains: [mainnet,sepolia],
+  transports: {
+    [mainnet.id]: http(customChains[0].rpcUrls.default.http[0]),
+    [sepolia.id]: http(customChains[1].rpcUrls.default.http[0]),
+  },
 })
 
-export const chains = [sepolia]
+export { config }
