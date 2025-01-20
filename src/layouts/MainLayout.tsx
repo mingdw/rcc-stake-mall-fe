@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
-import {QuestionOutlined , LogoutOutlined, CheckOutlined, HomeOutlined, ShoppingOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined } from '@ant-design/icons';
-import { MenuProps, Input, Avatar, List, Divider, Tooltip, Tabs, Card, message } from 'antd';
-import { Col, Row, Layout, Menu, theme, Space, Select, Button, Image, Dropdown, Typography } from 'antd';
+import {QuestionOutlined , LogoutOutlined, CheckOutlined, HomeOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined } from '@ant-design/icons';
+import { MenuProps, Avatar, message } from 'antd';
+import { Col, Row, Layout, Menu, theme, Space, Select, Button, Dropdown, Typography } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 
@@ -10,12 +10,10 @@ import Search from 'antd/es/input/Search';
 import { useTranslation } from 'react-i18next';
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { useAccount, useDisconnect, useBalance, useChainId, useConfig } from 'wagmi'
-import { type BaseError } from 'viem'
-import { injected } from 'wagmi/connectors'
 import { mainnet, sepolia } from 'wagmi/chains';
-import Link from 'antd/es/typography/Link';
+import { useAuth } from '../context/AuthContext';
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Footer } = Layout;
 export const HOME_PATH_NAME = "home"
 export const SUPLY_PATH_NAME = "suply"
 export const BORROW_PATH_NAME = "borrow"
@@ -33,7 +31,7 @@ const languges = [{
 
 
 const MainLayout: FC = () => {
-
+  const { setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
   type MenuItem = Required<MenuProps>['items'][number];
   const defaultAddeess = "0x127kkb...Kj52"
   const [tconnect, setTconnect] = useState(false); //
@@ -58,9 +56,22 @@ const MainLayout: FC = () => {
   // 处理连接钱包
   const handleConnectWallet = () => {
     setTconnect(true); // 默认设置为已连接
+    // 登录成功设置全局变量
+   
     // if (openConnectModal) {
     //   //openConnectModal()
     // }
+    const loginData = {
+      address: '0x1234567890abcdef', // 示例地址
+      balance: 1.5, // 示例余额
+      chainID: 1, // 示例链 ID
+      name: 'User Name', // 示例名称
+      isAdmin: true, // 示例是否是管理员
+  };
+
+  // 登录成功设置全局变量
+  setAuthData(loginData); 
+
   }
 
   const [current, setCurrent] = useState('home');
@@ -124,6 +135,13 @@ const MainLayout: FC = () => {
     console.info("select key: " + key);
     if (key == 'disconnect' && tconnect) {
       setTconnect(false)
+      setAuthData({
+        address: null,
+        balance: null,
+        chainID: null,
+        name: null,
+        isAdmin: false,
+      })
     }else{
       navigate(key)
     }

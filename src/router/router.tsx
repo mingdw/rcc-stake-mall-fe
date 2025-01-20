@@ -16,6 +16,7 @@ import NotificationSettings from "../view/admin/profile/NotificationSettings";
 
 import Borrow from "../view/borrow/BorrowIndex";
 import Suply from "../view/suply/SuplyIndex";
+import SuplyDetails from "../view/suply/SuplyDetails";
 
 
 const router = createBrowserRouter([
@@ -34,6 +35,11 @@ const router = createBrowserRouter([
             {
                 path: '/suply',
                 element:<Suply/>
+               
+            },
+            {
+                path:'/suply/details',
+                element:<SuplyDetails/>
             },
             {
                 path: '/borrow',

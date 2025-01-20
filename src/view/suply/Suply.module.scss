@@ -9,8 +9,74 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: left;
+    width: 80%;
+    height: auto;
+    background-color:#fff;
+    margin-top: 20px;
+    .icon{
+        font-size: 100px;
+        color: #0BA1E4;
+    }
+    .p1{
+        font-size: 24px;
+        font-weight: bold;
+        color: #0BA1E4;
+    }
+    .p2{
+        font-size: 16px;
+        color: gray;
+    }
+
+    .sp1{
+        color: gray;
+        font-size: 12px;
+    }
+    .sp2{
+        color: #0BA1E4;
+        font-size: 16px;
+        font-weight: bold;
+
+    }
+}
+
+.containerContent{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100px;
-    background-color: #f0f2f5;
+    width: 80%;
+    height: auto;
+    margin-top: 20px;
+}
+
+/* src/view/suply/SuplyIndex.css */
+.statusBadge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    color: white;
+    .b01{
+        background-color: #4caf50; /* 绿色 */           
+    }
+    .b02{
+        background-color: #f44336; /* 红色 */
+    }
+    .b03{
+        background-color: #ff9800; /* 橙色 */
+    }
+    .b04{
+        background-color: #ffeb3b; /* 黄色 */
+    }
+    .b05{
+        background-color: #2196f3; /* 蓝色 */
+    }
+    .b06{
+        background-color: #9e9e9e; /* 灰色 */
+    }
+    .b07{
+        background-color: #e91e63; /* 粉色 */
+    }
+    .b08{
+        background-color: #3f51b5; /* 深蓝色 */
+    }
 }
