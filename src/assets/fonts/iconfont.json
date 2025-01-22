@@ -6,6 +6,97 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "36584969",
+      "name": "Jewelry",
+      "font_class": "Jewelry",
+      "unicode": "e67d",
+      "unicode_decimal": 59005
+    },
+    {
+      "icon_id": "38351126",
+      "name": "highjewelry",
+      "font_class": "highjewelry",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "38403845",
+      "name": "tg-jewelry",
+      "font_class": "tg-jewelry",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "42130031",
+      "name": "Dangling Jewelry",
+      "font_class": "a-DanglingJewelry",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "213018",
+      "name": "jewelry",
+      "font_class": "jewelry",
+      "unicode": "e6e4",
+      "unicode_decimal": 59108
+    },
+    {
+      "icon_id": "2665336",
+      "name": "jewelry-round",
+      "font_class": "jewelry-round",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
+    },
+    {
+      "icon_id": "8010484",
+      "name": "Diamond",
+      "font_class": "Diamond",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "13609389",
+      "name": "jewelry",
+      "font_class": "jewelry1",
+      "unicode": "e6e8",
+      "unicode_decimal": 59112
+    },
+    {
+      "icon_id": "1043847",
+      "name": "wallet",
+      "font_class": "wallet",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "7215021",
+      "name": "Wallet",
+      "font_class": "Wallet",
+      "unicode": "e6e1",
+      "unicode_decimal": 59105
+    },
+    {
+      "icon_id": "11486655",
+      "name": "ethereum-wallet",
+      "font_class": "ethereum-wallet",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "16619493",
+      "name": "wallet",
+      "font_class": "wallet1",
+      "unicode": "e6e0",
+      "unicode_decimal": 59104
+    },
+    {
+      "icon_id": "24497711",
+      "name": "BTC",
+      "font_class": "BTC",
+      "unicode": "e622",
+      "unicode_decimal": 58914
+    },
+    {
       "icon_id": "201583",
       "name": "3.1回到顶部",
       "font_class": "31huidaodingbu",

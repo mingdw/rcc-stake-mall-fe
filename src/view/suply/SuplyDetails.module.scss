@@ -57,5 +57,71 @@
     width: 80%;
     height: auto;
     margin-top: 20px;
+
+    .progress{
+        color: #4CAF50;
+    }
+
+    .p1{
+        font-size: 12px;
+        color: gray;
+    }
+    .p2{
+        font-size: 16px;
+    }
+    .p3{
+        font-size: 16px;
+        color: gray;
+        font-weight: bold;
+    }
+
 }
+
+.accountInfo{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: left;
+    width: 100%;
+    height: auto;
+    .p1{
+        font-size: 12px;
+        color: gray;
+    }
+    .p2{
+        font-size: 16px;
+        color: black;
+    }
+    .p3{
+        font-size: 16px;
+        color: gray;
+        font-weight: bold;
+    }
+
+    .row{
+        margin-top: 20px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid black;
+        text-align: center;
+    }
+
+    .buttonActive{
+        width: 100%;
+        background-color: #fff;
+        color: black;
+        border-radius: 0px;
+    }
+  
+
+    .buttonUnActive{
+        width: 100%;
+        background-color: black;
+        color: white;
+        border-radius: 0px;
+    }
+}
+
 

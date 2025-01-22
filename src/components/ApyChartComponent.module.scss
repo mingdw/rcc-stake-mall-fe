@@ -1,0 +1,38 @@
+// src/components/ApyChartComponent.module.scss
+
+.chartContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.chartRow {
+    margin-bottom: -10px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    .title {
+        font-size: 16px;
+        margin-left: 0;
+        text-align: left;
+       
+    }
+    
+    .buttonGroup {
+        text-align: right;
+        margin-left: -10px;
+    }
+}
+
+
+.activeButton {
+    background-color: white; // 选中状态背景色
+    color: black; // 选中状态文字颜色
+}
+
+.inactiveButton {
+    background-color: rgb(214, 208, 208); // 默认状态背景色
+    color: white; // 默认状态文字颜色
+}

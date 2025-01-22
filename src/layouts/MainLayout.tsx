@@ -6,10 +6,11 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 
 import mainCss from './MainLayout.module.scss';
-import { useTranslation } from'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useBalance, useChains, useDisconnect, useSwitchChain } from 'wagmi';
 import { useAuth } from '../context/AuthContext';
+import { color } from 'echarts';
 
 const { Header, Content, Footer } = Layout;
 export const HOME_PATH_NAME = "home";
@@ -106,6 +107,12 @@ const MainLayout: FC = () => {
     marginBottom: '20px'
   };
 
+  const logoStyle={
+    color:'#1296DB',
+    fontSize:'16px',
+    with:'10px',
+    height:'10px',
+  }
 
   // 地址缩写函数
   const shortenAddress = (addr: string) => {
@@ -235,7 +242,7 @@ const MainLayout: FC = () => {
           <Row>
             <Typography.Text>{shortenAddress(address || '')}</Typography.Text>
           </Row>
-          {isCopy?
+          {isCopy ?
             <CheckOutlined className='text-success' /> :
             <a onClick={handleCopy} style={{ cursor: 'pointer' }}>
               <CopyOutlined className='text-defult' />
@@ -247,7 +254,7 @@ const MainLayout: FC = () => {
           <Row>
             <Col span={8}>
               <span className='text-danger' style={{ fontSize: '12px' }}>
-                {balance? formatBalance(balance.value.toString()) : 0} ETH
+                {balance ? formatBalance(balance.value.toString()) : 0} ETH
               </span><br />
               <span style={{ fontSize: '10px', color: 'gray' }}>
                 余额
@@ -255,7 +262,7 @@ const MainLayout: FC = () => {
             </Col>
             <Col span={8}>
               <span className='text-danger' style={{ fontSize: '12px' }}>
-                {balance? formatBalance(balance.value.toString()) : 0} ETH
+                {balance ? formatBalance(balance.value.toString()) : 0} ETH
               </span><br />
               <span style={{ fontSize: '10px', color: 'gray' }}>
                 质押
@@ -278,7 +285,7 @@ const MainLayout: FC = () => {
               key: menuItem.key,
               label: menuItem.title,
               icon: menuItem.icon,
-              children: menuItem.children? menuItem.children.map(subMenuItem => ({
+              children: menuItem.children ? menuItem.children.map(subMenuItem => ({
                 // Handle subMenuItem here if needed
               })) : undefined,
             }))}
@@ -311,7 +318,11 @@ const MainLayout: FC = () => {
       <Header style={{ display: 'flex', backgroundColor: 'white', height: '15%' }}>
         <Row style={{ width: '100%', alignItems: 'center' }}>
           <Col style={{ textAlign: 'left', width: '30%' }} >
-            <a style={{ marginLeft: '10px' }} href={HOME_PATH_NAME}> <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}</span> </a>
+          <span className="iconfont" style={{color:'#1296DB',fontSize:'34px'}}>&#xe610;</span>
+            <a style={{ marginLeft: '10px' }} href={HOME_PATH_NAME}>
+              <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}
+              </span> 
+            </a>
           </Col>
           <Col style={{ width: '40%' }}>
             <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />
@@ -320,7 +331,7 @@ const MainLayout: FC = () => {
           <Col style={{ width: '30%', display: 'flex', justifyContent: 'flex-end' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
               <Select size={"middle"} defaultValue="简体中文" onChange={handleChange} options={languges} style={{ marginLeft: '10px' }} />
-              {isConnected? (
+              {isConnected ? (
 
                 <Space style={{ marginLeft: '20px' }}>
                   <Select defaultValue={chains[0].name} options={chains.map((chain) => ({ label: chain.name, value: chain.id, prefixIcon: <img src={chainIcons[chain.id]} alt={chain.name} style={{ width: 20, height: 20 }} /> }))} onSelect={handleNetworkChange} />
@@ -330,7 +341,7 @@ const MainLayout: FC = () => {
                     )}
                     placement="bottom"
                   >
-                    <Input readOnly style={{ width: '70%' } } prefix={<UserAvatar />} defaultValue={shortenAddress(address || '')} suffix={<DownOutlined />} />
+                    <Input readOnly style={{ width: '70%' }} prefix={<UserAvatar />} defaultValue={shortenAddress(address || '')} suffix={<DownOutlined />} />
 
                   </Dropdown>
                 </Space>
