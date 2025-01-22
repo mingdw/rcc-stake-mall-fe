@@ -46,14 +46,14 @@ const Suply: React.FC = () => {
 
      // 动态样式映射
      const dynamicStyles: { [key: string]: React.CSSProperties } = {
-        b01: { backgroundColor: '#4caf50', color: 'white' }, // 绿色
-        b02: { backgroundColor: '#f44336', color: 'white' }, // 红色
-        b03: { backgroundColor: '#ff9800', color: 'white' }, // 橙色
-        b04: { backgroundColor: '#ffeb3b', color: 'blue' }, // 黄色
-        b05: { backgroundColor: '#2196f3', color: 'white' }, // 蓝色
-        b06: { backgroundColor: '#9e9e9e', color: 'white' }, // 灰色
-        b07: { backgroundColor: '#e91e63', color: 'white' }, // 粉色
-        b08: { backgroundColor: '#3f51b5', color: 'white' }, // 深蓝色
+        b01: { color: '#4caf50' }, // 绿色
+        b02: { color: '#f44336' }, // 红色
+        b03: { color: '#ff9800' }, // 橙色
+        b04: { color: '#ffeb3b' }, // 黄色
+        b05: { color: '#2196f3' }, // 蓝色
+        b06: { color: '#9e9e9e' }, // 灰色
+        b07: { color: '#e91e63' }, // 粉色
+        b08: { color: '#3f51b5' }, // 深蓝色
     };
 
     // 表格列定义

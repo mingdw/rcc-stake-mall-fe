@@ -8,9 +8,9 @@ import classnames from 'classnames';
 import mainCss from './MainLayout.module.scss';
 import { useTranslation } from 'react-i18next';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useAccount, useBalance, useChains, useDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useBalance, useChainId, useChains, useDisconnect, useSwitchChain } from 'wagmi';
 import { useAuth } from '../context/AuthContext';
-import { color } from 'echarts';
+import { formatBalance, shortenAddress } from '../utils/common';
 
 const { Header, Content, Footer } = Layout;
 export const HOME_PATH_NAME = "home";
@@ -36,28 +36,98 @@ const chainIcons: { [key: number]: string } = {
   // 添加其他链的图标
 };
 
-
 const MainLayout: FC = () => {
+  const chainId = useChainId();
   type MenuItem = Required<MenuProps>['items'][number];
   const { openConnectModal } = useConnectModal(); // 调用 useConnectModal
   const { isConnected, address } = useAccount(); // 获取连接状态和地址
-
-  //获取配置的网络连接列表
-
   const { disconnect } = useDisconnect(); // 获取 disconnect 方法
+  const { data: balance, isLoading, isError, refetch } = useBalance({ address });
+  const { switchChain } = useSwitchChain();
+  const chains = useChains(); // 获取可用的链
+  const { authData, setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
 
-  const { setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
+  // 监听账户变化
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined') {
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+    }
+
+    return () => {
+      if (typeof window.ethereum !== 'undefined') {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      }
+    };
+  }, []);
+
+  // 处理账户变化
+  const handleAccountsChanged = async (accounts: string[]) => {
+    console.log('Account changed:', accounts);
+    if (accounts.length === 0) {
+      // 用户断开了所有账户
+      await handleDisconnectWallet();
+    } else {
+      // 用户切换了账户
+      await handleAccountSwitch(accounts[0]);
+    }
+  };
+
+  // 处理账户切换
+  const handleAccountSwitch = async (newAccount: string) => {
+    try {
+      // 清理旧的连接状态
+      await handleDisconnectWallet();
+      // 更新状态为新账户
+      setAuthData({
+        address: newAccount,
+        balance: formatBalance(balance?.value.toString() || '0'), // 新的余额将通过 useBalance 自动获取
+        chainID: chainId,
+      });
+    } catch (error) {
+      console.error('Error switching account:', error);
+    }
+  };
+
+  // 处理断开连接
+  const handleDisconnectWallet = async () => {
+    try {
+      await disconnect();
+      // 清理所有状态
+      setAuthData({
+        address: '',
+        balance: '',
+        chainID: -1,
+        name: '',
+        isAdmin: false,
+      });
+      // 可能需要清理其他状态...
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+    }
+  };
+
   // 处理连接钱包
   const handleConnectWallet = async () => {
     if (!isConnected) {
-      openConnectModal?.(); // 打开连接界面
+      openConnectModal?.();
+    }else{
+      //  如果连接成功，setAuthData
+      setAuthData({
+        address: address,
+        balance: formatBalance(balance?.value.toString() || '0'),
+        chainID: chainId,
+        name: '',
+        isAdmin: false,
+      });
+      console.log(" 连接成功: " + JSON.stringify(authData));
     }
   };
-  const { switchChain } = useSwitchChain();
-  const { data: balance, isLoading, isError, refetch } = useBalance({ address });
+
+
+ 
   const [current, setCurrent] = useState('home');
   const navigate = useNavigate();
-  const chains = useChains(); // 获取可用的链
+
 
   const { t, i18n } = useTranslation();
   const items: MenuItem[] = [
@@ -107,40 +177,13 @@ const MainLayout: FC = () => {
     marginBottom: '20px'
   };
 
-  const logoStyle={
-    color:'#1296DB',
-    fontSize:'16px',
-    with:'10px',
-    height:'10px',
-  }
 
-  // 地址缩写函数
-  const shortenAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
-
-  // 余额格式话：将 wei 转换为 ETH 并保留3位小数
-  const formatBalance = (balance: string | bigint) => {
-    // 如果 balance 是 bigint 类型，将其转换为字符串
-    if (typeof balance === 'bigint') {
-      balance = balance.toString();
-    }
-    const ethBalance = parseFloat(balance) / Math.pow(10, 18);
-    return ethBalance.toFixed(3);
-  };
 
   const handleMenuClick = (key: string) => {
     console.info("select key: " + key);
     if (key == 'disconnect' && isConnected) {
       console.info("disconnect");
-      disconnect();
-      setAuthData({
-        address: null,
-        balance: null,
-        chainID: null,
-        name: null,
-        isAdmin: false,
-      });
+      handleDisconnectWallet();
     } else {
       navigate(key);
     }
@@ -152,7 +195,16 @@ const MainLayout: FC = () => {
     try {
       await switchChain({ chainId: networkId }); // 等待网络切换完成
       await refetch(); // 手动调用 refetch 函数
-      console.info("切换网络成功！！！+ 余额：" + formatBalance(balance?.value.toString() || '0'));
+    
+      const balanceInETH = formatBalance(balance?.value.toString() || '0');
+      console.info("切换网络成功！！！+ 连接状态： " +isConnected + " 余额： " + balanceInETH);
+      await setAuthData({
+        address: address,
+        balance: balanceInETH,
+        chainID: networkId,
+        name: '',
+        isAdmin: false,
+      });
     } catch (error) {
       console.error('Error occurred during network switch or balance fetch:', error);
       message.error('切换网络或更新余额时出错，请重试');
@@ -296,20 +348,6 @@ const MainLayout: FC = () => {
       </Space>
     );
   };
-
-  // 生成网络列表的菜单项
-  const menuProps = (
-    <Menu>
-      {chains.map((chain) => (
-        <Menu.Item key={chain.id} onClick={() => console.log(`切换到 ${chain.name}`)}>
-          <Space>
-            <img src={chainIcons[chain.id]} alt={chain.name} style={{ width: 20, height: 20, marginRight: 8 }} />
-            {chain.name}
-          </Space>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
 
 
   return (

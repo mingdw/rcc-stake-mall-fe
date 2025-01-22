@@ -2,17 +2,16 @@ import React, { FC, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Button, Card, Col, Divider, Progress, Row, Space, Tabs, TabsProps, Tooltip, Typography } from "antd";
-import { InfoCircleOutlined,PayCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from './SuplyDetails.module.scss'
 import ApyChartCompoment from "../../components/ApyChartCompoment";
+import { formatBalance } from "../../utils/common";
 
 const SuplyDetails: FC = () => {
     const location = useLocation();
-    const { address, balance, chainID, name, isAdmin } = useAuth()
     const { data } = location.state || {}; // 获取传递的行数据
-
+    const {authData} = useAuth();
     const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '6m' | '1y'>('1m');
-
     const balanceInfo = [
             {key:'tab1',title:'ETH',content:'ETH 余额信息展示区域'},
             {key:'tab2',title:'WETH',content:'WETH 余额信息展示区域'}
@@ -23,6 +22,7 @@ const SuplyDetails: FC = () => {
     const handleTabChange = (key: string) => {
         setSelectedTab(key);
         console.log(key);
+        console.log("authData: " + JSON.stringify(authData));
     };
 
     // 定义利率数据
@@ -73,22 +73,18 @@ const SuplyDetails: FC = () => {
 
     useEffect(() => {
         console.log("pool key: " + data.key);
-    }, [data])
+        console.log("authData: " + JSON.stringify(authData));
+    }, [data,authData])
 
-    const onChange = (key: string) => {
-        console.log(key);
-      };
 
     const createBalanceInfo = (tabKey:string)=>{
-
-
         return <div>
                     <Space direction="horizontal" size={10}>
                      <span className="iconfont" style={{color:'gray',fontSize:'36px'}}>&#xe6e0;</span>
                     {/* <PayCircleOutlined style={{color:'gray',fontSize:'36px'}}/> */}
                         <div>
                             <span className={styles.p1}>账户余额</span><br/>
-                            <span className={styles.p2}>{balance ? balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br/>
+                            <span className={styles.p2}>{authData.balance ? authData.balance: 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br/>
                         </div>
                     </Space>  
                     <Divider type="vertical" />
