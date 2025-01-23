@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "592907",
+      "name": "gasstation",
+      "font_class": "gasstation",
+      "unicode": "e693",
+      "unicode_decimal": 59027
+    },
+    {
+      "icon_id": "10330019",
+      "name": "gas-pump",
+      "font_class": "gas-pump",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
+      "icon_id": "7553919",
+      "name": "素材库",
+      "font_class": "RectangleCopy",
+      "unicode": "e6e9",
+      "unicode_decimal": 59113
+    },
+    {
       "icon_id": "36584969",
       "name": "Jewelry",
       "font_class": "Jewelry",

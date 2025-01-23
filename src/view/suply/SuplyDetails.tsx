@@ -1,20 +1,21 @@
 import React, { FC, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Button, Card, Col, Divider, Progress, Row, Space, Tabs, TabsProps, Tooltip, Typography } from "antd";
+import { Button, Card, Col, Divider, Input, Modal, Progress, Row, Space, Tabs, TabsProps, Tooltip, Typography } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from './SuplyDetails.module.scss'
 import ApyChartCompoment from "../../components/ApyChartCompoment";
-import { formatBalance } from "../../utils/common";
 
 const SuplyDetails: FC = () => {
     const location = useLocation();
     const { data } = location.state || {}; // 获取传递的行数据
-    const {authData} = useAuth();
+    const { authData } = useAuth();
+    const [balance, setBalance] = useState(authData?.balance ? authData?.balance : '0'); // 使用状态管理 balance
+
     const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '6m' | '1y'>('1m');
     const balanceInfo = [
-            {key:'tab1',title:'ETH',content:'ETH 余额信息展示区域'},
-            {key:'tab2',title:'WETH',content:'WETH 余额信息展示区域'}
+        { key: 'tab1', title: 'ETH', content: 'ETH 余额信息展示区域' },
+        { key: 'tab2', title: 'WETH', content: 'WETH 余额信息展示区域' }
     ]
 
 
@@ -23,6 +24,7 @@ const SuplyDetails: FC = () => {
         setSelectedTab(key);
         console.log(key);
         console.log("authData: " + JSON.stringify(authData));
+        setBalance("0.1")
     };
 
     // 定义利率数据
@@ -74,25 +76,130 @@ const SuplyDetails: FC = () => {
     useEffect(() => {
         console.log("pool key: " + data.key);
         console.log("authData: " + JSON.stringify(authData));
-    }, [data,authData])
+    }, [data, authData])
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [stakeAmount, setStakeAmount] = useState('');
 
 
-    const createBalanceInfo = (tabKey:string)=>{
+    const showModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleStakeAmountChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+        setStakeAmount(e.target.value);
+        // 这里可以添加逻辑来实时计算 ETH 的美元价值
+    };
+    const createBalanceInfo = (tabKey: string) => {
         return <div>
-                    <Space direction="horizontal" size={10}>
-                     <span className="iconfont" style={{color:'gray',fontSize:'36px'}}>&#xe6e0;</span>
+            <div style={{ textAlign: 'left' }}>
+                <Space direction="horizontal" size={10}>
+                    <span className="iconfont" style={{ color: 'gray', fontSize: '28px' }}>&#xe6e0;</span>
                     {/* <PayCircleOutlined style={{color:'gray',fontSize:'36px'}}/> */}
-                        <div>
-                            <span className={styles.p1}>账户余额</span><br/>
-                            <span className={styles.p2}>{authData.balance ? authData.balance: 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br/>
-                        </div>
-                    </Space>  
-                    <Divider type="vertical" />
-
                     <div>
-
+                        <span className={styles.p1}>账户余额</span><br />
+                        <span className={styles.p2}>{authData.balance ? authData.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
                     </div>
-                </div>
+                </Space>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+                <hr />
+                <Row style={{ width: '90%' }}>
+                    <Col span={12} style={{ textAlign: 'left' }}>
+                        <span className={styles.p1}>账户可用余额</span>
+                        <Tooltip title="质押率是指已质押资产与目标质押资产的比率。">
+                            <InfoCircleOutlined className={styles.titleIcon} />
+                        </Tooltip><br />
+                        <span className={styles.p2}>{authData.balance ? authData.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
+                        <span className={styles.p1}>$13.23</span>
+                    </Col>
+                    <Col span={12} style={{ textAlign: 'right' }}>
+                        <Button type="primary" style={{ marginTop: '20px' }} disabled={balance === '0'} onClick={showModal}>质押{balance}</Button>
+                        <Modal
+                            title="质押详情"
+                            open={isModalVisible}
+                            onOk={handleOk}
+                            onCancel={handleCancel}
+                            footer={null} // 自定义底部
+                            width={400}
+                        >
+                            <div style={{ backgroundColor: '#F9EBEB', color: '#7B4F4F', padding: '10px', marginBottom: '10px' }}>
+                                文字提示，你可以 <a href="#" style={{ color: '#7B4F4F', textDecoration: 'underline' }} >切换网络</a>
+                            </div>
+                            <Row style={{ marginTop: '20px' }}>
+                                <Col span={24}>
+                                    <span style={{ fontSize: '12px', color: 'gray' }}>交易金额</span>
+                                    <Tooltip title="质押率是指已质押资产与目标质押资产的比率。">
+                                        <InfoCircleOutlined className={styles.titleIcon} />
+                                    </Tooltip><br />
+                                    <Input
+                                        placeholder="输入质押金额"
+                                        prefix={
+                                            <div style={{position:'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                                                <span style={{fontSize:'14px',color:'gray',marginTop:'55px'}}>$ 134</span>
+                                            </div>
+                                            }
+                                        suffix={
+                                            <div style={{textAlign:'right',marginTop:'25px'}}>
+                                             <span className="iconfont" style={{ color: 'gray', fontSize: '18px',marginTop:'20px',marginRight:'10px' }}>&#xe67b;  ETH</span><br/>
+                                             <span style={{fontSize:'12px',color:'gray',marginTop:'55px'}}>钱包可用余额:0.00134 ETH</span>
+                                            </div>
+                                    
+                                        }
+                                        value={stakeAmount}
+                                        onChange={handleStakeAmountChange}
+                                        style={{ height: '70px',paddingBottom:'30px' }}
+                                    />
+                                </Col>
+                            </Row>
+                            <Row style={{ marginTop: '20px' }}>
+                                <Col span={24}>
+                                    <span style={{ fontSize: '12px', color: 'gray' }}>附加信息</span>
+                                    <Tooltip title="质押率是指已质押资产与目标质押资产的比率。">
+                                        <InfoCircleOutlined className={styles.titleIcon} /> 
+                                    </Tooltip><br />
+                                    <div style={{border:'1px solid #D9D9D9',borderRadius:'5px',padding:'10px'}}>
+                                        <Row>
+                                            <Col span={12} style={{textAlign:'left',color:'gray',fontSize:'10px'}}>质押收益率</Col>
+                                            <Col span={12} style={{textAlign:'right'}}>1.7 %</Col>
+                                        </Row>
+                                        <Row style={{color:'gray',fontSize:'10px',marginBottom:'10px'}}>
+                                            <Col span={12} style={{textAlign:'left'}}>质押期限</Col>
+                                            <Col span={12} style={{textAlign:'right'}}>30天</Col>
+                                        </Row>
+                                        <Row style={{color:'gray',fontSize:'10px',marginBottom:'10px'}}>
+                                            <Col span={12} style={{textAlign:'left'}}>质押状态</Col>
+                                            <Col span={12} style={{textAlign:'right',color:'#4CAF50'}}>可质押</Col>
+                                        </Row>
+                                    </div>
+                                </Col>
+                            </Row>
+                            <Row style={{ marginBottom: '10px'}}>
+                                <Col span={24}>
+                                    <span className="iconfont" style={{ color: 'black', fontSize: '18px' }} >&#xe693; -</span>
+                                </Col>
+                            </Row>
+                            <Button type="primary" block onClick={handleOk}>
+                                确认
+                            </Button>
+                        </Modal>
+                    </Col>
+                </Row>
+                <Row style={{ backgroundColor: '#E3EDF9', marginTop: '20px', textAlign: 'left' }}>
+                    <Typography.Paragraph style={{ color: '#28517F', marginLeft: '10px', marginTop: '10px', fontSize: '12px' }}>
+                        您需要质押不少于规定的最少质押金额
+                    </Typography.Paragraph>
+                </Row>
+            </div>
+        </div >
     }
 
     return (
@@ -220,20 +327,20 @@ const SuplyDetails: FC = () => {
                                 </Row>
                                 <Row className={styles.row}>
                                     <Col span={12} >
-                                        <Button className={selectedTab === 'tab1' ? styles.buttonActive : styles.buttonUnActive} onClick={()=>handleTabChange('tab1')}>{balanceInfo[0].title}</Button>
+                                        <Button className={selectedTab === 'tab1' ? styles.buttonActive : styles.buttonUnActive} onClick={() => handleTabChange('tab1')}>{balanceInfo[0].title}</Button>
                                     </Col>
                                     <Col span={12} >
-                                        <Button className={selectedTab === 'tab2' ? styles.buttonActive : styles.buttonUnActive} onClick={()=>handleTabChange('tab2')}>{balanceInfo[1].title}</Button>
+                                        <Button className={selectedTab === 'tab2' ? styles.buttonActive : styles.buttonUnActive} onClick={() => handleTabChange('tab2')}>{balanceInfo[1].title}</Button>
                                     </Col>
                                 </Row>
-                                <Row style={{marginTop:'20px'}}>
-                                      {balanceInfo.map((item,index)=>{
-                                        if(item.key === selectedTab){
-                                        return <Col span={12}>
-                                            {createBalanceInfo(item.key)}
-                                      </Col>
-                                      }
-                                      })}
+                                <Row className={styles.row}>
+                                    {balanceInfo.map((item, index) => {
+                                        if (item.key === selectedTab) {
+                                            return <Col span={24}>
+                                                {createBalanceInfo(item.key)}
+                                            </Col>
+                                        }
+                                    })}
                                 </Row>
                             </Card>
                         </Col>
