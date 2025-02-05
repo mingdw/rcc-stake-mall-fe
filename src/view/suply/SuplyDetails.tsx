@@ -5,11 +5,13 @@ import { Button, Card, Col, Divider, Input, Modal, Progress, Row, Space, Tabs, T
 import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from './SuplyDetails.module.scss'
 import ApyChartCompoment from "../../components/ApyChartCompoment";
+import { pingServer } from "../../api/apiService";
 
 const SuplyDetails: FC = () => {
     const location = useLocation();
     const { data } = location.state || {}; // 获取传递的行数据
     const { authData } = useAuth();
+   
     const [balance, setBalance] = useState(authData?.balance ? authData?.balance : '0'); // 使用状态管理 balance
 
     const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '6m' | '1y'>('1m');
@@ -79,7 +81,18 @@ const SuplyDetails: FC = () => {
     }, [data, authData])
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [stakeAmount, setStakeAmount] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [usdValue, setUsdValue] = useState('0');
+    
+    // ETH to USD 转换率（实际项目中应该从 API 获取）
+    const ETH_TO_USD_RATE = 3070; 
 
+    // 计算 ETH 余额对应的 USD 价值
+    const getBalanceInUSD = () => {
+        if (!authData?.balance) return '0.00';
+        const usdBalance = (Number(authData.balance) * ETH_TO_USD_RATE).toFixed(2);
+        return usdBalance;
+    };
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -87,16 +100,39 @@ const SuplyDetails: FC = () => {
 
     const handleOk = () => {
         setIsModalVisible(false);
+        pingServer().then(response => {
+            console.log('Server is running:', response);
+        }).catch(error => {
+            console.error('Failed to ping server:', error);
+        });
     };
 
     const handleCancel = () => {
         setIsModalVisible(false);
     };
 
-    const handleStakeAmountChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
-        setStakeAmount(e.target.value);
-        // 这里可以添加逻辑来实时计算 ETH 的美元价值
+    const handleStakeAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        
+        // 只允许输入数字和小数点
+        if (!/^\d*\.?\d*$/.test(inputValue)) {
+            return;
+        }
+
+        setStakeAmount(inputValue);
+
+        // 检查输入值是否大于可用余额
+        if (inputValue && Number(inputValue) > Number(authData.balance) && Number(inputValue) > 0) {
+            setErrorMessage('输入金额不能超过可用余额');
+        } else {
+            setErrorMessage('');
+        }
+
+        // 计算美元价值
+        const usdAmount = inputValue ? (Number(inputValue) * ETH_TO_USD_RATE).toFixed(2) : '0';
+        setUsdValue(usdAmount);
     };
+
     const createBalanceInfo = (tabKey: string) => {
         return <div>
             <div style={{ textAlign: 'left' }}>
@@ -119,10 +155,17 @@ const SuplyDetails: FC = () => {
                             <InfoCircleOutlined className={styles.titleIcon} />
                         </Tooltip><br />
                         <span className={styles.p2}>{authData.balance ? authData.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
-                        <span className={styles.p1}>$13.23</span>
+                        <span className={styles.p1}>$ {getBalanceInUSD()}</span>
                     </Col>
                     <Col span={12} style={{ textAlign: 'right' }}>
-                        <Button type="primary" style={{ marginTop: '20px' }} disabled={balance === '0'} onClick={showModal}>质押{balance}</Button>
+                        <Button 
+                            type="primary" 
+                            style={{ marginTop: '20px' }} 
+                            disabled={!authData.balance || Number(authData.balance) <= 0} 
+                            onClick={showModal}
+                        >
+                            质押
+                        </Button>
                         <Modal
                             title="质押详情"
                             open={isModalVisible}
@@ -132,7 +175,7 @@ const SuplyDetails: FC = () => {
                             width={400}
                         >
                             <div style={{ backgroundColor: '#F9EBEB', color: '#7B4F4F', padding: '10px', marginBottom: '10px' }}>
-                                文字提示，你可以 <a href="#" style={{ color: '#7B4F4F', textDecoration: 'underline' }} >切换网络</a>
+                                文字提示，你可以 <a href="!#" style={{ color: '#7B4F4F', textDecoration: 'underline' }} >切换网络</a>
                             </div>
                             <Row style={{ marginTop: '20px' }}>
                                 <Col span={24}>
@@ -144,20 +187,25 @@ const SuplyDetails: FC = () => {
                                         placeholder="输入质押金额"
                                         prefix={
                                             <div style={{position:'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                                                <span style={{fontSize:'14px',color:'gray',marginTop:'55px'}}>$ 134</span>
+                                                <span style={{fontSize:'14px',color:'gray',marginTop:'55px'}}>$ {usdValue}</span>
                                             </div>
-                                            }
+                                        }
                                         suffix={
                                             <div style={{textAlign:'right',marginTop:'25px'}}>
-                                             <span className="iconfont" style={{ color: 'gray', fontSize: '18px',marginTop:'20px',marginRight:'10px' }}>&#xe67b;  ETH</span><br/>
-                                             <span style={{fontSize:'12px',color:'gray',marginTop:'55px'}}>钱包可用余额:0.00134 ETH</span>
+                                                <span className="iconfont" style={{ color: 'gray', fontSize: '18px',marginTop:'20px',marginRight:'10px' }}>&#xe67b;  ETH</span><br/>
+                                                <span style={{fontSize:'12px',color:'gray',marginTop:'55px'}}>钱包可用余额:{authData.balance} ETH</span>
                                             </div>
-                                    
                                         }
                                         value={stakeAmount}
                                         onChange={handleStakeAmountChange}
-                                        style={{ height: '70px',paddingBottom:'30px' }}
+                                        style={{ height: '70px', paddingBottom:'30px' }}
+                                        status={errorMessage ? 'error' : ''}
                                     />
+                                    {errorMessage && (
+                                        <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                                            {errorMessage}
+                                        </div>
+                                    )}
                                 </Col>
                             </Row>
                             <Row style={{ marginTop: '20px' }}>
@@ -187,7 +235,17 @@ const SuplyDetails: FC = () => {
                                     <span className="iconfont" style={{ color: 'black', fontSize: '18px' }} >&#xe693; -</span>
                                 </Col>
                             </Row>
-                            <Button type="primary" block onClick={handleOk}>
+                            <Button 
+                                type="primary" 
+                                block 
+                                onClick={handleOk}
+                                disabled={
+                                    !stakeAmount || // 输入为空
+                                    Number(stakeAmount) <= 0 || // 输入金额小于等于0
+                                    Number(stakeAmount) > Number(authData.balance) || // 输入金额大于可用余额
+                                    errorMessage !== '' // 存在错误信息
+                                }
+                            >
                                 确认
                             </Button>
                         </Modal>

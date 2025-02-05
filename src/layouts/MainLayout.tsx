@@ -42,7 +42,7 @@ const MainLayout: FC = () => {
   const { openConnectModal } = useConnectModal(); // 调用 useConnectModal
   const { isConnected, address } = useAccount(); // 获取连接状态和地址
   const { disconnect } = useDisconnect(); // 获取 disconnect 方法
-  const { data: balance, isLoading, isError, refetch } = useBalance({ address });
+  const { data: balance, isLoading, isError, refetch } = useBalance({ address,query:{enabled:true} });
   const { switchChain } = useSwitchChain();
   const chains = useChains(); // 获取可用的链
   const { authData, setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
@@ -58,7 +58,19 @@ const MainLayout: FC = () => {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       }
     };
+    
   }, []);
+
+  
+  // 监听余额变化
+  useEffect(() => {
+    if (balance && address) {
+      const balanceInETH = formatBalance(balance.value.toString() || '0');
+      setAuthData({
+        balance: balanceInETH,
+      });
+    }
+  }, [balance, address]);
 
   // 处理账户变化
   const handleAccountsChanged = async (accounts: string[]) => {

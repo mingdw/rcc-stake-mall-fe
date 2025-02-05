@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import styles from './Suply.module.scss';
 import {  Card, Col, Row, Space, Table, Typography, Input, Button } from "antd";
-import { Outlet, useNavigate } from 'react-router-dom'; // 导入 useHistory
+import { data, Outlet, useNavigate } from 'react-router-dom'; // 导入 useHistory
 import { AppstoreOutlined } from '@ant-design/icons';
+import { useAccount } from 'wagmi';
+
 
 
 const { Search: AntSearch } = Input;
 
 const Suply: React.FC = () => {
     const navigate = useNavigate(); // 使用 useNavigate 钩子
-
-    const onSearch = (value: string) => {
-        console.log(value);
-    }
+    const { isConnected } = useAccount();
 
     // 示例数据
-    const allDataSource = [
+    const dataSource = [
         { key: '1', coin: 'Ethereum (ETH)', targetPool: 1000, yieldRate: '5%', borrowedAmount: 500, borrowRate: '1%', status: 'b01,b03' },
         { key: '2', coin: 'Bitcoin (BTC)', targetPool: 2000, yieldRate: '4%', borrowedAmount: 800, borrowRate: '1.5%', status: 'b02,b04' },
         { key: '3', coin: 'Cardano (ADA)', targetPool: 1500, yieldRate: '6%', borrowedAmount: 300, borrowRate: '0.5%', status: 'b03' },
@@ -29,6 +28,16 @@ const Suply: React.FC = () => {
         { key: '11', coin: 'Cardano (ADA)', targetPool: 1500, yieldRate: '6%', borrowedAmount: 300, borrowRate: '0.5%' ,status:'b03'},
         { key: '12', coin: 'Solana (SOL)', targetPool: 1200, yieldRate: '7%', borrowedAmount: 600, borrowRate: '1.2%' ,status:'b04'},
     ];
+
+    const [allDataSource, setAllDataSource] = useState(dataSource);
+    const onSearch = (value: string) => {
+        if(value === ''){
+            setAllDataSource(dataSource);
+        }else{
+            const filtered = allDataSource.filter(item => item.coin.toLowerCase().includes(value.toLowerCase()));
+            setAllDataSource(filtered);
+        }
+    }
 
     const [visibleCount, setVisibleCount] = useState(5); // 初始显示5行
 
@@ -106,7 +115,7 @@ const Suply: React.FC = () => {
             title: '操作',
             key: 'action',
             render: (text: any, record: any) => (
-                <Button type="link" onClick={() => handleViewDetails(record)}>
+                <Button type="link" onClick={() => handleViewDetails(record)} disabled={!isConnected}>
                     查看明细
                 </Button>
             ),

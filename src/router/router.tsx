@@ -4,19 +4,22 @@ import {createBrowserRouter} from 'react-router-dom';
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-import About from "../view/about/AboutIndex";
-import NotFount from "../view/404";
-import TransactionList from "../view/transaction/TransactionList";
-import Home from "../view/home/HomeIndex";
 
-import ProfileInfo from "../view/admin/profile/ProfileInfo";
-import ProfileBalance from "../view/admin/profile/ProfileBalance";
-import SecuritySettings from "../view/admin/profile/SecuritySettings";
-import NotificationSettings from "../view/admin/profile/NotificationSettings";
 
 import Borrow from "../view/borrow/BorrowIndex";
 import Suply from "../view/suply/SuplyIndex";
 import SuplyDetails from "../view/suply/SuplyDetails";
+import Home from "../view/Home/HomeIndex";
+import About from "../view/About/AboutIndex";
+import TransactionList from "../view/Transaction/TransactionList";
+import NotFount from "../view/403";
+import NotificationSettings from "../view/Admin/Profile/NotificationSettings";
+import ProfileBalance from "../view/Admin/Profile/ProfileBalance";
+import ProfileInfo from "../view/Admin/Profile/ProfileInfo";
+import SecuritySettings from "../view/Admin/Profile/SecuritySettings";
+import NotConnected from "../view/403";
+import PrivateRoute from "../components/PrivateRoute";
+
 
 
 const router = createBrowserRouter([
@@ -34,16 +37,27 @@ const router = createBrowserRouter([
             },
             {
                 path: '/suply',
-                element:<Suply/>
-               
+                element: (
+                    <PrivateRoute>
+                        <Suply/>
+                    </PrivateRoute>
+                )
             },
             {
                 path:'/suply/details',
-                element:<SuplyDetails/>
+                element: (
+                    <PrivateRoute>
+                        <SuplyDetails/>
+                    </PrivateRoute>
+                )
             },
             {
                 path: '/borrow',
-                element:<Borrow/>
+                element: (
+                    <PrivateRoute>
+                        <Borrow/>
+                    </PrivateRoute>
+                )
             },
 
             {
@@ -52,33 +66,65 @@ const router = createBrowserRouter([
             },
             {
                 path: '/transactionList',
-                element:<TransactionList/>
+                element: (
+                    <PrivateRoute>
+                        <TransactionList/>
+                    </PrivateRoute>
+                )
+            },
+            {
+                path: '/notConnected',
+                element:<NotConnected/>
             },
            
             {
                 path: '/admin',
-                element: <AdminLayout/>,
+                element: (
+                    <PrivateRoute>
+                        <AdminLayout/>
+                    </PrivateRoute>
+                ),
                 children:[
                     {
                         path: '/admin/profile/info',
-                        element: <ProfileInfo />
+                        element: (
+                            <PrivateRoute>
+                                <ProfileInfo />
+                            </PrivateRoute>
+                        )
                     },
                     {
                         path: '/admin/profile/balance',
-                        element: <ProfileBalance />
+                        element: (
+                            <PrivateRoute>
+                                <ProfileBalance />
+                            </PrivateRoute>
+                        )
                     },  
                     {
                         path: '/admin/profile/security',
-                        element: <SecuritySettings/>
+                        element: (
+                            <PrivateRoute>
+                                <SecuritySettings/>
+                            </PrivateRoute>
+                        )
                     },
                    
                     {
                         path: '/admin/profile/history',
-                        element: <TransactionList/>
+                        element: (
+                            <PrivateRoute>
+                                <TransactionList/>
+                            </PrivateRoute>
+                        )
                     },
                     {
                         path: '/admin/profile/notifications',
-                        element: <NotificationSettings/>
+                        element: (
+                            <PrivateRoute>
+                                <NotificationSettings/>
+                            </PrivateRoute>
+                        )
                     },
                     
                 ]
