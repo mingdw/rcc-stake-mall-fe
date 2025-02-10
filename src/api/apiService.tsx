@@ -49,4 +49,8 @@ export const pingServer = async () => {
   }
 };
 
-// 其他接口可以在这里继续添加
+//接口：判断某个地址是不是管理员
+export const isAdmin = async (address: string) => {
+  const response = await axiosInstance.get(`/isAdmin/${address}`);
+  return response.data;
+};  

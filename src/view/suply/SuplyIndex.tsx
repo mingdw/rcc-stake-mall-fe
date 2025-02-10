@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './Suply.module.scss';
-import {  Card, Col, Row, Space, Table, Typography, Input, Button } from "antd";
+import { Card, Col, Row, Space, Table, Typography, Input, Button, Layout } from "antd";
 import { data, Outlet, useNavigate } from 'react-router-dom'; // 导入 useHistory
 import { AppstoreOutlined } from '@ant-design/icons';
 import { useAccount } from 'wagmi';
@@ -23,17 +23,17 @@ const Suply: React.FC = () => {
         { key: '6', coin: 'Litecoin (LTC)', targetPool: 900, yieldRate: '4.5%', borrowedAmount: 200, borrowRate: '0.8%', status: 'b06' },
         { key: '7', coin: 'Chainlink (LINK)', targetPool: 1100, yieldRate: '6.5%', borrowedAmount: 350, borrowRate: '1.3%', status: 'b07' },
         { key: '8', coin: 'Ripple (XRP)', targetPool: 1300, yieldRate: '3.5%', borrowedAmount: 450, borrowRate: '0.7%', status: 'b08,b05' },
-        { key: '9', coin: 'Ethereum (ETH)', targetPool: 1000, yieldRate: '5%', borrowedAmount: 500, borrowRate: '1%' ,status:'b01,b03'},
-        { key: '10', coin: 'Bitcoin (BTC)', targetPool: 2000, yieldRate: '4%', borrowedAmount: 800, borrowRate: '1.5%' ,status:'b02,b04'},
-        { key: '11', coin: 'Cardano (ADA)', targetPool: 1500, yieldRate: '6%', borrowedAmount: 300, borrowRate: '0.5%' ,status:'b03'},
-        { key: '12', coin: 'Solana (SOL)', targetPool: 1200, yieldRate: '7%', borrowedAmount: 600, borrowRate: '1.2%' ,status:'b04'},
+        { key: '9', coin: 'Ethereum (ETH)', targetPool: 1000, yieldRate: '5%', borrowedAmount: 500, borrowRate: '1%', status: 'b01,b03' },
+        { key: '10', coin: 'Bitcoin (BTC)', targetPool: 2000, yieldRate: '4%', borrowedAmount: 800, borrowRate: '1.5%', status: 'b02,b04' },
+        { key: '11', coin: 'Cardano (ADA)', targetPool: 1500, yieldRate: '6%', borrowedAmount: 300, borrowRate: '0.5%', status: 'b03' },
+        { key: '12', coin: 'Solana (SOL)', targetPool: 1200, yieldRate: '7%', borrowedAmount: 600, borrowRate: '1.2%', status: 'b04' },
     ];
 
     const [allDataSource, setAllDataSource] = useState(dataSource);
     const onSearch = (value: string) => {
-        if(value === ''){
+        if (value === '') {
             setAllDataSource(dataSource);
-        }else{
+        } else {
             const filtered = allDataSource.filter(item => item.coin.toLowerCase().includes(value.toLowerCase()));
             setAllDataSource(filtered);
         }
@@ -53,8 +53,8 @@ const Suply: React.FC = () => {
         b08: '合规',
     };
 
-     // 动态样式映射
-     const dynamicStyles: { [key: string]: React.CSSProperties } = {
+    // 动态样式映射
+    const dynamicStyles: { [key: string]: React.CSSProperties } = {
         b01: { color: '#4caf50' }, // 绿色
         b02: { color: '#f44336' }, // 红色
         b03: { color: '#ff9800' }, // 橙色
@@ -137,68 +137,72 @@ const Suply: React.FC = () => {
     };
 
     return <>
-        <div className={styles.container}>
-           <div className={styles.containerTop}>
-                <Col span={2}>
-                    <AppstoreOutlined className={styles.icon}/>
-                </Col>
-                <Col span={10}>
-                    <div style={{textAlign:'left',marginLeft:'20px',color:'#fff'}}>
-                        <Space direction="vertical" size={1}>
-                            <Typography.Title level={5}  className={styles.p1}>质押</Typography.Title>
-                            <Typography.Title level={2}  className={styles.p2}>你可以将一部分的资产质押，到期后换取更多的收益</Typography.Title>
-                        </Space>
-                   </div>
-                </Col>
-                <Col span={12}>
-                    <Row style={{textAlign:'center'}}     >
-                        <Col span={6}>
-                            <span className={styles.sp1}>质押池数量</span><br/>
-                            <span className={styles.sp2}>4</span>
-                        </Col>
-                        <Col span={6}>
-                            <span className={styles.sp1}>目标数量</span><br/>
-                            <span className={styles.sp2}>$ 405.23M</span>
-                        </Col>
-                        <Col span={6}>
-                            <span className={styles.sp1}>质押总数</span><br/>
-                            <span className={styles.sp2}>$ 301.23M</span>
-                        </Col>
-                        <Col span={6}>
-                            <span className={styles.sp1}>使用率</span><br/>
-                            <span className={styles.sp2}>87%</span>
-                        </Col>
-                    </Row>
-                </Col>
-           </div>
-          
-          
-           <div className={styles.containerContent}>
-            <Card style={{width:'100%'}}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px' }}>
-                    <Typography.Text style={{ margin: 0 ,fontSize:'36px',color:'gray',fontFamily:'Impact, Haettenschweiler, Arial Narrow Bold, sans-serif',fontWeight:'bold'}}>sepolia</Typography.Text>
-                    <AntSearch
-                        placeholder="请输入币种"
-                        onSearch={onSearch}
-                        style={{ width: 200 }}
-                    />
+        <Layout className={styles.layout}>
+
+
+            <div className={styles.container}>
+                <div className={styles.containerTop}>
+                    <Col span={2}>
+                        <AppstoreOutlined className={styles.icon} />
+                    </Col>
+                    <Col span={10}>
+                        <div style={{ textAlign: 'left', marginLeft: '20px', color: '#fff' }}>
+                            <Space direction="vertical" size={1}>
+                                <Typography.Title level={5} className={styles.p1}>质押</Typography.Title>
+                                <Typography.Title level={2} className={styles.p2}>你可以将一部分的资产质押，到期后换取更多的收益</Typography.Title>
+                            </Space>
+                        </div>
+                    </Col>
+                    <Col span={12}>
+                        <Row style={{ textAlign: 'center' }}     >
+                            <Col span={6}>
+                                <span className={styles.sp1}>质押池数量</span><br />
+                                <span className={styles.sp2}>4</span>
+                            </Col>
+                            <Col span={6}>
+                                <span className={styles.sp1}>目标数量</span><br />
+                                <span className={styles.sp2}>$ 405.23M</span>
+                            </Col>
+                            <Col span={6}>
+                                <span className={styles.sp1}>质押总数</span><br />
+                                <span className={styles.sp2}>$ 301.23M</span>
+                            </Col>
+                            <Col span={6}>
+                                <span className={styles.sp1}>使用率</span><br />
+                                <span className={styles.sp2}>87%</span>
+                            </Col>
+                        </Row>
+                    </Col>
                 </div>
-                <div>
-                   <Table
-                        dataSource={allDataSource.slice(0, visibleCount)} // 根据可见行数切片数据
-                        columns={columns}
-                        pagination={false} // 关闭分页
-                        rowKey="key" // 设置行的唯一标识
-                    />
-                    {visibleCount < allDataSource.length && ( // 如果还有更多数据，显示加载更多按钮
-                        <Button type="primary" onClick={handleLoadMore} style={{ marginTop: '20px' }}>
-                            加载更多
-                        </Button>
-                    )}
+
+
+                <div className={styles.containerContent}>
+                    <Card style={{ width: '100%' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px' }}>
+                            <Typography.Text style={{ margin: 0, fontSize: '36px', color: 'gray', fontFamily: 'Impact, Haettenschweiler, Arial Narrow Bold, sans-serif', fontWeight: 'bold' }}>sepolia</Typography.Text>
+                            <AntSearch
+                                placeholder="请输入币种"
+                                onSearch={onSearch}
+                                style={{ width: 200 }}
+                            />
+                        </div>
+                        <div>
+                            <Table
+                                dataSource={allDataSource.slice(0, visibleCount)} // 根据可见行数切片数据
+                                columns={columns}
+                                pagination={false} // 关闭分页
+                                rowKey="key" // 设置行的唯一标识
+                            />
+                            {visibleCount < allDataSource.length && ( // 如果还有更多数据，显示加载更多按钮
+                                <Button type="primary" onClick={handleLoadMore} style={{ marginTop: '20px' }}>
+                                    加载更多
+                                </Button>
+                            )}
+                        </div>
+                    </Card>
                 </div>
-            </Card>
             </div>
-        </div>
+        </Layout>
     </>
 }
 

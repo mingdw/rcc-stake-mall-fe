@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Button, Col, Row, Typography, Carousel, Timeline, Space, Divider } from 'antd';
+import { Button, Col, Row, Typography, Carousel, Timeline, Space, Divider, Layout } from 'antd';
 import { GithubOutlined, TaobaoCircleOutlined, SafetyCertificateOutlined, DollarOutlined, LikeOutlined, SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import img01 from '../../assets/images/login-bg-4.jpg';
 import img02 from '../../assets/images/login-bg-2.jpg';
@@ -20,7 +20,7 @@ const Home: React.FC = () => {
 
     const carouselData = [
         { image: img01, title: '质押简单快捷', description: '安全高收益，轻松获取稳定收益' },
-        { image: img02, title: '低抵押率', description: '安全快捷的借贷操作' },
+        { image: img02, title: '代币商城', description: '种类丰富，完全白嫖' },
         { image: img03, title: '参与我们的社区', description: '共享未来的金融生态' },
     ];
 
@@ -77,7 +77,6 @@ const Home: React.FC = () => {
     };
 
     const handleMouseEnter = () => {
-        console.info("鼠标移入");
         const marquee = document.getElementById('marquee');
         if (marquee) {
             marquee.style.animationPlayState = 'paused'; // 暂停动画
@@ -85,7 +84,6 @@ const Home: React.FC = () => {
     };
 
     const handleMouseLeave = () => {
-        console.info("鼠标离开");
         const marquee = document.getElementById('marquee');
         if (marquee) {
             marquee.style.animationPlayState = 'running'; // 恢复动画
@@ -130,7 +128,9 @@ const Home: React.FC = () => {
     }, []);
 
     return (
-        <div style={{ padding: '20px' }}>
+        <Layout className={styles.layout}>
+
+        <div>
             <Row className={styles.announcementBar}>
               <Space>
                <span> 📢 新功能上线！现在用户可以通过手机应用进行质押操作。点击</span> <Link to="/#" > 了解更多。</Link>
@@ -279,6 +279,7 @@ const Home: React.FC = () => {
             </CardContentComponent>
 
         </div>
+        </Layout>
     );
 };
 

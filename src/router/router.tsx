@@ -4,11 +4,8 @@ import {createBrowserRouter} from 'react-router-dom';
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-
-
-import Borrow from "../view/borrow/BorrowIndex";
-import Suply from "../view/suply/SuplyIndex";
-import SuplyDetails from "../view/suply/SuplyDetails";
+import Suply from "../view/Suply/SuplyIndex";
+import SuplyDetails from "../view/Suply/SuplyDetails";
 import Home from "../view/Home/HomeIndex";
 import About from "../view/About/AboutIndex";
 import TransactionList from "../view/Transaction/TransactionList";
@@ -19,6 +16,8 @@ import ProfileInfo from "../view/Admin/Profile/ProfileInfo";
 import SecuritySettings from "../view/Admin/Profile/SecuritySettings";
 import NotConnected from "../view/403";
 import PrivateRoute from "../components/PrivateRoute";
+import Mall from "../view/Mall/MallIndex";
+import Budding from "../view/budding";
 
 
 
@@ -52,12 +51,18 @@ const router = createBrowserRouter([
                 )
             },
             {
-                path: '/borrow',
+                path: '/small',
                 element: (
                     <PrivateRoute>
-                        <Borrow/>
+                        <Mall/>
                     </PrivateRoute>
-                )
+                ),
+                children:[
+                    {
+                        path: '/small/budding',
+                        element: <Budding/>
+                    }
+                ]
             },
 
             {

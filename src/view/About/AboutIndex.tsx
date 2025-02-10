@@ -563,7 +563,7 @@ const About = () => {
   };
 
   return (
-    <div style={{marginLeft:'5%'}}>
+    <div>
       <Layout style={{ height: '100vh', width: '100%' }}>
         {/* 页面头部，包含 Breadcrumb 组件 */}
         <Header style={{ background: '#F5F5F5', padding: '0 0', display: 'flex', alignItems: 'center', justifyContent: 'start', height: '40px' }}>

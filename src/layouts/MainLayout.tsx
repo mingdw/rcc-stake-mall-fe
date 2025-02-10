@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { QuestionOutlined, LogoutOutlined, CheckOutlined, HomeOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined, DownOutlined } from '@ant-design/icons';
+import { QuestionOutlined, LogoutOutlined, CheckOutlined, HomeOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined, DownOutlined ,ShopOutlined} from '@ant-design/icons';
 import { MenuProps, Avatar, message, Input } from 'antd';
 import { Col, Row, Layout, Menu, Space, Select, Button, Dropdown, Typography } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -15,7 +15,7 @@ import { formatBalance, shortenAddress } from '../utils/common';
 const { Header, Content, Footer } = Layout;
 export const HOME_PATH_NAME = "home";
 export const SUPLY_PATH_NAME = "suply";
-export const BORROW_PATH_NAME = "borrow";
+export const SMALL_PATH_NAME = "small";
 export const ABOUT_PATH_NAME = "about";
 
 const languges = [{
@@ -156,9 +156,9 @@ const MainLayout: FC = () => {
     },
 
     {
-      label: t('header.nav.borrow'),
-      key: BORROW_PATH_NAME,
-      icon: <TransactionOutlined />,
+      label: t('header.nav.mall'),
+      key: SMALL_PATH_NAME,
+      icon: <ShopOutlined />,
     },
     {
       label: t('header.nav.about'),
@@ -409,7 +409,7 @@ const MainLayout: FC = () => {
           </Col>
         </Row>
       </Header>
-      <Content style={{ padding: '0 48px' }}>
+      <Content style={{alignItems:'center',justifyContent:'center'}}>
         {/* 确保 Outlet 只有一个父元素包裹 */}
         <div>
           <Outlet />
