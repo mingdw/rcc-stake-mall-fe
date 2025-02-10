@@ -67,45 +67,46 @@
 .tagSection {
   display: flex;
   align-items: center;
-  margin-left: 38px;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .tagTitle {
   font-weight: 500;
   margin-right: 16px;
   white-space: nowrap;
+  color: #262626;
 }
 
 .tags {
   display: flex;
-  gap: 4px;
-  margin: 0;
-  flex-wrap: nowrap;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 8px;
 
   :global(.ant-tag) {
     margin: 0;
     border-radius: 2px;
     font-size: 12px;
-    padding: 0 6px;
-    background: rgba(24, 144, 255, 0.1);
+    padding: 0 12px;
+    background: #f5f5f5;
     border: none;
-    color: #1890ff;
-    height: 20px;
-    line-height: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
+    color: #595959;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
 
-    &.moreTag {
-      background: transparent;
-      color: #8c8c8c;
-      cursor: pointer;
-      margin-left: -4px;
-      padding-right: 0;
+    &:hover {
+      color: #1890ff;
+      background: #e6f7ff;
+    }
 
-      &:hover {
-        color: #1890ff;
-      }
+    &.active {
+      color: #1890ff;
+      background: #e6f7ff;
     }
   }
 }
@@ -113,10 +114,6 @@
 .clickableTag {
   cursor: pointer;
   user-select: none;
-  
-  &:hover {
-    opacity: 0.8;
-  }
 }
 
 .categoryCards {
@@ -604,7 +601,8 @@
 }
 
 .content {
-  min-height: calc(100vh - 64px - 11px);
+  padding: 24px;
+  background: #f0f2f5;
 }
 
 .searchWrapper {
@@ -779,6 +777,86 @@
         color: #1890ff;
       }
     }
+  }
+}
+
+.filterContainer {
+  background: #fff;
+  padding: 16px 24px;
+  margin: 1px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tagFilterSection {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.tagFilterTitle {
+  width: 56px;
+  font-size: 14px;
+  color: #595959;
+  line-height: 32px;
+  font-weight: 500;
+}
+
+.tagFilterContent {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-right: 40px;
+}
+
+.filterTag {
+  margin: 0 !important;
+  padding: 0 12px !important;
+  font-size: 14px !important;
+  border-radius: 2px !important;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s;
+  background: #f5f5f5 !important;
+  border: 1px solid transparent !important;
+  color: #595959 !important;
+  height: 32px !important;
+  line-height: 30px !important;
+
+  &:hover {
+    color: #1890ff !important;
+    background: #e6f7ff !important;
+    border-color: #1890ff !important;
+  }
+
+  &.active {
+    color: #1890ff !important;
+    background: #e6f7ff !important;
+    border-color: #1890ff !important;
+  }
+}
+
+.clearTag {
+  margin: 0 !important;
+  padding: 0 12px !important;
+  font-size: 14px !important;
+  border-radius: 2px !important;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s;
+  background: transparent !important;
+  border: 1px dashed #d9d9d9 !important;
+  color: #8c8c8c !important;
+  height: 32px !important;
+  line-height: 30px !important;
+
+  &:hover {
+    color: #ff4d4f !important;
+    border-color: #ff4d4f !important;
   }
 }
 

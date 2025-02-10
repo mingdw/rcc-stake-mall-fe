@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Layout, Input, Menu, Card, Row, Col, Button, Pagination, Empty, Tooltip, Tag, Typography } from 'antd';
 import {
   ShoppingCartOutlined,
@@ -55,10 +55,16 @@ interface CategoryTitleProps {
   onSortChange?: (type: SortType) => void;
 }
 
+// 组件外部的接口定义
+interface CategoryTags {
+  scenes: string[];
+  styles: string[];
+}
+
 const MallIndex: React.FC = () => {
   const [showAllCategories, setShowAllCategories] = useState(true); // 默认为 true
-  const [selectedScenes, setSelectedScenes] = useState<string[]>([]); // 改为数组支持多选
-  const [selectedStyles, setSelectedStyles] = useState<string[]>([]); // 改为数组支持多选
+  const [selectedScenes, setSelectedScenes] = useState<string[]>([]); // 场景标签
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]); // 风格标签
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -73,35 +79,122 @@ const MallIndex: React.FC = () => {
   const [activeKey, setActiveKey] = useState<string>('all'); // 添加选中状态
   const [sortType, setSortType] = useState<string>('default');
 
-  // 收集所有场景和风格标签
-  const allTags = {
-    scenes: Array.from(new Set(products.flatMap(product => 
-      product.tags?.filter(tag => tag.includes('场景')) || []))),
-    styles: Array.from(new Set(products.flatMap(product => 
-      product.tags?.filter(tag => tag.includes('风格')) || [])))
-  };
+  // 按分类组织商品
+  const groupedProducts = useMemo(() => {
+    return categories.reduce((acc, category) => {
+      // 处理一级分类
+      acc[category.key] = products.filter(product => {
+        // 匹配当前一级分类及其所有子分类的商品
+        return product.category === category.key || 
+               category.children?.some(subCat => 
+                 product.subCategory === subCat.key ||
+                 subCat.children?.some(thirdCat => 
+                   product.thirdCategory === thirdCat.key
+                 )
+               );
+      });
+
+      // 处理二级分类
+      category.children?.forEach(subCategory => {
+        acc[subCategory.key] = products.filter(product => 
+          // 匹配当前二级分类及其子分类的商品
+          product.subCategory === subCategory.key ||
+          subCategory.children?.some(thirdCat => 
+            product.thirdCategory === thirdCat.key
+          )
+        );
+
+        // 处理三级分类
+        subCategory.children?.forEach(thirdCategory => {
+          acc[thirdCategory.key] = products.filter(product => 
+            // 只匹配当前三级分类的商品
+            product.thirdCategory === thirdCategory.key
+          );
+        });
+      });
+
+      return acc;
+    }, {} as { [key: string]: Product[] });
+  }, []);  // 因为 products 和 categories 是导入的常量，所以依赖项为空
+
+  // 获取标签函数
+  const getTagsByCategory = useCallback((categoryKey: string | null): CategoryTags => {
+    // 如果是全部商品或没有选择分类，返回所有分类的标签
+    if (!categoryKey || categoryKey === 'all') {
+      const allTags = categories.reduce((acc, category) => {
+        if (category.tags) {
+          acc.scenes = [...new Set([...acc.scenes, ...category.tags.scenes])];
+          acc.styles = [...new Set([...acc.styles, ...category.tags.styles])];
+        }
+        category.children?.forEach(subCategory => {
+          if (subCategory.tags) {
+            acc.scenes = [...new Set([...acc.scenes, ...subCategory.tags.scenes])];
+            acc.styles = [...new Set([...acc.styles, ...subCategory.tags.styles])];
+          }
+        });
+        return acc;
+      }, { scenes: [], styles: [] } as CategoryTags);
+      return allTags;
+    }
+
+    // 查找当前分类
+    const findCategory = (key: string) => {
+      for (const category of categories) {
+        if (category.key === key) return category;
+        for (const subCategory of category.children || []) {
+          if (subCategory.key === key) return subCategory;
+          for (const thirdCategory of subCategory.children || []) {
+            if (thirdCategory.key === key) {
+              // 如果是三级分类，返回其父级分类的标签
+              return subCategory;
+            }
+          }
+        }
+      }
+      return null;
+    };
+
+    const currentCategory = findCategory(categoryKey);
+    if (!currentCategory || !currentCategory.tags) {
+      // 如果找不到分类或该分类没有标签，返回空数组
+      return { scenes: [], styles: [] };
+    }
+
+    return {
+      scenes: currentCategory.tags.scenes || [],
+      styles: currentCategory.tags.styles || []
+    };
+  }, []);
 
   const handleAllCategoriesClick = () => {
     setShowAllCategories(!showAllCategories);
   };
 
-  // 修改为多选处理
-  const handleSceneSelect = (scene: string) => {
+  // 处理标签选择
+  const handleSceneSelect = useCallback((scene: string) => {
     setSelectedScenes(prev => 
       prev.includes(scene)
         ? prev.filter(s => s !== scene)
         : [...prev, scene]
     );
-  };
+  }, []);
 
-  // 修改为多选处理
-  const handleStyleSelect = (style: string) => {
+  const handleStyleSelect = useCallback((style: string) => {
     setSelectedStyles(prev => 
       prev.includes(style)
         ? prev.filter(s => s !== style)
         : [...prev, style]
     );
-  };
+  }, []);
+
+  // 清空标签
+  const handleClearScenes = useCallback(() => {
+    setSelectedScenes([]);
+  }, []);
+
+  const handleClearStyles = useCallback(() => {
+    setSelectedStyles([]);
+  }, []);
 
   // 根据选中的场景和风格筛选商品
   const filteredProducts = useMemo(() => {
@@ -143,44 +236,6 @@ const MallIndex: React.FC = () => {
       setSearchResults([]);
     }
   };
-
-  // 按分类组织商品
-  const groupedProducts = useMemo(() => {
-    return categories.reduce((acc, category) => {
-      // 处理一级分类
-      acc[category.key] = products.filter(product => {
-        // 匹配当前一级分类及其所有子分类的商品
-        return product.category === category.key || 
-               category.children?.some(subCat => 
-                 product.subCategory === subCat.key ||
-                 subCat.children?.some(thirdCat => 
-                   product.thirdCategory === thirdCat.key
-                 )
-               );
-      });
-
-      // 处理二级分类
-      category.children?.forEach(subCategory => {
-        acc[subCategory.key] = products.filter(product => 
-          // 匹配当前二级分类及其子分类的商品
-          product.subCategory === subCategory.key ||
-          subCategory.children?.some(thirdCat => 
-            product.thirdCategory === thirdCat.key
-          )
-        );
-
-        // 处理三级分类
-        subCategory.children?.forEach(thirdCategory => {
-          acc[thirdCategory.key] = products.filter(product => 
-            // 只匹配当前三级分类的商品
-            product.thirdCategory === thirdCategory.key
-          );
-        });
-      });
-
-      return acc;
-    }, {} as { [key: string]: Product[] });
-  }, [products]);
 
   // 获取当前分类的完整信息
   const getCurrentCategory = (key: string) => {
@@ -588,6 +643,83 @@ const MallIndex: React.FC = () => {
     );
   };
 
+  // 标签筛选组件
+  const TagFilter: React.FC<{
+    title: string;
+    tags: string[];
+    selectedTags: string[];
+    onTagSelect: (tag: string) => void;
+    onClear: () => void;
+  }> = ({ title, tags, selectedTags, onTagSelect, onClear }) => (
+    <div className={stylesCss.tagFilterSection}>
+      <div className={stylesCss.tagFilterTitle}>{title}：</div>
+      <div className={stylesCss.tagFilterContent}>
+        {tags.map(tag => (
+          <Tag
+            key={tag}
+            className={`${stylesCss.filterTag} ${selectedTags.includes(tag) ? stylesCss.active : ''}`}
+            onClick={() => onTagSelect(tag)}
+          >
+            {tag}
+          </Tag>
+        ))}
+        {selectedTags.length > 0 && (
+          <Tag
+            className={stylesCss.clearTag}
+            onClick={onClear}
+          >
+            清空
+          </Tag>
+        )}
+      </div>
+    </div>
+  );
+
+  // 渲染标签过滤器
+  const renderTagFilters = useCallback(() => {
+    const currentTags = getTagsByCategory(selectedCategory);
+    
+    // 添加日志查看当前标签
+    console.log('Current tags:', currentTags);
+    
+    // 修改判断逻辑，确保数组存在且长度大于0
+    if (!currentTags || (!currentTags.scenes.length && !currentTags.styles.length)) {
+      return null;
+    }
+
+    return (
+      <div className={stylesCss.filterContainer}>
+        {currentTags.scenes.length > 0 && (
+          <TagFilter
+            title="场景"
+            tags={currentTags.scenes}
+            selectedTags={selectedScenes}
+            onTagSelect={handleSceneSelect}
+            onClear={handleClearScenes}
+          />
+        )}
+        {currentTags.styles.length > 0 && (
+          <TagFilter
+            title="风格"
+            tags={currentTags.styles}
+            selectedTags={selectedStyles}
+            onTagSelect={handleStyleSelect}
+            onClear={handleClearStyles}
+          />
+        )}
+      </div>
+    );
+  }, [
+    selectedCategory, 
+    selectedScenes, 
+    selectedStyles, 
+    getTagsByCategory, 
+    handleSceneSelect, 
+    handleStyleSelect, 
+    handleClearScenes, 
+    handleClearStyles
+  ]);
+
   return (
     <Layout>
       <Header className={stylesCss.header}>
@@ -646,7 +778,7 @@ const MallIndex: React.FC = () => {
           </Col>
         </Row>
       </Header>
-
+      {renderTagFilters()}
       <div className={stylesCss.content}>
         {showSearchResults ? (
           renderSearchResults()

@@ -333,7 +333,7 @@ export const products = [
       tags: ["限定头像", "NFT", "社交分享"],
       stock: 5,
       sold: 2,
-      description: "这是一款限定的头像，具有很高的收藏价值。",
+      description: "这是一款限定的头像，具有很高的收藏价值。 通过该头像，你可以展示你的个性和品味。",
       originalPrice: 1000
     },
     {
