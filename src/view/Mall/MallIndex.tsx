@@ -271,15 +271,17 @@ const MallIndex: React.FC = () => {
     });
   };
 
-  // 处理分类菜单点击
-  const handleMenuClick = (key: string) => {
+  // 修改菜单点击处理函数
+  const handleMenuClick = ({ key }: { key: string }) => {
+    const firstLevelKey = getFirstLevelKey(key);
+    
     // 清空搜索状态
     setSearchText('');
     setShowSearchResults(false);
     setSearchResults([]);
     
     // 设置导航状态
-    setActiveKey(key);
+    setActiveKey(firstLevelKey || key);
     if (key === 'all') {
       setShowAllCategories(true);
       setSelectedCategory(null);
@@ -288,6 +290,10 @@ const MallIndex: React.FC = () => {
       setSelectedCategory(key);
     }
     setCurrentPage(1);
+    
+    // 重置标签选择
+    setSelectedScenes([]);
+    setSelectedStyles([]);
   };
 
   // 处理返回全部商品
@@ -643,7 +649,7 @@ const MallIndex: React.FC = () => {
     );
   };
 
-  // 标签筛选组件
+  // 修改 TagFilter 组件
   const TagFilter: React.FC<{
     title: string;
     tags: string[];
@@ -652,7 +658,7 @@ const MallIndex: React.FC = () => {
     onClear: () => void;
   }> = ({ title, tags, selectedTags, onTagSelect, onClear }) => (
     <div className={stylesCss.tagFilterSection}>
-      <div className={stylesCss.tagFilterTitle}>{title}：</div>
+      <div className={stylesCss.tagFilterTitle}>{title}</div>
       <div className={stylesCss.tagFilterContent}>
         {tags.map(tag => (
           <Tag
@@ -675,15 +681,11 @@ const MallIndex: React.FC = () => {
     </div>
   );
 
-  // 渲染标签过滤器
+  // 修改渲染标签过滤器的容器样式
   const renderTagFilters = useCallback(() => {
-    const currentTags = getTagsByCategory(selectedCategory);
+    const currentTags = getTagsByCategory(activeKey === 'all' ? null : selectedCategory);
     
-    // 添加日志查看当前标签
-    console.log('Current tags:', currentTags);
-    
-    // 修改判断逻辑，确保数组存在且长度大于0
-    if (!currentTags || (!currentTags.scenes.length && !currentTags.styles.length)) {
+    if (!currentTags.scenes.length && !currentTags.styles.length) {
       return null;
     }
 
@@ -710,39 +712,63 @@ const MallIndex: React.FC = () => {
       </div>
     );
   }, [
-    selectedCategory, 
-    selectedScenes, 
-    selectedStyles, 
-    getTagsByCategory, 
-    handleSceneSelect, 
-    handleStyleSelect, 
-    handleClearScenes, 
+    activeKey,
+    selectedCategory,
+    selectedScenes,
+    selectedStyles,
+    getTagsByCategory,
+    handleSceneSelect,
+    handleStyleSelect,
+    handleClearScenes,
     handleClearStyles
   ]);
+
+  // 添加 getFirstLevelKey 函数
+  const getFirstLevelKey = (key: string) => {
+    // 如果是全部商品，直接返回
+    if (key === 'all') return key;
+    
+    // 如果是一级分类，直接返回
+    if (categories.find(c => c.key === key)) {
+      return key;
+    }
+    
+    // 查找二级分类所属的一级分类
+    for (const category of categories) {
+      if (category.children?.some(sub => sub.key === key)) {
+        return category.key;
+      }
+      // 查找三级分类所属的一级分类
+      for (const subCategory of category.children || []) {
+        if (subCategory.children?.some(third => third.key === key)) {
+          return category.key;
+        }
+      }
+    }
+    return key; // 如果找不到对应的一级分类，返回原key
+  };
 
   return (
     <Layout>
       <Header className={stylesCss.header}>
         <Row align="middle">
-          <Col span={18}>
+          <Col span={14}>
             <Menu 
               mode="horizontal" 
               className={stylesCss.menu}
               selectedKeys={[activeKey]}
+              onClick={handleMenuClick}
+              selectable={true}
             >
-              <Menu.Item 
-                key="all"
-                icon={<BarsOutlined />}
-                onClick={() => handleMenuClick('all')}
-              >
+              <Menu.Item key="all" icon={<BarsOutlined />}>
                 全部商品
               </Menu.Item>
               {categories.map(category => (
-                <SubMenu 
+                <Menu.SubMenu 
                   key={category.key} 
                   icon={category.icon} 
                   title={category.title}
-                  onTitleClick={({ key }) => handleMenuClick(key)}
+                  onTitleClick={({ key }) => handleMenuClick({ key })} // 添加一级菜单标题点击处理
                 >
                   {category.children?.map(subCategory => (
                     <Menu.SubMenu 
@@ -750,20 +776,17 @@ const MallIndex: React.FC = () => {
                       title={subCategory.title}
                     >
                       {subCategory.children?.map(item => (
-                        <Menu.Item 
-                          key={item.key}
-                          onClick={() => handleMenuClick(item.key)}
-                        >
+                        <Menu.Item key={item.key}>
                           {item.title}
                         </Menu.Item>
                       ))}
                     </Menu.SubMenu>
                   ))}
-                </SubMenu>
+                </Menu.SubMenu>
               ))}
             </Menu>
           </Col>
-          <Col span={6}>
+          <Col span={5}>
             <div className={stylesCss.searchWrapper}>
               <Search
                 placeholder="请输入商品名称"

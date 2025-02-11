@@ -1,9 +1,20 @@
-.header {
-  background-color: #fff;
-  margin-top: 10px;
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
-  line-height: 64px;
+}
+
+.header {
+  background: #fff;
+  padding: 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  .menu {
+    line-height: 46px;
+    border-bottom: none;
+    margin-left: 5%;
+  }
 }
 
 .menu {
@@ -128,7 +139,7 @@
 }
 
 .searchResults {
-  padding: 24px;
+ margin-top: 10px;
 }
 
 .searchResultsHeader {
@@ -208,7 +219,8 @@
 }
 
 .allCategories {
-  padding: 24px;
+  width: 100%;
+  background: #f5f5f5;
   
   .categoryCard {
     margin-bottom: 16px;
@@ -228,21 +240,24 @@
 }
 
 .categoryCard {
-  border-radius: 8px;
+  background: #fff;
+  border-radius: 2px;
+  width: 100%;
   
   :global {
     .ant-card-head {
       padding: 0;
-      border-bottom: none;
+      border-bottom: 1px solid #f0f0f0;
       min-height: auto;
     }
     
     .ant-card-head-title {
-      padding: 0;
+      padding: 16px 24px;
     }
     
     .ant-card-body {
-      padding-top: 16px;
+      padding: 24px;
+      width: 100%;
     }
   }
 }
@@ -251,7 +266,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 8px 24px;
+  height: 24px;
 }
 
 .categoryTitle {
@@ -261,92 +277,81 @@
   
   .categoryIcon {
     font-size: 20px;
-    color: #1890ff;
+    color: #2b85e4;
+    display: flex;
+    align-items: center;
   }
   
   .categoryName {
     font-size: 16px;
-    font-weight: 500;
-    color: #262626;
+    font-weight: 600;
+    color: #17233d;
+    letter-spacing: 0.5px;
+    
+    .categoryCount {
+      font-size: 13px;
+      font-weight: 400;
+      color: #808695;
+      margin-left: 12px;
+      position: relative;
+      padding-left: 12px;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 14px;
+        background-color: #e8eaef;
+      }
+    }
   }
 }
 
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 }
 
-.sortButtonGroup {
+.sortButtons {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
 .sortButton {
   height: 32px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  border: 1px solid #d9d9d9;
+  padding: 0 16px;
+  font-size: 14px;
   border-radius: 4px;
-  color: #595959;
-  background: #fff;
-  transition: all 0.3s;
+  color: #515a6e;
+  border: 1px solid #dcdee2;
   
   &:hover {
-    color: #1890ff;
-    border-color: #1890ff;
-    
-    .sortIcon {
-      color: #1890ff;
-    }
+    color: #2b85e4;
+    border-color: #2b85e4;
+    background: rgba(43, 133, 228, 0.1);
   }
   
   &.active {
-    color: #1890ff;
-    border-color: #1890ff;
-    background: #e6f7ff;
-    
-    .sortIcon {
-      color: #1890ff;
-    }
-  }
-}
-
-.sortIcon {
-  font-size: 12px;
-  color: #8c8c8c;
-  transition: all 0.3s;
-  
-  &.active {
-    color: #1890ff;
-  }
-}
-
-.defaultSortIcons {
-  display: flex;
-  flex-direction: column;
-  height: 12px;
-  color: #8c8c8c;
-  
-  :global(.anticon) {
-    font-size: 8px;
-    line-height: 6px;
+    color: #2b85e4;
+    border-color: #2b85e4;
+    background: rgba(43, 133, 228, 0.1);
   }
 }
 
 .verticalDivider {
   width: 1px;
-  height: 16px;
-  background-color: #e8e8e8;
-  margin: 0;
+  height: 20px;
+  background-color: #e8eaef;
+  margin: 0 4px;
 }
 
 .totalCount {
-  color: #8c8c8c;
+  color: #808695;
   font-size: 14px;
-  line-height: 32px;
   white-space: nowrap;
 }
 
@@ -403,6 +408,7 @@
 .productCard {
   height: 100%;
   transition: all 0.3s;
+  width: 100%;
   
   &:hover {
     transform: translateY(-4px);
@@ -414,12 +420,14 @@
       padding: 12px;
       display: flex;
       flex-direction: column;
+      border-top: 1px solid #f0f0f0;
     }
 
     .ant-card-actions {
-      border-top: none;
+      border-top: 1px solid #f0f0f0;
       background: transparent;
-      margin-top: 0;
+      margin-top: auto;
+      padding: 12px 0;
     }
   }
 }
@@ -591,8 +599,9 @@
 }
 
 .categoryProducts {
-  padding: 24px;
-  scroll-behavior: smooth;
+  margin-bottom: 24px;
+  width: 100%;
+ 
 }
 
 .pagination {
@@ -601,8 +610,9 @@
 }
 
 .content {
-  padding: 24px;
-  background: #f0f2f5;
+  width: 100%;
+  margin-top: 10px;
+  background: #f5f5f5;
 }
 
 .searchWrapper {
@@ -705,11 +715,6 @@
   }
 }
 
-.sortButtons {
-  display: flex;
-  gap: 8px;
-}
-
 .buttonContent {
   display: inline-flex;
   align-items: center;
@@ -782,15 +787,27 @@
 
 .filterContainer {
   background: #fff;
+  width: 100%;
   padding: 16px 24px;
   margin: 1px 0;
   border-bottom: 1px solid #f0f0f0;
+
+  .tagFilterSection {
+    margin: 0 auto;
+    padding: 0 24px;
+    margin-bottom: 16px;
+    margin-left: 1.5%;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .tagFilterSection {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 
   &:last-child {
     margin-bottom: 0;
@@ -798,11 +815,12 @@
 }
 
 .tagFilterTitle {
-  width: 56px;
+  min-width: 42px;
+  margin-right: 16px;
   font-size: 14px;
-  color: #595959;
+  color: #666;
   line-height: 32px;
-  font-weight: 500;
+  font-weight: normal;
 }
 
 .tagFilterContent {
@@ -822,7 +840,7 @@
   user-select: none;
   transition: all 0.3s;
   background: #f5f5f5 !important;
-  border: 1px solid transparent !important;
+  border: 1px solid #f0f0f0 !important;
   color: #595959 !important;
   height: 32px !important;
   line-height: 30px !important;
@@ -830,7 +848,7 @@
   &:hover {
     color: #1890ff !important;
     background: #e6f7ff !important;
-    border-color: #1890ff !important;
+    border-color: #91d5ff !important;
   }
 
   &.active {
