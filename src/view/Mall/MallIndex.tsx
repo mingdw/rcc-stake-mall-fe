@@ -198,14 +198,30 @@ const MallIndex: React.FC = () => {
 
   // 根据选中的场景和风格筛选商品
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    // 获取当前需要过滤的商品列表
+    let productsToFilter = showSearchResults ? searchResults : 
+                          selectedCategory ? groupedProducts[selectedCategory] : 
+                          showAllCategories ? products :  // 添加 showAllCategories 条件
+                          products;
+
+    // 应用标签过滤
+    return productsToFilter.filter(product => {
       const matchesScenes = selectedScenes.length === 0 || 
         selectedScenes.some(scene => product.tags.includes(scene));
       const matchesStyles = selectedStyles.length === 0 || 
         selectedStyles.some(style => product.tags.includes(style));
       return matchesScenes && matchesStyles;
     });
-  }, [selectedScenes, selectedStyles]);
+  }, [
+    selectedScenes, 
+    selectedStyles, 
+    showSearchResults, 
+    searchResults, 
+    selectedCategory, 
+    groupedProducts,
+    showAllCategories, // 添加依赖项
+    products
+  ]);
 
   // 处理搜索
   const handleSearch = (value: string) => {
@@ -504,7 +520,8 @@ const MallIndex: React.FC = () => {
     const currentCategory = getCurrentCategory(selectedCategory);
     if (!currentCategory) return null;
 
-    const categoryProducts = groupedProducts[selectedCategory] || [];
+    // 使用 filteredProducts 替代直接使用 groupedProducts
+    const categoryProducts = filteredProducts;
     const sortedProducts = handleSort(categoryProducts, sortType);
     const pageSize = 12;
     
@@ -571,7 +588,8 @@ const MallIndex: React.FC = () => {
 
   // 渲染搜索结果
   const renderSearchResults = () => {
-    const sortedResults = handleSort(searchResults, sortType);
+    // 使用 filteredProducts 替代直接使用 searchResults
+    const sortedResults = handleSort(filteredProducts, sortType);
     const pageSize = 12;
 
     return (
@@ -585,7 +603,7 @@ const MallIndex: React.FC = () => {
                 title: '搜索结果',
                 icon: <SearchOutlined />
               }}
-              total={searchResults.length}
+              total={sortedResults.length}
               sortType={sortType as SortType}
               onSortChange={setSortType}
             />
@@ -748,6 +766,51 @@ const MallIndex: React.FC = () => {
     return key; // 如果找不到对应的一级分类，返回原key
   };
 
+  // 修改渲染全部商品的逻辑
+  const renderAllCategories = () => {
+    return (
+      <div className={stylesCss.allCategories}>
+        <Row gutter={[16, 16]}>
+          {categories.map(category => {
+            // 获取当前分类下的商品，并应用标签过滤
+            const categoryProducts = filteredProducts.filter(product => 
+              product.category === category.key ||
+              category.children?.some(subCat => 
+                product.subCategory === subCat.key ||
+                subCat.children?.some(thirdCat => 
+                  product.thirdCategory === thirdCat.key
+                )
+              )
+            );
+
+            return (
+              <Col span={24} key={category.key}>
+                <Card 
+                  className={stylesCss.categoryCard}
+                  title={
+                    <CategoryCardTitle 
+                      category={category}
+                      total={categoryProducts.length}
+                      onViewMore={() => handleViewMore(category.key)}
+                    />
+                  }
+                >
+                  <Row gutter={[16, 16]}>
+                    {categoryProducts.slice(0, 4).map(product => (
+                      <Col span={6} key={product.id}>
+                        <ProductCard product={product} />
+                      </Col>
+                    ))}
+                  </Row>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
+      </div>
+    );
+  };
+
   return (
     <Layout>
       <Header className={stylesCss.header}>
@@ -806,32 +869,7 @@ const MallIndex: React.FC = () => {
         {showSearchResults ? (
           renderSearchResults()
         ) : showAllCategories ? (
-          <div className={stylesCss.allCategories}>
-            <Row gutter={[16, 16]}>
-              {categories.map(category => (
-                <Col span={24} key={category.key}>
-                  <Card 
-                    className={stylesCss.categoryCard}
-                    title={
-                      <CategoryCardTitle 
-                        category={category}
-                        total={groupedProducts[category.key]?.length || 0}
-                        onViewMore={() => handleViewMore(category.key)}
-                      />
-                    }
-                  >
-                    <Row gutter={[16, 16]}>
-                      {groupedProducts[category.key]?.slice(0, 4).map(product => (
-                        <Col span={6} key={product.id}>
-                          <ProductCard product={product} />
-                        </Col>
-                      ))}
-                    </Row>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </div>
+          renderAllCategories()  // 使用新的渲染函数
         ) : (
           renderCategoryProducts()
         )}

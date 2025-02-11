@@ -89,7 +89,7 @@ export const categories = [
       icon: <FileOutlined />,
       title: '数字素材类',
       tags: {
-        scenes: ['工作总结', '培训课件', '简历制作', '商业提案', '数据分析', '项目汇报'],
+        scenes: ['工作总结', '培训课件', '商业提案', '数据分析', '项目汇报'],
         styles: ['简约商务', '清新文艺', '科技感强', '创意设计', '传统严谨']
       },
       children: [
@@ -316,7 +316,7 @@ export const products = [
       category: "nft",
       subCategory: "virtual-identity",
       thirdCategory: "unique-avatar",
-      tags: ["稀有头像", "NFT", "收藏展示"],
+      tags: ["收藏展示", "社交分享", "赛博朋克"],
       stock: 10,
       sold: 5,
       description: "这是一款稀有的数字头像，具有独特的艺术风格。",
@@ -330,10 +330,10 @@ export const products = [
       category: "nft",
       subCategory: "virtual-identity",
       thirdCategory: "custom-avatar",
-      tags: ["限定头像", "NFT", "社交分享"],
+      tags: ["社交分享", "未来科技", "抽象创意"],
       stock: 5,
       sold: 2,
-      description: "这是一款限定的头像，具有很高的收藏价值。 通过该头像，你可以展示你的个性和品味。",
+      description: "这是一款限定的头像，具有很高的收藏价值。",
       originalPrice: 1000
     },
     {
@@ -387,7 +387,7 @@ export const products = [
       category: "digital-resources",
       subCategory: "document-templates",
       thirdCategory: "word-templates",
-      tags: ["文档模板", "工作总结", "简约商务"],
+      tags: ["工作总结", "商业提案", "简约商务"],
       stock: 5,
       sold: 2,
       description: "这是一款Microsoft Office的订阅服务，具有很高的办公效率。"
@@ -487,16 +487,16 @@ export const products = [
     // 学习资源类
     {
       id: 14,
-      name: "英雄联盟点券充值服务",
+      name: "高校专业课程资料",
       price: 100,
       image: "https://rcc01-1251895040.cos.ap-guangzhou.myqcloud.com/products%2F180108d0360bb77b5e7b99fc3c8320ad.jpg",
       category: "learning-resources",
       subCategory: "academic",
       thirdCategory: "university-courses",
-      tags: ["英雄联盟点券", "游戏"],
+      tags: ["考试备考", "学术研究", "系统全面"],
       stock: 10,
       sold: 5,
-      description: "这是一项英雄联盟点券充值服务，具有很高的游戏体验。"
+      description: "系统完整的专业课程学习资料，助力考试备考。"
     },
     {
       id: 15,
@@ -527,16 +527,16 @@ export const products = [
     // 会员权益类
     {
       id: 17,
-      name: "王者荣耀限定皮肤",
+      name: "爱奇艺年度会员",
       price: 168,
       image: "https://rcc01-1251895040.cos.ap-guangzhou.myqcloud.com/products/0e1b6c3393ebb46069aba381768002bf.jpeg",
       category: "membership",
       subCategory: "video-membership",
       thirdCategory: "iqiyi",
-      tags: ["游戏皮肤", "游戏"],
+      tags: ["日常娱乐", "尊享专属", "基础服务"],
       stock: 5,
       sold: 2,
-      description: "这是一款王者荣耀限定皮肤，具有很高的游戏体验。"
+      description: "爱奇艺年度会员，海量视频内容随心看。"
     },
     {
       id: 18,
@@ -567,16 +567,16 @@ export const products = [
     // 软件服务类
     {
       id: 20,
-      name: "王者荣耀限定皮肤",
+      name: "Adobe Creative Cloud",
       price: 168,
       image: "https://rcc01-1251895040.cos.ap-guangzhou.myqcloud.com/products/0e1b6c3393ebb46069aba381768002bf.jpeg",
       category: "software",
       subCategory: "office-software",
       thirdCategory: "ms-office",
-      tags: ["游戏皮肤", "游戏"],
+      tags: ["设计创作", "专业版本", "办公应用"],
       stock: 5,
       sold: 2,
-      description: "这是一款王者荣耀限定皮肤，具有很高的游戏体验。"
+      description: "Adobe全家桶订阅服务，专业设计创作必备。"
     },
     {
       id: 21,
