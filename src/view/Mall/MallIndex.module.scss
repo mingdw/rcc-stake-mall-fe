@@ -406,13 +406,14 @@
 }
 
 .productCard {
-  height: 100%;
+  cursor: pointer;
   transition: all 0.3s;
+  height: 100%;
   width: 100%;
   
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   :global {
@@ -595,6 +596,10 @@
   .anticon {
     margin-right: 6px;
     font-size: 16px;
+  }
+
+  &:hover {
+    transform: scale(1.05);
   }
 }
 

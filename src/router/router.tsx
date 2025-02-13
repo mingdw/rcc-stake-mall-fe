@@ -18,6 +18,7 @@ import NotConnected from "../view/403";
 import PrivateRoute from "../components/PrivateRoute";
 import Mall from "../view/Mall/MallIndex";
 import Budding from "../view/budding";
+import ProductDetail from "../view/Mall/ProductDetail";
 
 
 
@@ -133,6 +134,22 @@ const router = createBrowserRouter([
                     },
                     
                 ]
+            },
+            {
+                path: '/mall',
+                element: (
+                    <PrivateRoute>
+                        <Mall/>
+                    </PrivateRoute>
+                )
+            },
+            {
+                path: '/mall/product/:id',
+                element: (
+                    <PrivateRoute>
+                        <ProductDetail/>
+                    </PrivateRoute>
+                )
             },
             {
                 path: '*',

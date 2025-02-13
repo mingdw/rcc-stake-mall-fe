@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
-import { Layout, Input, Menu, Card, Row, Col, Button, Pagination, Empty, Tooltip, Tag, Typography } from 'antd';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { Layout, Input, Menu, Card, Row, Col, Button, Pagination, Empty, Tooltip, Tag, Typography, Tree } from 'antd';
 import {
   ShoppingCartOutlined,
   SearchOutlined,
@@ -13,6 +13,8 @@ import {
 import stylesCss from './MallIndex.module.scss';
 import { Header } from 'antd/es/layout/layout';
 import { categories, products } from '../../api/mockDatas'; // 导入数据
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Key } from 'antd/es/table/interface';
 const { Search } = Input;
 const { SubMenu } = Menu;
 const { Text, Paragraph } = Typography;
@@ -68,7 +70,7 @@ const MallIndex: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const categoryRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>(
     categories.reduce((acc, category) => ({
@@ -78,6 +80,51 @@ const MallIndex: React.FC = () => {
   );
   const [activeKey, setActiveKey] = useState<string>('all'); // 添加选中状态
   const [sortType, setSortType] = useState<string>('default');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+
+  // 从 URL 参数中获取分类
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+      setShowAllCategories(false); // 确保不显示全部商品视图
+      
+      // 查找并设置一级分类为选中状态
+      const firstLevelKey = getFirstLevelKey(categoryFromUrl);
+      setActiveKey(firstLevelKey);
+
+      // 展开对应的分类菜单
+      const expandKeys: string[] = [];
+      categories.forEach(cat => {
+        if (cat.key === categoryFromUrl) {
+          expandKeys.push(cat.key);
+        }
+        cat.children?.forEach(subCat => {
+          if (subCat.key === categoryFromUrl) {
+            expandKeys.push(cat.key, subCat.key);
+          }
+          subCat.children?.forEach(thirdCat => {
+            if (thirdCat.key === categoryFromUrl) {
+              expandKeys.push(cat.key, subCat.key, thirdCat.key);
+            }
+          });
+        });
+      });
+      setExpandedKeys(expandKeys);
+    }
+  }, [location.search]);
+
+  // 处理分类选择
+  const onSelect = (selectedKeys: Key[], info: any) => {
+    const selectedKey = selectedKeys[0] as string;
+    setSelectedCategory(selectedKey);
+    
+    // 更新 URL 参数
+    navigate(`/mall?category=${selectedKey}`);
+  };
 
   // 按分类组织商品
   const groupedProducts = useMemo(() => {
@@ -115,7 +162,34 @@ const MallIndex: React.FC = () => {
 
       return acc;
     }, {} as { [key: string]: Product[] });
-  }, []);  // 因为 products 和 categories 是导入的常量，所以依赖项为空
+  }, []);  // 空依赖数组，因为 products 和 categories 是常量
+
+  // 过滤商品
+  const filteredTagProducts = useMemo(() => {
+    // 获取当前需要过滤的商品列表
+    let productsToFilter = showSearchResults ? searchResults : 
+                          selectedCategory ? groupedProducts[selectedCategory] : 
+                          showAllCategories ? products : 
+                          products;
+
+    // 应用标签过滤
+    return productsToFilter.filter(product => {
+      const matchesScenes = selectedScenes.length === 0 || 
+        selectedScenes.some(scene => product.tags.includes(scene));
+      const matchesStyles = selectedStyles.length === 0 || 
+        selectedStyles.some(style => product.tags.includes(style));
+      return matchesScenes && matchesStyles;
+    });
+  }, [
+    selectedScenes, 
+    selectedStyles, 
+    showSearchResults, 
+    searchResults, 
+    selectedCategory, 
+    showAllCategories,
+    // 移除 groupedProducts 从依赖数组中
+    // 移除 products 因为它是常量
+  ]);
 
   // 获取标签函数
   const getTagsByCategory = useCallback((categoryKey: string | null): CategoryTags => {
@@ -196,33 +270,6 @@ const MallIndex: React.FC = () => {
     setSelectedStyles([]);
   }, []);
 
-  // 根据选中的场景和风格筛选商品
-  const filteredProducts = useMemo(() => {
-    // 获取当前需要过滤的商品列表
-    let productsToFilter = showSearchResults ? searchResults : 
-                          selectedCategory ? groupedProducts[selectedCategory] : 
-                          showAllCategories ? products :  // 添加 showAllCategories 条件
-                          products;
-
-    // 应用标签过滤
-    return productsToFilter.filter(product => {
-      const matchesScenes = selectedScenes.length === 0 || 
-        selectedScenes.some(scene => product.tags.includes(scene));
-      const matchesStyles = selectedStyles.length === 0 || 
-        selectedStyles.some(style => product.tags.includes(style));
-      return matchesScenes && matchesStyles;
-    });
-  }, [
-    selectedScenes, 
-    selectedStyles, 
-    showSearchResults, 
-    searchResults, 
-    selectedCategory, 
-    groupedProducts,
-    showAllCategories, // 添加依赖项
-    products
-  ]);
-
   // 处理搜索
   const handleSearch = (value: string) => {
     const trimmedValue = value.trim();
@@ -300,7 +347,7 @@ const MallIndex: React.FC = () => {
     setActiveKey(firstLevelKey || key);
     if (key === 'all') {
       setShowAllCategories(true);
-      setSelectedCategory(null);
+      setSelectedCategory('');
     } else {
       setShowAllCategories(false);
       setSelectedCategory(key);
@@ -322,73 +369,86 @@ const MallIndex: React.FC = () => {
     // 设置导航状态
     setActiveKey('all');
     setShowAllCategories(true);
-    setSelectedCategory(null);
+    setSelectedCategory('');
     setCurrentPage(1);
   };
 
-  // 统一的商品卡片组件
-  const ProductCard: React.FC<{ product: Product }> = ({ product }) => (
-    <Card
-      hoverable
-      className={stylesCss.productCard}
-      cover={
-        <div className={stylesCss.imageWrapper}>
-          <img alt={product.name} src={product.image} />
-          {product.sold > 100 && (
-            <div className={stylesCss.hotTag}>
-              <FireOutlined /> 热销
-            </div>
-          )}
-        </div>
-      }
-      actions={[
-        <Button 
-          type="primary" 
-          className={stylesCss.exchangeButton}
-          disabled={product.stock === 0}
-        >
-          <ShoppingCartOutlined />
-          {product.stock === 0 ? '暂时售罄' : '立即兑换'}
-        </Button>
-      ]}
-    >
-      <div className={stylesCss.productContent}>
-        <Tooltip title={product.name}>
-          <div className={stylesCss.productTitle}>{product.name}</div>
-        </Tooltip>
+  // 修改商品卡片组件
+  const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
+    const handleCardClick = () => {
+      navigate(`/mall/product/${product.id}`);
+    };
 
-        <Tooltip title={product.description}>
-          <div className={stylesCss.description}>
-            {product.description}
-          </div>
-        </Tooltip>
+    const handleExchangeClick = (e: React.MouseEvent) => {
+      e.stopPropagation(); // 阻止事件冒泡
+      navigate(`/mall/product/${product.id}`);
+    };
 
-        <div className={stylesCss.priceStatisticsRow}>
-          <div className={stylesCss.priceInfo}>
-            <span className={stylesCss.currency}>¥</span>
-            <span className={stylesCss.currentPrice}>{product.price}</span>
-            <span className={stylesCss.unit}>R</span>
-            {product.originalPrice && (
-              <span className={stylesCss.originalPrice}>
-                ¥{product.originalPrice}R
-              </span>
+    return (
+      <Card
+        hoverable
+        className={stylesCss.productCard}
+        onClick={handleCardClick}
+        cover={
+          <div className={stylesCss.imageWrapper}>
+            <img alt={product.name} src={product.image} />
+            {product.sold > 100 && (
+              <div className={stylesCss.hotTag}>
+                <FireOutlined /> 热销
+              </div>
             )}
           </div>
-          <div className={stylesCss.statistics}>
-            <span>库存 {product.stock}</span>
-            <div className={stylesCss.divider} />
-            <span>已售 {product.sold}</span>
+        }
+        actions={[
+          <Button 
+            type="primary" 
+            className={stylesCss.exchangeButton}
+            disabled={product.stock === 0}
+            onClick={handleExchangeClick}
+          >
+            <ShoppingCartOutlined />
+            {product.stock === 0 ? '暂时售罄' : '立即兑换'}
+          </Button>
+        ]}
+      >
+        <div className={stylesCss.productContent}>
+          <Tooltip title={product.name}>
+            <div className={stylesCss.productTitle}>{product.name}</div>
+          </Tooltip>
+
+          <Tooltip title={product.description}>
+            <div className={stylesCss.description}>
+              {product.description}
+            </div>
+          </Tooltip>
+
+          <div className={stylesCss.priceStatisticsRow}>
+            <div className={stylesCss.priceInfo}>
+              <span className={stylesCss.currency}>¥</span>
+              <span className={stylesCss.currentPrice}>{product.price}</span>
+              <span className={stylesCss.unit}>R</span>
+              {product.originalPrice && (
+                <span className={stylesCss.originalPrice}>
+                  ¥{product.originalPrice}R
+                </span>
+              )}
+            </div>
+            <div className={stylesCss.statistics}>
+              <span>库存 {product.stock}</span>
+              <div className={stylesCss.divider} />
+              <span>已售 {product.sold}</span>
+            </div>
+          </div>
+
+          <div className={stylesCss.tags}>
+            {product.tags.slice(0, 4).map(tag => (
+              <Tag key={tag}>{tag}</Tag>
+            ))}
           </div>
         </div>
-
-        <div className={stylesCss.tags}>
-          {product.tags.slice(0, 4).map(tag => (
-            <Tag key={tag}>{tag}</Tag>
-          ))}
-        </div>
-      </div>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   // 修改标题组件
   const CategoryCardTitle: React.FC<CategoryTitleProps> = ({ 
@@ -520,9 +580,8 @@ const MallIndex: React.FC = () => {
     const currentCategory = getCurrentCategory(selectedCategory);
     if (!currentCategory) return null;
 
-    // 使用 filteredProducts 替代直接使用 groupedProducts
-    const categoryProducts = filteredProducts;
-    const sortedProducts = handleSort(categoryProducts, sortType);
+    // 使用新的 filteredTagProducts
+    const sortedProducts = handleSort(filteredTagProducts, sortType);
     const pageSize = 12;
     
     return (
@@ -535,7 +594,7 @@ const MallIndex: React.FC = () => {
           title={
             <CategoryCardTitle 
               category={currentCategory}
-              total={categoryProducts.length}
+              total={filteredTagProducts.length}
               sortType={sortType as SortType}
               onSortChange={setSortType}
             />
@@ -589,7 +648,7 @@ const MallIndex: React.FC = () => {
   // 渲染搜索结果
   const renderSearchResults = () => {
     // 使用 filteredProducts 替代直接使用 searchResults
-    const sortedResults = handleSort(filteredProducts, sortType);
+    const sortedResults = handleSort(filteredTagProducts, sortType);
     const pageSize = 12;
 
     return (
@@ -773,7 +832,7 @@ const MallIndex: React.FC = () => {
         <Row gutter={[16, 16]}>
           {categories.map(category => {
             // 获取当前分类下的商品，并应用标签过滤
-            const categoryProducts = filteredProducts.filter(product => 
+            const categoryProducts = filteredTagProducts.filter(product => 
               product.category === category.key ||
               category.children?.some(subCat => 
                 product.subCategory === subCat.key ||

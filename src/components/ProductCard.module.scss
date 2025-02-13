@@ -1,0 +1,46 @@
+.productCard {
+  width: 100%;
+  
+  :global {
+    .ant-card-cover {
+      img {
+        height: 200px;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+.productInfo {
+  .price {
+    margin-bottom: 8px;
+    
+    .currency {
+      color: #ff4d4f;
+      font-size: 14px;
+      margin-right: 2px;
+    }
+    
+    .amount {
+      color: #ff4d4f;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    
+    .originalPrice {
+      color: #999;
+      text-decoration: line-through;
+      margin-left: 8px;
+      font-size: 14px;
+    }
+  }
+  
+  .tags {
+    margin-bottom: 8px;
+  }
+  
+  .sold {
+    color: #666;
+    font-size: 12px;
+  }
+}

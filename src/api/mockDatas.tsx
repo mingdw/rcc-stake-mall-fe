@@ -320,7 +320,17 @@ export const products = [
       stock: 10,
       sold: 5,
       description: "这是一款稀有的数字头像，具有独特的艺术风格。",
-      originalPrice: 1200
+      originalPrice: 1200,
+      specifications: {
+        "发行方": "数字艺术工作室",
+        "发行时间": "2024-01-01",
+        "作品编号": "#001",
+        "区块链": "以太坊",
+        "版权说明": "该NFT作品版权归发行方所有",
+        "使用说明": "可用于社交平台展示",
+        "稀有度": "SSR",
+        "区块链地址": "0x1234...5678"
+      }
     },
     {
       id: 2,
@@ -334,7 +344,17 @@ export const products = [
       stock: 5,
       sold: 2,
       description: "这是一款限定的头像，具有很高的收藏价值。",
-      originalPrice: 1000
+      originalPrice: 1000,
+      specifications: {
+        "发行方": "Meta数字艺术",
+        "发行时间": "2024-01-15",
+        "作品编号": "#002",
+        "区块链": "以太坊",
+        "版权说明": "该NFT作品版权归发行方所有",
+        "使用说明": "可用于元宇宙平台",
+        "稀有度": "SR",
+        "区块链地址": "0x2345...6789"
+      }
     },
     {
       id: 3,
@@ -348,7 +368,17 @@ export const products = [
       stock: 8,
       sold: 3,
       description: "这是一幅数字艺术画作，具有很高的艺术价值。",
-      originalPrice: 2200
+      originalPrice: 2200,
+      specifications: {
+        "艺术家": "CryptoArt工作室",
+        "创作时间": "2023-12-01",
+        "作品编号": "ART#001",
+        "区块链": "以太坊",
+        "作品尺寸": "3000x4000px",
+        "文件格式": "PNG/SVG",
+        "版权说明": "永久版权授权",
+        "区块链地址": "0x3456...7890"
+      }
     },
     {
       id: 4,
@@ -390,7 +420,17 @@ export const products = [
       tags: ["工作总结", "商业提案", "简约商务"],
       stock: 5,
       sold: 2,
-      description: "这是一款Microsoft Office的订阅服务，具有很高的办公效率。"
+      description: "这是一款Microsoft Office的订阅服务，具有很高的办公效率。",
+      specifications: {
+        "产品版本": "Microsoft 365 企业版",
+        "授权期限": "12个月",
+        "适用设备": "Windows/Mac",
+        "账号数量": "5个设备",
+        "存储空间": "1TB OneDrive",
+        "技术支持": "7*24小时",
+        "自动续费": "支持",
+        "激活方式": "账号激活"
+      }
     },
     {
       id: 7,
@@ -403,7 +443,17 @@ export const products = [
       tags: ["设计软件", "创意设计", "科技感强"],
       stock: 3,
       sold: 1,
-      description: "这是一款Adobe Creative Cloud的订阅服务，具有很高的设计效率。"
+      description: "这是一款Adobe Creative Cloud的订阅服务，具有很高的设计效率。",
+      specifications: {
+        "产品版本": "Adobe CC 2024",
+        "授权期限": "12个月",
+        "适用设备": "Windows/Mac",
+        "包含软件": "PS/AI/PR/AE等",
+        "云存储": "100GB",
+        "技术支持": "在线支持",
+        "自动续费": "支持",
+        "激活方式": "Adobe ID授权"
+      }
     },
     {
       id: 8,
@@ -443,7 +493,17 @@ export const products = [
       tags: ["优酷会员", "视频"],
       stock: 10,
       sold: 5,
-      description: "这是一项优酷会员服务，具有很高的视频观看体验。"
+      description: "这是一项优酷会员服务，具有很高的视频观看体验。",
+      specifications: {
+        "会员类型": "黄金会员",
+        "有效期": "12个月",
+        "观看清晰度": "4K",
+        "支持设备数": "4台设备",
+        "下载权限": "支持",
+        "广告特权": "无广告",
+        "会员福利": "优先观看",
+        "激活时限": "购买后30天内"
+      }
     },
     {
       id: 11,
@@ -496,7 +556,17 @@ export const products = [
       tags: ["考试备考", "学术研究", "系统全面"],
       stock: 10,
       sold: 5,
-      description: "系统完整的专业课程学习资料，助力考试备考。"
+      description: "系统完整的专业课程学习资料，助力考试备考。",
+      specifications: {
+        "资料类型": "视频+文档",
+        "适用专业": "计算机科学",
+        "课程数量": "12门核心课程",
+        "资料格式": "PDF/MP4",
+        "更新周期": "季度更新",
+        "使用期限": "永久有效",
+        "下载次数": "不限",
+        "售后服务": "一对一答疑"
+      }
     },
     {
       id: 15,
@@ -576,7 +646,17 @@ export const products = [
       tags: ["设计创作", "专业版本", "办公应用"],
       stock: 5,
       sold: 2,
-      description: "Adobe全家桶订阅服务，专业设计创作必备。"
+      description: "Adobe全家桶订阅服务，专业设计创作必备。",
+      specifications: {
+        "软件版本": "CC 2024 完整版",
+        "授权类型": "订阅授权",
+        "使用期限": "12个月",
+        "授权范围": "个人使用",
+        "设备支持": "最多2台设备",
+        "云存储空间": "100GB",
+        "技术支持": "在线客服",
+        "更新服务": "自动更新"
+      }
     },
     {
       id: 21,
@@ -617,7 +697,17 @@ export const products = [
       tags: ['Word模板', '商业计划书'],
       stock: 200,
       sold: 800,
-      description: '专业的商业计划书Word模板，包含完整的框架和案例'
+      description: '专业的商业计划书Word模板，包含完整的框架和案例',
+      specifications: {
+        "模板格式": "Word 2016-2024",
+        "文件大小": "15MB",
+        "页面数量": "50+",
+        "模板数量": "10套",
+        "使用授权": "可商用",
+        "更新服务": "终身更新",
+        "设计风格": "简约商务",
+        "适用场景": "创业融资/商业策划"
+      }
     },
     // Excel模板 - 财务报表
     {
@@ -632,7 +722,17 @@ export const products = [
       tags: ['Excel模板', '财务分析'],
       stock: 150,
       sold: 600,
-      description: '专业的财务分析Excel模板，包含多种财务报表和分析工具'
+      description: '专业的财务分析Excel模板，包含多种财务报表和分析工具',
+      specifications: {
+        "模板格式": "Excel 2016-2024",
+        "文件大小": "25MB",
+        "表格数量": "30+",
+        "计算公式": "自动化处理",
+        "使用授权": "可商用",
+        "更新服务": "一年更新",
+        "适用行业": "通用行业",
+        "教程支持": "配套视频教程"
+      }
     },
     // PPT模板 - 商务汇报
     {
