@@ -464,26 +464,69 @@
 
 .recommendCard {
   margin-top: 24px;
+  background: #fff;
+  border-radius: 8px;
   
-  .recommendTitle {
+  :global {
+    .ant-card-head {
+      padding: 0 24px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .ant-card-body {
+      padding: 24px;
+    }
+    
+    .ant-list-item {
+      margin: 0;
+      padding: 0;
+    }
+
+    // 确保商品卡片样式一致
+    .ant-card {
+      &:hover {
+        transform: translateY(-4px);
+      }
+    }
+  }
+}
+
+.recommendTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+
+  .titleLeft {
     display: flex;
     align-items: center;
-    
-    .recommendCount {
-      margin-left: 12px;
-      color: #999;
+    gap: 12px;
+
+    .mainTitle {
+      font-size: 16px;
+      font-weight: 500;
+      color: #262626;
+    }
+
+    .subTitle {
       font-size: 14px;
-      font-weight: normal;
+      color: #8c8c8c;
     }
   }
 
-  :global {
-    .ant-card-head {
-      border-bottom: none;
-    }
+  .moreButton {
+    color: #595959;
+    font-size: 14px;
+    padding: 0;
+    height: auto;
     
-    .ant-card-body {
-      padding: 24px;
+    &:hover {
+      color: #1890ff;
+    }
+
+    :global(.anticon) {
+      font-size: 12px;
+      margin-left: 4px;
     }
   }
 }

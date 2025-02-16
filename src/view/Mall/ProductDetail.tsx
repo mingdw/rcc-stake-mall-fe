@@ -26,38 +26,17 @@ import {
   ShareAltOutlined,
   HomeOutlined,
   RightOutlined,
-  ShoppingOutlined,
-  ZoomInOutlined,
+
   FireOutlined,
   LeftOutlined,
   SafetyOutlined,
   CheckCircleOutlined
 } from '@ant-design/icons';
-import { products, categories } from '../../api/mockDatas';
+import { products, categories, Specification, Product } from '../../api/mockDatas';
+
 import styles from './ProductDetail.module.scss';
 import type { TabsProps } from 'antd';
 import ProductCard from '../../components/ProductCardComents';
-
-// 在文件顶部添加 Product 接口定义
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  image: string;      // 主图
-  images?: string[];  // 商品轮播图集合
-  detailImages?: string[]; // 详情图片集合
-  category: string;
-  subCategory?: string;
-  thirdCategory?: string;
-  tags: string[];
-  stock: number;
-  sold: number;
-  description: string;
-  specifications?: {
-    [key: string]: string;
-  };
-}
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
@@ -69,20 +48,36 @@ const ProductDetail: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
 
-  // 查找商品信息并指定类型
-  const product = products.find(p => p.id === Number(id)) as Product | undefined;
+  // 获取当前商品
+  const product = useMemo(() => {
+    return products.find(p => p.id === Number(id));
+  }, [id]);
 
   // 查找商品所属分类信息
   const category = categories.find(c => c.key === product?.category);
   const subCategory = category?.children?.find(sc => sc.key === product?.subCategory);
   const thirdCategory = subCategory?.children?.find(tc => tc.key === product?.thirdCategory);
 
-  // 获取推荐商品（同一级分类下的其他商品）
-  const recommendedProducts = useMemo(() => {
+  // 获取同类商品（同一级目录下的所有商品，排除当前商品）
+  const relatedProducts = useMemo(() => {
     if (!product) return [];
     return products
-      .filter(p => p.category === product.category && p.id !== product.id)
-      .slice(0, 8); // 最多显示8个推荐商品
+      .filter(p => 
+        // 确保是同一个一级目录
+        p.category === product.category && 
+        // 排除当前商品
+        p.id !== product.id
+      )
+      // 随机打乱顺序
+      .sort(() => Math.random() - 0.5)
+      // 取前4个
+      .slice(0, 4);
+  }, [product]);
+
+  // 获取同类商品总数（同一级目录下的所有商品数量）
+  const categoryProductsCount = useMemo(() => {
+    if (!product) return 0;
+    return products.filter(p => p.category === product.category).length;
   }, [product]);
 
   // 辅助函数：格式化以太坊地址
@@ -146,10 +141,10 @@ const ProductDetail: React.FC = () => {
           <div className={styles.parameters}>
             <h3>规格参数</h3>
             <ul className={styles.parameterList}>
-              {product?.specifications && Object.entries(product.specifications).map(([key, value]) => (
-                <li key={key}>
-                  <span className={styles.paramKey}>{key}：</span>
-                  <span className={styles.paramValue}>{value}</span>
+              {product?.specifications && product.specifications.map((spec: Specification) => (  
+                <li key={spec.id}>
+                  <span className={styles.paramKey}>{spec.label}：</span>
+                  <span className={styles.paramValue}>{spec.value}</span>
                 </li>
               ))}
             </ul>
@@ -328,6 +323,23 @@ const ProductDetail: React.FC = () => {
     }
   };
 
+  // 使用商品的images数组
+  const productImages = product?.images || [];
+
+  // 规格展示部分的更新
+  const renderSpecifications = () => {
+    return (
+      <div className={styles.specifications}>
+        {product?.specifications?.map((spec) => (
+          <div key={spec.id} className={styles.specItem}>
+            <span className={styles.specLabel}>{spec.label}：</span>
+            <span className={styles.specValue}>{spec.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.container}>
       {/* 面包屑导航 */}
@@ -377,7 +389,7 @@ const ProductDetail: React.FC = () => {
               >
                 <div className={styles.imageBox}>
                   <Image
-                    src={product?.images?.[currentImage] || product?.image}
+                    src={productImages[currentImage]}
                     alt={`${product?.name}-main`}
                     className={styles.mainImage}
                     preview={false}
@@ -388,7 +400,7 @@ const ProductDetail: React.FC = () => {
                     <div 
                       className={styles.zoomImage}
                       style={{
-                        backgroundImage: `url(${product?.images?.[currentImage] || product?.image})`,
+                        backgroundImage: `url(${productImages[currentImage]})`,
                         backgroundPosition: `${mousePosition.x}% ${mousePosition.y}%`
                       }}
                     />
@@ -408,7 +420,7 @@ const ProductDetail: React.FC = () => {
                   }}
                 />
                 <div className={styles.thumbnailScroll}>
-                  {product?.images?.map((image, index) => (
+                  {productImages.map((image, index) => (
                     <div
                       key={index}
                       className={`${styles.thumbnail} ${currentImage === index ? styles.active : ''}`}
@@ -493,9 +505,7 @@ const ProductDetail: React.FC = () => {
                 {/* 添加更多服务承诺 */}
               </div>
 
-              <div className={styles.specifications}>
-                {/* ... existing specifications ... */}
-              </div>
+              {renderSpecifications()}
 
               <div className={styles.purchaseSection}>
                 <div className={styles.quantity}>
@@ -549,25 +559,47 @@ const ProductDetail: React.FC = () => {
         <Tabs defaultActiveKey="detail" items={tabItems} />
       </Card>
 
-      {/* 推荐商品 */}
+      {/* 同类商品推荐 */}
       <Card
         title={
           <div className={styles.recommendTitle}>
-            <span>推荐商品</span>
-            <span className={styles.recommendCount}>
-              共 {recommendedProducts.length} 件商品
-            </span>
+            <div className={styles.titleLeft}>
+              <span className={styles.mainTitle}>同类商品推荐</span>
+              <span className={styles.subTitle}>
+                共 {categoryProductsCount} 件商品
+              </span>
+            </div>
+            <Button 
+              type="link" 
+              onClick={() => navigate(`/mall?category=${product?.category}`)}
+              className={styles.moreButton}
+            >
+              查看更多 <RightOutlined />
+            </Button>
           </div>
         }
         className={styles.recommendCard}
+        bodyStyle={{ padding: '24px' }}
       >
-        <Row gutter={[16, 16]}>
-          {recommendedProducts.map(product => (
-            <Col xs={12} sm={8} md={6} key={product.id}>
-              <ProductCard product={product} />
-            </Col>
-          ))}
-        </Row>
+        <List
+          grid={{
+            gutter: 24,
+            xs: 1,
+            sm: 2,
+            md: 3,
+            lg: 4,
+            xl: 4,
+            xxl: 4,
+          }}
+          dataSource={relatedProducts}
+          renderItem={(item) => (
+            <List.Item>
+              <ProductCard 
+                product={item}
+              />
+            </List.Item>
+          )}
+        />
       </Card>
     </div>
   );

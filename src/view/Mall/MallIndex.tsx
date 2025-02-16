@@ -12,27 +12,13 @@ import {
 } from '@ant-design/icons';
 import stylesCss from './MallIndex.module.scss';
 import { Header } from 'antd/es/layout/layout';
-import { categories, products } from '../../api/mockDatas'; // 导入数据
+import { categories, Product, products } from '../../api/mockDatas'; // 导入数据
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Key } from 'antd/es/table/interface';
 const { Search } = Input;
 const { SubMenu } = Menu;
 const { Text, Paragraph } = Typography;
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;      // 一级目录（必须）
-  subCategory?: string;  // 二级目录（可选）
-  thirdCategory?: string;// 三级目录（可选，但如果有则必须有二级目录）
-  tags: string[];
-  stock: number;
-  sold: number;
-  description: string;
-  originalPrice?: number;
-}
 
 
 // 添加所有需要的类型定义
@@ -391,7 +377,7 @@ const MallIndex: React.FC = () => {
         onClick={handleCardClick}
         cover={
           <div className={stylesCss.imageWrapper}>
-            <img alt={product.name} src={product.image} />
+            <img alt={product.name} src={product.images[0]} />
             {product.sold > 100 && (
               <div className={stylesCss.hotTag}>
                 <FireOutlined /> 热销
