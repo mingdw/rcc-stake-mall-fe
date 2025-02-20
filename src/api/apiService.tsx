@@ -2,9 +2,6 @@ import axiosInstance from './axiosInstance';
 import axios, { AxiosError } from 'axios';
 
 
-
-
-
 // 示例接口：获取质押币种列表
 export const getSuplyList = async () => {
   try {

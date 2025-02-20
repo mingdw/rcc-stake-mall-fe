@@ -4,21 +4,21 @@ import {createBrowserRouter} from 'react-router-dom';
 import MainLayout from "../layouts/MainLayout";
 import AdminLayout from "../layouts/AdminLayout";
 
-import Suply from "../view/Suply/SuplyIndex";
-import SuplyDetails from "../view/Suply/SuplyDetails";
-import Home from "../view/Home/HomeIndex";
-import About from "../view/About/AboutIndex";
-import TransactionList from "../view/Transaction/TransactionList";
+import Suply from "../view/suply/SuplyIndex";
+import SuplyDetails from "../view/suply/SuplyDetails";
+import Home from "../view/home/HomeIndex";
+import About from "../view/about/AboutIndex";
+import TransactionList from "../view/transaction/TransactionList";
 import NotFount from "../view/403";
-import NotificationSettings from "../view/Admin/Profile/NotificationSettings";
-import ProfileBalance from "../view/Admin/Profile/ProfileBalance";
-import ProfileInfo from "../view/Admin/Profile/ProfileInfo";
-import SecuritySettings from "../view/Admin/Profile/SecuritySettings";
+import NotificationSettings from "../view/admin/profile/NotificationSettings";
+import ProfileBalance from "../view/admin/profile/ProfileBalance";
+import ProfileInfo from "../view/admin/profile/ProfileInfo";
+import SecuritySettings from "../view/admin/profile/SecuritySettings";
 import NotConnected from "../view/403";
 import PrivateRoute from "../components/PrivateRoute";
-import Mall from "../view/Mall/MallIndex";
+import Mall from "../view/mall/MallIndex";
 import Budding from "../view/budding";
-import ProductDetail from "../view/Mall/ProductDetail";
+import ProductDetail from "../view/mall/ProductDetail";
 
 
 
@@ -52,20 +52,24 @@ const router = createBrowserRouter([
                 )
             },
             {
-                path: '/small',
+                path: '/mall',
                 element: (
-                    <PrivateRoute>
                         <Mall/>
-                    </PrivateRoute>
                 ),
                 children:[
                     {
-                        path: '/small/budding',
+                        path: 'mall/budding',
                         element: <Budding/>
                     }
+                    
                 ]
             },
-
+            {
+                path: '/mall/product/:id',
+                element: (
+                        <ProductDetail/>
+                )
+            },
             {
                 path: '/about',
                 element:<About/>
@@ -135,22 +139,8 @@ const router = createBrowserRouter([
                     
                 ]
             },
-            {
-                path: '/mall',
-                element: (
-                    <PrivateRoute>
-                        <Mall/>
-                    </PrivateRoute>
-                )
-            },
-            {
-                path: '/mall/product/:id',
-                element: (
-                    <PrivateRoute>
-                        <ProductDetail/>
-                    </PrivateRoute>
-                )
-            },
+           
+            
             {
                 path: '*',
                 element:<NotFount/>

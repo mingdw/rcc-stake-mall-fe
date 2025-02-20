@@ -35,7 +35,8 @@ import {
   ScissorOutlined,
   CodeOutlined,
   AppleOutlined,
-  PlaySquareOutlined
+  PlaySquareOutlined,
+  HeartOutlined
 } from '@ant-design/icons';
 
 // 规格接口
@@ -45,6 +46,21 @@ export interface Specification {
   label: string;
   value: string;
 }
+
+export interface RTag {
+  id: number;
+  name: string;
+  code: string;
+  icon?: React.ReactNode;
+}
+ 
+export interface Tags {
+  id: number;
+  tagGroupCode: string;
+  tagGroupName: string;
+  tags: RTag[];
+}
+
 
 // 商品接口
 export interface Product {
@@ -69,19 +85,140 @@ export const categories = [
       key: 'nft',
       icon: <CrownOutlined />,
       title: 'NFT专区',
-      tags: {
-        scenes: ['收藏展示', '社交分享', '游戏体验', '投资理财', '艺术收藏'],
-        styles: ['赛博朋克', '未来科技', '像素复古', '艺术写实', '抽象创意']
-      },
+      tags: [
+        {
+          id: 1,
+          tagGroupName: '场景',
+          tagGroupCode: 'scene',
+          tags: [
+            {
+              id: 1,
+              name: '收藏展示',
+              code: 'collect',
+              icon: <CrownOutlined />
+            },
+            {
+              id: 2,
+              name: '社交分享',
+              code: 'share',
+              icon: <UserOutlined />
+            },
+            {
+              id: 3,
+              name: '游戏体验',
+              code: 'game',
+              icon: <TrophyOutlined />
+            },
+            {
+              id: 4,
+              name: '投资理财',
+              code: 'invest',
+              icon: <TrophyOutlined />
+            },
+            {
+              id: 5,
+              name: '艺术收藏',
+              code: 'art',
+              icon: <TrophyOutlined />
+            }
+          ]
+        },
+        {
+          id: 2,
+          tagGroupName: '风格',
+          tagGroupCode: 'style',
+          tags: [
+            {
+              id: 1,
+              name: '赛博朋克',
+              code: 'cyberpunk',
+              icon: <CrownOutlined />
+            },
+            {
+              id: 2,
+              name: '未来科技',
+              code: 'future',
+              icon: <CrownOutlined />
+            },
+            {
+              id: 3,
+              name: '像素复古',
+              code: 'pixel',
+              icon: <CrownOutlined />
+            },
+            {
+              id: 4,
+              name: '艺术写实',
+              code: 'art',
+              icon: <CrownOutlined />
+            },
+            {
+              id: 5,
+              name: '抽象创意',
+              code: 'abstract',
+              icon: <CrownOutlined />
+            }
+          ]
+        }
+      ],
+      
       children: [
         {
           key: 'digital-art',
           icon: <PictureOutlined />,
           title: '数字艺术品NFT',
-          tags: {
-            scenes: ['艺术收藏', '展厅陈列', '社交展示'],
-            styles: ['抽象艺术', '写实主义', '超现实']
-          },
+          tags: [
+            {
+              id: 1,
+              tagGroupName: '场景',
+              tagGroupCode: 'scene',
+              tags: [
+                {
+                  id: 1,
+                  name: '艺术收藏',
+                  code: 'art-collection',
+                  icon: <CrownOutlined />
+                },
+                {
+                  id: 2,
+                  name: '展厅陈列',
+                  code: 'exhibition',
+                  icon: <PictureOutlined />
+                },
+                {
+                  id: 3,
+                  name: '社交展示',
+                  code: 'social-display',
+                  icon: <TeamOutlined />
+                }
+              ]
+            },
+            {
+              id: 2,
+              tagGroupName: '风格',
+              tagGroupCode: 'style',
+              tags: [
+                {
+                  id: 1,
+                  name: '抽象艺术',
+                  code: 'abstract',
+                  icon: <HighlightOutlined />
+                },
+                {
+                  id: 2,
+                  name: '写实主义',
+                  code: 'realism',
+                  icon: <PictureOutlined />
+                },
+                {
+                  id: 3,
+                  name: '超现实',
+                  code: 'surreal',
+                  icon: <SketchOutlined />
+                }
+              ]
+            }
+          ],
           children: [
             { key: 'trendy-art', title: '潮流艺术画作NFT', icon: <HighlightOutlined /> },
             { key: 'music-art', title: '先锋音乐作品NFT', icon: <CustomerServiceOutlined /> },
@@ -114,19 +251,145 @@ export const categories = [
       key: 'digital-resources',
       icon: <FileOutlined />,
       title: '数字素材类',
-      tags: {
-        scenes: ['工作总结', '培训课件', '商业提案', '数据分析', '项目汇报'],
-        styles: ['简约商务', '清新文艺', '科技感强', '创意设计', '传统严谨']
-      },
+      tags: [
+        {
+          id: 1,
+          tagGroupName: '场景',
+          tagGroupCode: 'scene',
+          tags: [
+            {
+              id: 1,
+              name: '工作总结',
+              code: 'work-summary',
+              icon: <FileTextOutlined />
+            },
+            {
+              id: 2,
+              name: '培训课件',
+              code: 'training',
+              icon: <FileWordOutlined />
+            },
+            {
+              id: 3,
+              name: '商业提案',
+              code: 'business-proposal',
+              icon: <FilePptOutlined />
+            },
+            {
+              id: 4,
+              name: '数据分析',
+              code: 'data-analysis',
+              icon: <FileExcelOutlined />
+            },
+            {
+              id: 5,
+              name: '项目汇报',
+              code: 'project-report',
+              icon: <ProfileOutlined />
+            }
+          ]
+        },
+        {
+          id: 2,
+          tagGroupName: '风格',
+          tagGroupCode: 'style',
+          tags: [
+            {
+              id: 1,
+              name: '简约商务',
+              code: 'business',
+              icon: <FileOutlined />
+            },
+            {
+              id: 2,
+              name: '清新文艺',
+              code: 'fresh',
+              icon: <FileTextOutlined />
+            },
+            {
+              id: 3,
+              name: '科技感强',
+              code: 'tech',
+              icon: <LayoutOutlined />
+            },
+            {
+              id: 4,
+              name: '创意设计',
+              code: 'creative',
+              icon: <PictureOutlined />
+            },
+            {
+              id: 5,
+              name: '传统严谨',
+              code: 'traditional',
+              icon: <ProfileOutlined />
+            }
+          ]
+        }
+      ],
       children: [
         {
           key: 'document-templates',
           icon: <FileTextOutlined />,
           title: '文档模板',
-          tags: {
-            scenes: ['工作汇报', '项目总结', '教学课件', '个人简历'],
-            styles: ['商务简约', '创意设计', '学术严谨']
-          },
+          tags: [
+            {
+              id: 1,
+              tagGroupName: '场景',
+              tagGroupCode: 'scene',
+              tags: [
+                {
+                  id: 1,
+                  name: '工作汇报',
+                  code: 'work-report',
+                  icon: <FileTextOutlined />
+                },
+                {
+                  id: 2,
+                  name: '项目总结',
+                  code: 'project-summary',
+                  icon: <ProfileOutlined />
+                },
+                {
+                  id: 3,
+                  name: '教学课件',
+                  code: 'teaching',
+                  icon: <ReadOutlined />
+                },
+                {
+                  id: 4,
+                  name: '个人简历',
+                  code: 'resume',
+                  icon: <UserOutlined />
+                }
+              ]
+            },
+            {
+              id: 2,
+              tagGroupName: '风格',
+              tagGroupCode: 'style',
+              tags: [
+                {
+                  id: 1,
+                  name: '商务简约',
+                  code: 'business',
+                  icon: <FileOutlined />
+                },
+                {
+                  id: 2,
+                  name: '创意设计',
+                  code: 'creative',
+                  icon: <HighlightOutlined />
+                },
+                {
+                  id: 3,
+                  name: '学术严谨',
+                  code: 'academic',
+                  icon: <BookOutlined />
+                }
+              ]
+            }
+          ],
           children: [
             { key: 'word-templates', title: 'Word商务报告模板', icon: <FileWordOutlined /> },
             { key: 'excel-templates', title: 'Excel财务报表模板', icon: <FileExcelOutlined /> },
@@ -137,10 +400,70 @@ export const categories = [
           key: 'image-resources',
           icon: <PictureOutlined />,
           title: '图片素材',
-          tags: {
-            scenes: ['广告设计', '社媒运营', '个人美化', '商业展示'],
-            styles: ['小清新', '商务风', '科技感', '复古风']
-          },
+          tags: [
+            {
+              id: 1,
+              tagGroupName: '场景',
+              tagGroupCode: 'scene',
+              tags: [
+                {
+                  id: 1,
+                  name: '广告设计',
+                  code: 'advertising',
+                  icon: <SketchOutlined />
+                },
+                {
+                  id: 2,
+                  name: '社媒运营',
+                  code: 'social-media',
+                  icon: <TeamOutlined />
+                },
+                {
+                  id: 3,
+                  name: '个人美化',
+                  code: 'personal',
+                  icon: <UserOutlined />
+                },
+                {
+                  id: 4,
+                  name: '商业展示',
+                  code: 'business',
+                  icon: <PictureOutlined />
+                }
+              ]
+            },
+            {
+              id: 2,
+              tagGroupName: '风格',
+              tagGroupCode: 'style',
+              tags: [
+                {
+                  id: 1,
+                  name: '小清新',
+                  code: 'fresh',
+                  icon: <PictureOutlined />
+                },
+                {
+                  id: 2,
+                  name: '商务风',
+                  code: 'business',
+                  icon: <FileOutlined />
+                },
+                {
+                  id: 3,
+                  name: '科技感',
+                  code: 'tech',
+                  icon: <AppstoreOutlined />
+                },
+                {
+                  id: 4,
+                  name: '复古风',
+                  code: 'retro',
+                  icon: <HighlightOutlined />
+                }
+              ]
+            }
+          ],
           children: [
             { key: 'hd-wallpapers', title: '高清风景壁纸', icon: <PictureOutlined /> },
             { key: 'cartoon-avatars', title: '可爱卡通头像', icon: <FileOutlined /> },
@@ -167,10 +490,76 @@ export const categories = [
       key: 'learning-resources',
       icon: <ReadOutlined />,
       title: '学习资源类',
-      tags: {
-        scenes: ['考试备考', '技能提升', '职业发展', '学术研究', '自我提升'],
-        styles: ['系统全面', '重点突出', '实用性强', '深入浅出']
-      },
+      tags: [
+        {
+          id: 1,
+          tagGroupName: '场景',
+          tagGroupCode: 'scene',
+          tags: [
+            {
+              id: 1,
+              name: '考试备考',
+              code: 'exam',
+              icon: <BookOutlined />
+            },
+            {
+              id: 2,
+              name: '技能提升',
+              code: 'skill',
+              icon: <ToolOutlined />
+            },
+            {
+              id: 3,
+              name: '职业发展',
+              code: 'career',
+              icon: <ProfileOutlined />
+            },
+            {
+              id: 4,
+              name: '学术研究',
+              code: 'research',
+              icon: <ReadOutlined />
+            },
+            {
+              id: 5,
+              name: '自我提升',
+              code: 'self-improvement',
+              icon: <UserOutlined />
+            }
+          ]
+        },
+        {
+          id: 2,
+          tagGroupName: '风格',
+          tagGroupCode: 'style',
+          tags: [
+            {
+              id: 1,
+              name: '系统全面',
+              code: 'systematic',
+              icon: <AppstoreOutlined />
+            },
+            {
+              id: 2,
+              name: '重点突出',
+              code: 'focused',
+              icon: <HighlightOutlined />
+            },
+            {
+              id: 3,
+              name: '实用性强',
+              code: 'practical',
+              icon: <ToolOutlined />
+            },
+            {
+              id: 4,
+              name: '深入浅出',
+              code: 'easy',
+              icon: <ReadOutlined />
+            }
+          ]
+        }
+      ],
       children: [
         {
           key: 'academic',
@@ -208,10 +597,70 @@ export const categories = [
       key: 'entertainment',
       icon: <PlayCircleOutlined />,
       title: '生活娱乐类',
-      tags: {
-        scenes: ['休闲娱乐', '兴趣培养', '社交分享', '个人收藏'],
-        styles: ['轻松欢快', '文艺小众', '热血动感', '温馨治愈']
-      },
+      tags: [
+        {
+          id: 1,
+          tagGroupName: '场景',
+          tagGroupCode: 'scene',
+          tags: [
+            {
+              id: 1,
+              name: '休闲娱乐',
+              code: 'leisure',
+              icon: <PlayCircleOutlined />
+            },
+            {
+              id: 2,
+              name: '兴趣培养',
+              code: 'hobby',
+              icon: <CameraOutlined />
+            },
+            {
+              id: 3,
+              name: '社交分享',
+              code: 'social',
+              icon: <TeamOutlined />
+            },
+            {
+              id: 4,
+              name: '个人收藏',
+              code: 'collection',
+              icon: <CrownOutlined />
+            }
+          ]
+        },
+        {
+          id: 2,
+          tagGroupName: '风格',
+          tagGroupCode: 'style',
+          tags: [
+            {
+              id: 1,
+              name: '轻松欢快',
+              code: 'happy',
+              icon: <PlayCircleOutlined />
+            },
+            {
+              id: 2,
+              name: '文艺小众',
+              code: 'artistic',
+              icon: <CustomerServiceOutlined />
+            },
+            {
+              id: 3,
+              name: '热血动感',
+              code: 'energetic',
+              icon: <TrophyOutlined />
+            },
+            {
+              id: 4,
+              name: '温馨治愈',
+              code: 'healing',
+              icon: <HeartOutlined />
+            }
+          ]
+        }
+      ],
       children: [
         {
           key: 'media',
@@ -249,10 +698,70 @@ export const categories = [
       key: 'membership',
       icon: <CrownOutlined />,
       title: '会员权益类',
-      tags: {
-        scenes: ['日常娱乐', '学习充电', '工作效率', '创作创造'],
-        styles: ['基础服务', '进阶特权', '尊享专属', '定制服务']
-      },
+      tags: [
+        {
+          id: 1,
+          tagGroupName: '场景',
+          tagGroupCode: 'scene',
+          tags: [
+            {
+              id: 1,
+              name: '日常娱乐',
+              code: 'daily',
+              icon: <PlayCircleOutlined />
+            },
+            {
+              id: 2,
+              name: '学习充电',
+              code: 'study',
+              icon: <ReadOutlined />
+            },
+            {
+              id: 3,
+              name: '工作效率',
+              code: 'work',
+              icon: <ToolOutlined />
+            },
+            {
+              id: 4,
+              name: '创作创造',
+              code: 'create',
+              icon: <HighlightOutlined />
+            }
+          ]
+        },
+        {
+          id: 2,
+          tagGroupName: '风格',
+          tagGroupCode: 'style',
+          tags: [
+            {
+              id: 1,
+              name: '基础服务',
+              code: 'basic',
+              icon: <AppstoreOutlined />
+            },
+            {
+              id: 2,
+              name: '进阶特权',
+              code: 'advanced',
+              icon: <CrownOutlined />
+            },
+            {
+              id: 3,
+              name: '尊享专属',
+              code: 'premium',
+              icon: <SafetyCertificateOutlined />
+            },
+            {
+              id: 4,
+              name: '定制服务',
+              code: 'custom',
+              icon: <ToolOutlined />
+            }
+          ]
+        }
+      ],
       children: [
         {
           key: 'video-membership',
@@ -290,10 +799,70 @@ export const categories = [
       key: 'software',
       icon: <AppstoreOutlined />,
       title: '软件服务类',
-      tags: {
-        scenes: ['办公应用', '设计创作', '开发编程', '系统工具'],
-        styles: ['专业版本', '企业定制', '个人使用', '教育版本']
-      },
+      tags: [
+        {
+          id: 1,
+          tagGroupName: '场景',
+          tagGroupCode: 'scene',
+          tags: [
+            {
+              id: 1,
+              name: '办公应用',
+              code: 'office',
+              icon: <FileWordOutlined />
+            },
+            {
+              id: 2,
+              name: '设计创作',
+              code: 'design',
+              icon: <SketchOutlined />
+            },
+            {
+              id: 3,
+              name: '开发编程',
+              code: 'development',
+              icon: <CodeOutlined />
+            },
+            {
+              id: 4,
+              name: '系统工具',
+              code: 'system',
+              icon: <WindowsOutlined />
+            }
+          ]
+        },
+        {
+          id: 2,
+          tagGroupName: '风格',
+          tagGroupCode: 'style',
+          tags: [
+            {
+              id: 1,
+              name: '专业版本',
+              code: 'professional',
+              icon: <SafetyCertificateOutlined />
+            },
+            {
+              id: 2,
+              name: '企业定制',
+              code: 'enterprise',
+              icon: <AppstoreOutlined />
+            },
+            {
+              id: 3,
+              name: '个人使用',
+              code: 'personal',
+              icon: <UserOutlined />
+            },
+            {
+              id: 4,
+              name: '教育版本',
+              code: 'education',
+              icon: <ReadOutlined />
+            }
+          ]
+        }
+      ],
       children: [
         {
           key: 'office-software',

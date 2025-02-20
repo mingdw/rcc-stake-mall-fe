@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import stylesCss from './MallIndex.module.scss';
 import { Header } from 'antd/es/layout/layout';
-import { categories, Product, products } from '../../api/mockDatas'; // 导入数据
+import { categories, Product, products, RTag, Tags } from '../../api/mockDatas'; // 导入数据
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Key } from 'antd/es/table/interface';
 const { Search } = Input;
@@ -43,11 +43,6 @@ interface CategoryTitleProps {
   onSortChange?: (type: SortType) => void;
 }
 
-// 组件外部的接口定义
-interface CategoryTags {
-  scenes: string[];
-  styles: string[];
-}
 
 const MallIndex: React.FC = () => {
   const [showAllCategories, setShowAllCategories] = useState(true); // 默认为 true
@@ -150,13 +145,37 @@ const MallIndex: React.FC = () => {
     }, {} as { [key: string]: Product[] });
   }, []);  // 空依赖数组，因为 products 和 categories 是常量
 
-  // 过滤商品
+  // 修改过滤商品的逻辑
   const filteredTagProducts = useMemo(() => {
     // 获取当前需要过滤的商品列表
-    let productsToFilter = showSearchResults ? searchResults : 
-                          selectedCategory ? groupedProducts[selectedCategory] : 
-                          showAllCategories ? products : 
-                          products;
+    let productsToFilter = showSearchResults ? searchResults : products;
+
+    // 如果选择了分类，先按分类筛选
+    if (selectedCategory && !showSearchResults) {
+      productsToFilter = productsToFilter.filter(product => {
+        // 如果是一级分类
+        if (categories.some(cat => cat.key === selectedCategory)) {
+          return product.category === selectedCategory;
+        }
+        
+        // 如果是二级分类
+        for (const category of categories) {
+          const secondLevel = category.children?.find(sub => sub.key === selectedCategory);
+          if (secondLevel) {
+            return product.subCategory === selectedCategory;
+          }
+          
+          // 如果是三级分类
+          for (const subCategory of category.children || []) {
+            const thirdLevel = subCategory.children?.find(third => third.key === selectedCategory);
+            if (thirdLevel) {
+              return product.thirdCategory === selectedCategory;
+            }
+          }
+        }
+        return false;
+      });
+    }
 
     // 应用标签过滤
     return productsToFilter.filter(product => {
@@ -171,29 +190,32 @@ const MallIndex: React.FC = () => {
     selectedStyles, 
     showSearchResults, 
     searchResults, 
-    selectedCategory, 
-    showAllCategories,
-    // 移除 groupedProducts 从依赖数组中
-    // 移除 products 因为它是常量
+    selectedCategory
   ]);
 
   // 获取标签函数
-  const getTagsByCategory = useCallback((categoryKey: string | null): CategoryTags => {
+  const getTagsByCategory = useCallback((categoryKey: string | null): Tags[] => {
     // 如果是全部商品或没有选择分类，返回所有分类的标签
     if (!categoryKey || categoryKey === 'all') {
       const allTags = categories.reduce((acc, category) => {
-        if (category.tags) {
-          acc.scenes = [...new Set([...acc.scenes, ...category.tags.scenes])];
-          acc.styles = [...new Set([...acc.styles, ...category.tags.styles])];
+        if (category.tags && Array.isArray(category.tags)) {
+          // 合并场景标签
+          const sceneTags = category.tags.find(t => t.tagGroupCode === 'scene')?.tags || [];
+          acc[0].tags = [...acc[0].tags, ...sceneTags].filter((tag, index, self) => 
+            index === self.findIndex(t => t.code === tag.code)
+          );
+          
+          // 合并风格标签
+          const styleTags = category.tags.find(t => t.tagGroupCode === 'style')?.tags || [];
+          acc[1].tags = [...acc[1].tags, ...styleTags].filter((tag, index, self) => 
+            index === self.findIndex(t => t.code === tag.code)
+          );
         }
-        category.children?.forEach(subCategory => {
-          if (subCategory.tags) {
-            acc.scenes = [...new Set([...acc.scenes, ...subCategory.tags.scenes])];
-            acc.styles = [...new Set([...acc.styles, ...subCategory.tags.styles])];
-          }
-        });
         return acc;
-      }, { scenes: [], styles: [] } as CategoryTags);
+      }, [
+        { id: 1, tagGroupName: '场景', tagGroupCode: 'scene', tags: [] },
+        { id: 2, tagGroupName: '风格', tagGroupCode: 'style', tags: [] }
+      ] as Tags[]);
       return allTags;
     }
 
@@ -205,7 +227,6 @@ const MallIndex: React.FC = () => {
           if (subCategory.key === key) return subCategory;
           for (const thirdCategory of subCategory.children || []) {
             if (thirdCategory.key === key) {
-              // 如果是三级分类，返回其父级分类的标签
               return subCategory;
             }
           }
@@ -216,14 +237,11 @@ const MallIndex: React.FC = () => {
 
     const currentCategory = findCategory(categoryKey);
     if (!currentCategory || !currentCategory.tags) {
-      // 如果找不到分类或该分类没有标签，返回空数组
-      return { scenes: [], styles: [] };
+      return [];
     }
 
-    return {
-      scenes: currentCategory.tags.scenes || [],
-      styles: currentCategory.tags.styles || []
-    };
+    // 确保返回的是 Tags[] 类型
+    return Array.isArray(currentCategory.tags) ? currentCategory.tags : [];
   }, []);
 
   const handleAllCategoriesClick = () => {
@@ -231,19 +249,19 @@ const MallIndex: React.FC = () => {
   };
 
   // 处理标签选择
-  const handleSceneSelect = useCallback((scene: string) => {
+  const handleSceneSelect = useCallback((code: string) => {
     setSelectedScenes(prev => 
-      prev.includes(scene)
-        ? prev.filter(s => s !== scene)
-        : [...prev, scene]
+      prev.includes(code)
+        ? prev.filter(s => s !== code)
+        : [...prev, code]
     );
   }, []);
 
-  const handleStyleSelect = useCallback((style: string) => {
+  const handleStyleSelect = useCallback((code: string) => {
     setSelectedStyles(prev => 
-      prev.includes(style)
-        ? prev.filter(s => s !== style)
-        : [...prev, style]
+      prev.includes(code)
+        ? prev.filter(s => s !== code)
+        : [...prev, code]
     );
   }, []);
 
@@ -714,22 +732,22 @@ const MallIndex: React.FC = () => {
 
   // 修改 TagFilter 组件
   const TagFilter: React.FC<{
-    title: string;
-    tags: string[];
+    tagGroup: Tags;
     selectedTags: string[];
     onTagSelect: (tag: string) => void;
     onClear: () => void;
-  }> = ({ title, tags, selectedTags, onTagSelect, onClear }) => (
+  }> = ({ tagGroup, selectedTags, onTagSelect, onClear }) => (
     <div className={stylesCss.tagFilterSection}>
-      <div className={stylesCss.tagFilterTitle}>{title}</div>
+      <div className={stylesCss.tagFilterTitle}>{tagGroup.tagGroupName}</div>
       <div className={stylesCss.tagFilterContent}>
-        {tags.map(tag => (
+        {tagGroup.tags.map((tag: RTag) => (
           <Tag
-            key={tag}
-            className={`${stylesCss.filterTag} ${selectedTags.includes(tag) ? stylesCss.active : ''}`}
-            onClick={() => onTagSelect(tag)}
+            key={tag.code}
+            className={`${stylesCss.filterTag} ${selectedTags.includes(tag.code) ? stylesCss.active : ''}`}
+            onClick={() => onTagSelect(tag.code)}
+            icon={tag.icon}
           >
-            {tag}
+            {tag.name}
           </Tag>
         ))}
         {selectedTags.length > 0 && (
@@ -744,34 +762,25 @@ const MallIndex: React.FC = () => {
     </div>
   );
 
-  // 修改渲染标签过滤器的容器样式
+  // 修改渲染标签过滤器的容器
   const renderTagFilters = useCallback(() => {
     const currentTags = getTagsByCategory(activeKey === 'all' ? null : selectedCategory);
     
-    if (!currentTags.scenes.length && !currentTags.styles.length) {
+    if (!currentTags || (!currentTags.length)) {
       return null;
     }
 
     return (
       <div className={stylesCss.filterContainer}>
-        {currentTags.scenes.length > 0 && (
+        {currentTags.map(tagGroup => (
           <TagFilter
-            title="场景"
-            tags={currentTags.scenes}
-            selectedTags={selectedScenes}
-            onTagSelect={handleSceneSelect}
-            onClear={handleClearScenes}
+            key={tagGroup.tagGroupCode}
+            tagGroup={tagGroup}
+            selectedTags={tagGroup.tagGroupCode === 'scene' ? selectedScenes : selectedStyles}
+            onTagSelect={tagGroup.tagGroupCode === 'scene' ? handleSceneSelect : handleStyleSelect}
+            onClear={tagGroup.tagGroupCode === 'scene' ? handleClearScenes : handleClearStyles}
           />
-        )}
-        {currentTags.styles.length > 0 && (
-          <TagFilter
-            title="风格"
-            tags={currentTags.styles}
-            selectedTags={selectedStyles}
-            onTagSelect={handleStyleSelect}
-            onClear={handleClearStyles}
-          />
-        )}
+        ))}
       </div>
     );
   }, [
@@ -860,7 +869,7 @@ const MallIndex: React.FC = () => {
     <Layout>
       <Header className={stylesCss.header}>
         <Row align="middle">
-          <Col span={14}>
+          <Col span={17}>
             <Menu 
               mode="horizontal" 
               className={stylesCss.menu}
@@ -877,11 +886,12 @@ const MallIndex: React.FC = () => {
                   icon={category.icon} 
                   title={category.title}
                   onTitleClick={({ key }) => handleMenuClick({ key })} // 添加一级菜单标题点击处理
-                >
+               >
                   {category.children?.map(subCategory => (
                     <Menu.SubMenu 
                       key={subCategory.key} 
                       title={subCategory.title}
+                      onTitleClick={({ key }) => handleMenuClick({ key })} // 添加二级菜单标题点击处理
                     >
                       {subCategory.children?.map(item => (
                         <Menu.Item key={item.key}>
@@ -894,7 +904,7 @@ const MallIndex: React.FC = () => {
               ))}
             </Menu>
           </Col>
-          <Col span={5}>
+          <Col span={6}>
             <div className={stylesCss.searchWrapper}>
               <Search
                 placeholder="请输入商品名称"

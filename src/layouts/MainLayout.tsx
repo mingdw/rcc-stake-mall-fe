@@ -11,12 +11,10 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useBalance, useChainId, useChains, useDisconnect, useSwitchChain } from 'wagmi';
 import { useAuth } from '../context/AuthContext';
 import { formatBalance, shortenAddress } from '../utils/common';
+import { ABOUT_PATH_NAME, chainIcons, HOME_PATH_NAME, SMALL_PATH_NAME, SUPLY_PATH_NAME } from '../config/valiable';
 
 const { Header, Content, Footer } = Layout;
-export const HOME_PATH_NAME = "home";
-export const SUPLY_PATH_NAME = "suply";
-export const SMALL_PATH_NAME = "small";
-export const ABOUT_PATH_NAME = "about";
+
 
 const languges = [{
   value: 'zh',
@@ -28,13 +26,6 @@ const languges = [{
 },
 ];
 
-// 手动定义链图标
-const chainIcons: { [key: number]: string } = {
-  1: 'https://example.com/eth-icon.png', // Ethereum
-  56: 'https://example.com/bsc-icon.png', // Binance Smart Chain
-  137: 'https://example.com/polygon-icon.png', // Polygon
-  // 添加其他链的图标
-};
 
 const MainLayout: FC = () => {
   const chainId = useChainId();
@@ -42,7 +33,7 @@ const MainLayout: FC = () => {
   const { openConnectModal } = useConnectModal(); // 调用 useConnectModal
   const { isConnected, address } = useAccount(); // 获取连接状态和地址
   const { disconnect } = useDisconnect(); // 获取 disconnect 方法
-  const { data: balance, isLoading, isError, refetch } = useBalance({ address,query:{enabled:true} });
+  const { data: balance, refetch } = useBalance({ address,query:{enabled:true} });
   const { switchChain } = useSwitchChain();
   const chains = useChains(); // 获取可用的链
   const { authData, setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
