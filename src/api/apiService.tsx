@@ -6,7 +6,11 @@ import axios, { AxiosError } from 'axios';
 export const getSuplyList = async () => {
   try {
     const response = await axiosInstance.get('/suply');
-    return response.data;
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data;
+    } else {
+      throw new Error('Failed to fetch suply list');
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // 处理 AxiosError
@@ -22,7 +26,11 @@ export const getSuplyList = async () => {
 export const getSuplyDetails = async (id: string) => {
   try {
     const response = await axiosInstance.get(`/suply/${id}`);
-    return response.data;
+    if (response.status === 200 && response.data.code === 0) {  
+      return response.data;
+    } else {
+      throw new Error('Failed to fetch suply details');
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message || 'Failed to fetch suply details');
@@ -36,7 +44,11 @@ export const getSuplyDetails = async (id: string) => {
 export const pingServer = async () => {
   try {
     const response = await axiosInstance.get('/v1/ping');
-    return response.data;
+    if (response.status === 200 && response.data.code === 0) {  
+      return response.data;
+    } else {
+      throw new Error('Failed to ping server');
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message || 'Failed to ping server');
@@ -49,5 +61,21 @@ export const pingServer = async () => {
 //接口：判断某个地址是不是管理员
 export const isAdmin = async (address: string) => {
   const response = await axiosInstance.get(`/isAdmin/${address}`);
-  return response.data;
+  if (response.status === 200 && response.data.code === 0) {
+    return response.data;
+  } else {
+    throw new Error('Failed to check if address is admin');
+  }
 };  
+
+export const getCategoryList = async () => {
+  const response = await axiosInstance.get('/v1/categories');
+  if (response.status === 200 && response.data.code === 0) {
+    return response.data.data.categories;
+  } else {
+    throw new Error('Failed to fetch category list');
+  } 
+};
+
+
+

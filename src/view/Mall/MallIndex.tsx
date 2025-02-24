@@ -12,14 +12,14 @@ import {
 } from '@ant-design/icons';
 import stylesCss from './MallIndex.module.scss';
 import { Header } from 'antd/es/layout/layout';
-import { categories, Product, products, RTag, Tags } from '../../api/mockDatas'; // 导入数据
+import { Product, products, } from '../../api/mockDatas'; // 导入数据
+import { getCategoryList } from "../../api/apiService";
+
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Key } from 'antd/es/table/interface';
 const { Search } = Input;
 const { SubMenu } = Menu;
-const { Text, Paragraph } = Typography;
-
-
+const { Text, Paragraph } = Typography; 
 
 // 添加所有需要的类型定义
 type SortDirection = 'asc' | 'desc';
@@ -33,14 +33,45 @@ interface SortState {
 
 interface CategoryTitleProps {
   category: {
-    key: string;
-    icon: React.ReactNode;
-    title: string;
+    code: string;
+    icon?: React.ReactNode;
+    name: string;
   };
   total: number;
   onViewMore?: () => void;
   sortType?: SortType;
   onSortChange?: (type: SortType) => void;
+}
+
+interface Attr{
+  id: number;
+  name: string;
+  code: string;
+  sort: number;
+  status: number;
+  type:number;
+}
+
+interface AttrGroup {
+  id: number;
+  name: string;
+  code: string;
+  status:number;
+  type:number;
+  sort: number;
+  attrs: Attr[];
+}
+
+interface CategoryResponse {
+  id: number;
+  name: string;
+  code: string;
+  level: number;
+  sort: number;
+  parentId: number;
+  icon?: string;
+  attrGroups?: AttrGroup[];
+  children?: CategoryResponse[];
 }
 
 
@@ -53,12 +84,30 @@ const MallIndex: React.FC = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
-  const categoryRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>(
-    categories.reduce((acc, category) => ({
-      ...acc,
-      [category.key]: React.createRef<HTMLDivElement>()
-    }), {})
-  );
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategoryList();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+        setCategories([]); // 错误时设置为空数组
+      }
+    };
+  
+    fetchCategories();
+  }, []);
+
+ const categoryRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
+
+useEffect(() => {
+  categoryRefs.current = (categories || []).reduce((acc, category) => ({
+    ...acc,
+    [category.code]: React.createRef<HTMLDivElement>()
+  }), {});
+}, [categories]);
   const [activeKey, setActiveKey] = useState<string>('all'); // 添加选中状态
   const [sortType, setSortType] = useState<string>('default');
   const navigate = useNavigate();
@@ -76,20 +125,19 @@ const MallIndex: React.FC = () => {
       // 查找并设置一级分类为选中状态
       const firstLevelKey = getFirstLevelKey(categoryFromUrl);
       setActiveKey(firstLevelKey);
-
       // 展开对应的分类菜单
       const expandKeys: string[] = [];
       categories.forEach(cat => {
-        if (cat.key === categoryFromUrl) {
-          expandKeys.push(cat.key);
+        if (cat.code === categoryFromUrl) {
+          expandKeys.push(cat.code);
         }
         cat.children?.forEach(subCat => {
-          if (subCat.key === categoryFromUrl) {
-            expandKeys.push(cat.key, subCat.key);
+          if (subCat.code === categoryFromUrl) {
+            expandKeys.push(cat.code, subCat.code);
           }
           subCat.children?.forEach(thirdCat => {
-            if (thirdCat.key === categoryFromUrl) {
-              expandKeys.push(cat.key, subCat.key, thirdCat.key);
+            if (thirdCat.code === categoryFromUrl) {
+              expandKeys.push(cat.code, subCat.code, thirdCat.code);
             }
           });
         });
@@ -111,32 +159,32 @@ const MallIndex: React.FC = () => {
   const groupedProducts = useMemo(() => {
     return categories.reduce((acc, category) => {
       // 处理一级分类
-      acc[category.key] = products.filter(product => {
+      acc[category.code] = products.filter(product => {
         // 匹配当前一级分类及其所有子分类的商品
-        return product.category === category.key || 
+        return product.category === category.code || 
                category.children?.some(subCat => 
-                 product.subCategory === subCat.key ||
+                 product.subCategory === subCat.code ||
                  subCat.children?.some(thirdCat => 
-                   product.thirdCategory === thirdCat.key
+                   product.thirdCategory === thirdCat.code
                  )
                );
       });
 
       // 处理二级分类
       category.children?.forEach(subCategory => {
-        acc[subCategory.key] = products.filter(product => 
+        acc[subCategory.code] = products.filter(product => 
           // 匹配当前二级分类及其子分类的商品
-          product.subCategory === subCategory.key ||
+          product.subCategory === subCategory.code ||
           subCategory.children?.some(thirdCat => 
-            product.thirdCategory === thirdCat.key
+            product.thirdCategory === thirdCat.code
           )
         );
 
         // 处理三级分类
         subCategory.children?.forEach(thirdCategory => {
-          acc[thirdCategory.key] = products.filter(product => 
+          acc[thirdCategory.code] = products.filter(product => 
             // 只匹配当前三级分类的商品
-            product.thirdCategory === thirdCategory.key
+            product.thirdCategory === thirdCategory.code
           );
         });
       });
@@ -154,20 +202,20 @@ const MallIndex: React.FC = () => {
     if (selectedCategory && !showSearchResults) {
       productsToFilter = productsToFilter.filter(product => {
         // 如果是一级分类
-        if (categories.some(cat => cat.key === selectedCategory)) {
+        if (categories.some(cat => cat.code === selectedCategory)) {
           return product.category === selectedCategory;
         }
         
         // 如果是二级分类
         for (const category of categories) {
-          const secondLevel = category.children?.find(sub => sub.key === selectedCategory);
+          const secondLevel = category.children?.find(sub => sub.code === selectedCategory);
           if (secondLevel) {
             return product.subCategory === selectedCategory;
           }
           
           // 如果是三级分类
           for (const subCategory of category.children || []) {
-            const thirdLevel = subCategory.children?.find(third => third.key === selectedCategory);
+            const thirdLevel = subCategory.children?.find(third => third.code === selectedCategory);
             if (thirdLevel) {
               return product.thirdCategory === selectedCategory;
             }
@@ -194,55 +242,78 @@ const MallIndex: React.FC = () => {
   ]);
 
   // 获取标签函数
-  const getTagsByCategory = useCallback((categoryKey: string | null): Tags[] => {
-    // 如果是全部商品或没有选择分类，返回所有分类的标签
-    if (!categoryKey || categoryKey === 'all') {
-      const allTags = categories.reduce((acc, category) => {
-        if (category.tags && Array.isArray(category.tags)) {
-          // 合并场景标签
-          const sceneTags = category.tags.find(t => t.tagGroupCode === 'scene')?.tags || [];
-          acc[0].tags = [...acc[0].tags, ...sceneTags].filter((tag, index, self) => 
-            index === self.findIndex(t => t.code === tag.code)
-          );
-          
-          // 合并风格标签
-          const styleTags = category.tags.find(t => t.tagGroupCode === 'style')?.tags || [];
-          acc[1].tags = [...acc[1].tags, ...styleTags].filter((tag, index, self) => 
-            index === self.findIndex(t => t.code === tag.code)
-          );
-        }
-        return acc;
-      }, [
-        { id: 1, tagGroupName: '场景', tagGroupCode: 'scene', tags: [] },
-        { id: 2, tagGroupName: '风格', tagGroupCode: 'style', tags: [] }
-      ] as Tags[]);
-      return allTags;
-    }
+ // ... existing code ...
+const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] => {
+  // 如果是全部商品或没有选择分类，返回所有一级分类目录的标签组
+  if (!categoryKey || categoryKey === 'all') {
+    // 初始化包含场景和风格两个标签组的数组
+    const allTags: AttrGroup[] = [
+      {
+        id: 1,
+        name: '场景',
+        code: 'scene',
+        status: 1,
+        type: 1,
+        sort: 1,
+        attrs: []
+      },
+      {
+        id: 2,
+        name: '风格',
+        code: 'style',
+        status: 1,
+        type: 1,
+        sort: 2,
+        attrs: []
+      }
+    ];
 
-    // 查找当前分类
-    const findCategory = (key: string) => {
-      for (const category of categories) {
-        if (category.key === key) return category;
-        for (const subCategory of category.children || []) {
-          if (subCategory.key === key) return subCategory;
-          for (const thirdCategory of subCategory.children || []) {
-            if (thirdCategory.key === key) {
-              return subCategory;
-            }
-          }
+    // 合并所有分类的标签
+    categories.forEach(category => {
+      if (category.attrGroups && Array.isArray(category.attrGroups)) {
+        // 找到场景和风格的标签组
+        const sceneGroup = category.attrGroups.find(g => g.code === 'scene');
+        const styleGroup = category.attrGroups.find(g => g.code === 'style');
+
+        // 合并场景标签
+        if (sceneGroup?.attrs) {
+          allTags[0].attrs = [...allTags[0].attrs, ...sceneGroup.attrs]
+            .filter((attr, index, self) => 
+              index === self.findIndex(a => a.code === attr.code)
+            );
+        }
+
+        // 合并风格标签
+        if (styleGroup?.attrs) {
+          allTags[1].attrs = [...allTags[1].attrs, ...styleGroup.attrs]
+            .filter((attr, index, self) => 
+              index === self.findIndex(a => a.code === attr.code)
+            );
         }
       }
-      return null;
-    };
+    });
 
-    const currentCategory = findCategory(categoryKey);
-    if (!currentCategory || !currentCategory.tags) {
-      return [];
+    return allTags;
+  }
+
+  // 查找当前分类
+  const findCategory = (key: string) => {
+    for (const category of categories) {
+      if (category.code === key) return category;
+      for (const subCategory of category.children || []) {
+        if (subCategory.code === key) return subCategory;
+        for (const thirdCategory of subCategory.children || []) {
+          if (thirdCategory.code === key) return thirdCategory;
+        }
+      }
     }
+    return null;
+  };
 
-    // 确保返回的是 Tags[] 类型
-    return Array.isArray(currentCategory.tags) ? currentCategory.tags : [];
-  }, []);
+  const currentCategory = findCategory(categoryKey);
+  return currentCategory?.attrGroups || [];
+}, [categories]);
+// ... existing code ...
 
   const handleAllCategoriesClick = () => {
     setShowAllCategories(!showAllCategories);
@@ -307,19 +378,19 @@ const MallIndex: React.FC = () => {
   // 获取当前分类的完整信息
   const getCurrentCategory = (key: string) => {
     // 查找一级分类
-    const firstLevel = categories.find(c => c.key === key);
+    const firstLevel = categories.find(c => c.code === key);
     if (firstLevel) return firstLevel;
 
     // 查找二级分类
     for (const category of categories) {
-      const secondLevel = category.children?.find(c => c.key === key);
+      const secondLevel = category.children?.find(c => c.code === key);
       if (secondLevel) return { ...secondLevel, icon: category.icon };
     }
 
     // 查找三级分类
     for (const category of categories) {
       for (const subCategory of category.children || []) {
-        const thirdLevel = subCategory.children?.find(c => c.key === key);
+        const thirdLevel = subCategory.children?.find(c => c.code === key);
         if (thirdLevel) return { ...thirdLevel, icon: category.icon };
       }
     }
@@ -496,7 +567,7 @@ const MallIndex: React.FC = () => {
         <div className={stylesCss.categoryTitle}>
           <span className={stylesCss.categoryIcon}>{category.icon}</span>
           <span className={stylesCss.categoryName}>
-            {category.title}
+            {category.name}
             {!onSortChange && <span className={stylesCss.categoryCount}>共 {total} 件商品</span>}
           </span>
         </div>
@@ -534,12 +605,12 @@ const MallIndex: React.FC = () => {
                 // 获取当前分类的一级目录
                 const parentCategory = categories.find(cat => 
                   cat.children?.some(subCat => 
-                    subCat.key === category.key || 
-                    subCat.children?.some(thirdCat => thirdCat.key === category.key)
+                    subCat.code === category.code || 
+                    subCat.children?.some(thirdCat => thirdCat.code === category.code)
                   )
                 );
                 if (parentCategory) {
-                  setActiveKey(parentCategory.key);
+                  setActiveKey(parentCategory.code);
                 }
                 onViewMore();
               }}
@@ -662,8 +733,8 @@ const MallIndex: React.FC = () => {
           title={
             <CategoryCardTitle 
               category={{
-                key: 'search',
-                title: '搜索结果',
+                code: 'search',
+                name: '搜索结果',
                 icon: <SearchOutlined />
               }}
               total={sortedResults.length}
@@ -732,20 +803,19 @@ const MallIndex: React.FC = () => {
 
   // 修改 TagFilter 组件
   const TagFilter: React.FC<{
-    tagGroup: Tags;
+    tagGroup: AttrGroup;
     selectedTags: string[];
     onTagSelect: (tag: string) => void;
     onClear: () => void;
   }> = ({ tagGroup, selectedTags, onTagSelect, onClear }) => (
     <div className={stylesCss.tagFilterSection}>
-      <div className={stylesCss.tagFilterTitle}>{tagGroup.tagGroupName}</div>
+      <div className={stylesCss.tagFilterTitle}>{tagGroup.name}</div>
       <div className={stylesCss.tagFilterContent}>
-        {tagGroup.tags.map((tag: RTag) => (
+        {tagGroup.attrs.map((tag: Attr) => (
           <Tag
             key={tag.code}
             className={`${stylesCss.filterTag} ${selectedTags.includes(tag.code) ? stylesCss.active : ''}`}
             onClick={() => onTagSelect(tag.code)}
-            icon={tag.icon}
           >
             {tag.name}
           </Tag>
@@ -774,11 +844,11 @@ const MallIndex: React.FC = () => {
       <div className={stylesCss.filterContainer}>
         {currentTags.map(tagGroup => (
           <TagFilter
-            key={tagGroup.tagGroupCode}
+            key={tagGroup.code}
             tagGroup={tagGroup}
-            selectedTags={tagGroup.tagGroupCode === 'scene' ? selectedScenes : selectedStyles}
-            onTagSelect={tagGroup.tagGroupCode === 'scene' ? handleSceneSelect : handleStyleSelect}
-            onClear={tagGroup.tagGroupCode === 'scene' ? handleClearScenes : handleClearStyles}
+            selectedTags={tagGroup.code === 'scene' ? selectedScenes : selectedStyles}
+            onTagSelect={tagGroup.code === 'scene' ? handleSceneSelect : handleStyleSelect}
+            onClear={tagGroup.code === 'scene' ? handleClearScenes : handleClearStyles}
           />
         ))}
       </div>
@@ -801,19 +871,19 @@ const MallIndex: React.FC = () => {
     if (key === 'all') return key;
     
     // 如果是一级分类，直接返回
-    if (categories.find(c => c.key === key)) {
+    if (categories.find(c => c.code === key)) {
       return key;
     }
     
     // 查找二级分类所属的一级分类
     for (const category of categories) {
-      if (category.children?.some(sub => sub.key === key)) {
-        return category.key;
+      if (category.children?.some(sub => sub.code === key)) {
+        return category.code;
       }
       // 查找三级分类所属的一级分类
       for (const subCategory of category.children || []) {
-        if (subCategory.children?.some(third => third.key === key)) {
-          return category.key;
+        if (subCategory.children?.some(third => third.code === key)) {
+          return category.code;
         }
       }
     }
@@ -828,24 +898,24 @@ const MallIndex: React.FC = () => {
           {categories.map(category => {
             // 获取当前分类下的商品，并应用标签过滤
             const categoryProducts = filteredTagProducts.filter(product => 
-              product.category === category.key ||
+              product.category === category.code ||
               category.children?.some(subCat => 
-                product.subCategory === subCat.key ||
+                product.subCategory === subCat.code ||
                 subCat.children?.some(thirdCat => 
-                  product.thirdCategory === thirdCat.key
+                  product.thirdCategory === thirdCat.code
                 )
               )
             );
 
             return (
-              <Col span={24} key={category.key}>
+              <Col span={24} key={category.code}>
                 <Card 
                   className={stylesCss.categoryCard}
                   title={
                     <CategoryCardTitle 
                       category={category}
                       total={categoryProducts.length}
-                      onViewMore={() => handleViewMore(category.key)}
+                      onViewMore={() => handleViewMore(category.code)}
                     />
                   }
                 >
@@ -880,22 +950,22 @@ const MallIndex: React.FC = () => {
               <Menu.Item key="all" icon={<BarsOutlined />}>
                 全部商品
               </Menu.Item>
-              {categories.map(category => (
+              {(categories || []).map(category => (
                 <Menu.SubMenu 
-                  key={category.key} 
+                  key={category.code} 
                   icon={category.icon} 
-                  title={category.title}
+                  title={category.name}
                   onTitleClick={({ key }) => handleMenuClick({ key })} // 添加一级菜单标题点击处理
                >
                   {category.children?.map(subCategory => (
                     <Menu.SubMenu 
-                      key={subCategory.key} 
-                      title={subCategory.title}
+                      key={subCategory.code} 
+                      title={subCategory.name}
                       onTitleClick={({ key }) => handleMenuClick({ key })} // 添加二级菜单标题点击处理
                     >
                       {subCategory.children?.map(item => (
-                        <Menu.Item key={item.key}>
-                          {item.title}
+                        <Menu.Item key={item.code}>
+                          {item.name}
                         </Menu.Item>
                       ))}
                     </Menu.SubMenu>
