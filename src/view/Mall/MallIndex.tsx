@@ -242,78 +242,62 @@ useEffect(() => {
   ]);
 
   // 获取标签函数
- // ... existing code ...
-const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] => {
-  // 如果是全部商品或没有选择分类，返回所有一级分类目录的标签组
-  if (!categoryKey || categoryKey === 'all') {
-    // 初始化包含场景和风格两个标签组的数组
-    const allTags: AttrGroup[] = [
-      {
-        id: 1,
-        name: '场景',
-        code: 'scene',
-        status: 1,
-        type: 1,
-        sort: 1,
-        attrs: []
-      },
-      {
-        id: 2,
-        name: '风格',
-        code: 'style',
-        status: 1,
-        type: 1,
-        sort: 2,
-        attrs: []
-      }
-    ];
+  const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] => {
+    // 如果是全部商品或没有选择分类，返回所有一级分类目录的标签组
+    if (!categoryKey || categoryKey === 'all') {
+      // 初始化一个 Map 来存储合并后的标签组
+      const mergedGroups = new Map<string, AttrGroup>();
 
-    // 合并所有分类的标签
-    categories.forEach(category => {
-      if (category.attrGroups && Array.isArray(category.attrGroups)) {
-        // 找到场景和风格的标签组
-        const sceneGroup = category.attrGroups.find(g => g.code === 'scene');
-        const styleGroup = category.attrGroups.find(g => g.code === 'style');
-
-        // 合并场景标签
-        if (sceneGroup?.attrs) {
-          allTags[0].attrs = [...allTags[0].attrs, ...sceneGroup.attrs]
-            .filter((attr, index, self) => 
-              index === self.findIndex(a => a.code === attr.code)
-            );
+      // 遍历所有一级分类
+      categories.forEach(category => {
+        // 确保只处理一级分类
+        if (category.attrGroups && Array.isArray(category.attrGroups)) {
+          category.attrGroups.forEach(group => {
+            if (!mergedGroups.has(group.code)) {
+              // 如果这个标签组还不存在，直接添加
+              mergedGroups.set(group.code, { ...group });
+            } else {
+              // 如果标签组已存在，合并属性，去重
+              const existingGroup = mergedGroups.get(group.code)!;
+              const mergedAttrs = [...existingGroup.attrs];
+              
+              group.attrs.forEach(attr => {
+                if (!mergedAttrs.some(existing => existing.code === attr.code)) {
+                  mergedAttrs.push(attr);
+                }
+              });
+              
+              mergedGroups.set(group.code, {
+                ...existingGroup,
+                attrs: mergedAttrs.sort((a, b) => a.sort - b.sort) // 保持属性的排序
+              });
+            }
+          });
         }
+      });
 
-        // 合并风格标签
-        if (styleGroup?.attrs) {
-          allTags[1].attrs = [...allTags[1].attrs, ...styleGroup.attrs]
-            .filter((attr, index, self) => 
-              index === self.findIndex(a => a.code === attr.code)
-            );
-        }
-      }
-    });
-
-    return allTags;
-  }
-
-  // 查找当前分类
-  const findCategory = (key: string) => {
-    for (const category of categories) {
-      if (category.code === key) return category;
-      for (const subCategory of category.children || []) {
-        if (subCategory.code === key) return subCategory;
-        for (const thirdCategory of subCategory.children || []) {
-          if (thirdCategory.code === key) return thirdCategory;
-        }
-      }
+      // 将 Map 转换回数组并按 sort 字段排序
+      return Array.from(mergedGroups.values())
+        .sort((a, b) => a.sort - b.sort);
     }
-    return null;
-  };
 
-  const currentCategory = findCategory(categoryKey);
-  return currentCategory?.attrGroups || [];
-}, [categories]);
-// ... existing code ...
+    // 查找当前分类
+    const findCategory = (key: string) => {
+      for (const category of categories) {
+        if (category.code === key) return category;
+        for (const subCategory of category.children || []) {
+          if (subCategory.code === key) return subCategory;
+          for (const thirdCategory of subCategory.children || []) {
+            if (thirdCategory.code === key) return thirdCategory;
+          }
+        }
+      }
+      return null;
+    };
+
+    const currentCategory = findCategory(categoryKey);
+    return currentCategory?.attrGroups || [];
+  }, [categories]);
 
   const handleAllCategoriesClick = () => {
     setShowAllCategories(!showAllCategories);
@@ -345,7 +329,7 @@ const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] 
     setSelectedStyles([]);
   }, []);
 
-  // 处理搜索
+  // 修改搜索处理函数
   const handleSearch = (value: string) => {
     const trimmedValue = value.trim();
     if (!trimmedValue) {
@@ -807,30 +791,65 @@ const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] 
     selectedTags: string[];
     onTagSelect: (tag: string) => void;
     onClear: () => void;
-  }> = ({ tagGroup, selectedTags, onTagSelect, onClear }) => (
-    <div className={stylesCss.tagFilterSection}>
-      <div className={stylesCss.tagFilterTitle}>{tagGroup.name}</div>
-      <div className={stylesCss.tagFilterContent}>
-        {tagGroup.attrs.map((tag: Attr) => (
-          <Tag
-            key={tag.code}
-            className={`${stylesCss.filterTag} ${selectedTags.includes(tag.code) ? stylesCss.active : ''}`}
-            onClick={() => onTagSelect(tag.code)}
-          >
-            {tag.name}
-          </Tag>
-        ))}
-        {selectedTags.length > 0 && (
-          <Tag
-            className={stylesCss.clearTag}
-            onClick={onClear}
-          >
-            清空
-          </Tag>
-        )}
+  }> = ({ tagGroup, selectedTags, onTagSelect, onClear }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [needsExpansion, setNeedsExpansion] = useState(false);
+
+    // 检测是否需要展开按钮
+    useEffect(() => {
+      if (contentRef.current) {
+        const needsToExpand = contentRef.current.scrollHeight > contentRef.current.clientHeight;
+        setNeedsExpansion(needsToExpand);
+        // 如果有选中的标签且需要展开，则自动展开
+        if (selectedTags.length > 0 && needsToExpand) {
+          setIsExpanded(true);
+        }
+      }
+    }, [tagGroup.attrs, selectedTags]);
+
+    return (
+      <div className={stylesCss.tagFilterSection}>
+        <div className={stylesCss.tagFilterHeader}>
+          <span className={stylesCss.tagFilterTitle}>{tagGroup.name}</span>
+        </div>
+        <div 
+          ref={contentRef}
+          className={`${stylesCss.tagFilterContent} ${isExpanded ? stylesCss.expanded : ''}`}
+        >
+          <div className={stylesCss.tagList}>
+            {tagGroup.attrs.map((tag: Attr) => (
+              <Tag
+                key={tag.code}
+                className={`${stylesCss.filterTag} ${selectedTags.includes(tag.code) ? stylesCss.active : ''}`}
+                onClick={() => onTagSelect(tag.code)}
+              >
+                {tag.name}
+              </Tag>
+            ))}
+            {selectedTags.length > 0 && (
+              <Tag
+                className={stylesCss.clearTag}
+                onClick={onClear}
+              >
+                清空
+              </Tag>
+            )}
+          </div>
+          {needsExpansion && (
+            <Button 
+              type="link" 
+              className={stylesCss.expandButton}
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? '收起' : '展开'} 
+              {isExpanded ? <CaretUpOutlined /> : <CaretDownOutlined />}
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // 修改渲染标签过滤器的容器
   const renderTagFilters = useCallback(() => {
@@ -842,6 +861,7 @@ const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] 
 
     return (
       <div className={stylesCss.filterContainer}>
+        <div className={stylesCss.filterHeader}>
         {currentTags.map(tagGroup => (
           <TagFilter
             key={tagGroup.code}
@@ -851,6 +871,7 @@ const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] 
             onClear={tagGroup.code === 'scene' ? handleClearScenes : handleClearStyles}
           />
         ))}
+        </div>
       </div>
     );
   }, [
