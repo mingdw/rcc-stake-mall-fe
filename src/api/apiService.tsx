@@ -1,80 +1,80 @@
 import axiosInstance from './axiosInstance';
-import axios, { AxiosError } from 'axios';
+import { message } from 'antd';
 
+// 统一的错误处理函数
+const handleApiError = (error: any, customMessage?: string) => {
+  if (error.response?.data?.message) {
+    message.error(error.response.data.message);
+  } else {
+    message.error(customMessage || '系统异常，请稍后重试');
+  }
+  throw error;
+};
 
-// 示例接口：获取质押币种列表
+// 获取质押币种列表
 export const getSuplyList = async () => {
   try {
     const response = await axiosInstance.get('/suply');
     if (response.status === 200 && response.data.code === 0) {
       return response.data;
-    } else {
-      throw new Error('Failed to fetch suply list');
     }
+    return null;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      // 处理 AxiosError
-      throw new Error(error.response?.data?.message || 'Failed to fetch suply list');
-    } else {
-      // 处理其他类型的错误
-      throw new Error('An unexpected error occurred');
-    }
+    handleApiError(error, '获取质押币种列表失败');
   }
 };
 
-// 示例接口：根据ID获取质押币种详情
+// 根据ID获取质押币种详情
 export const getSuplyDetails = async (id: string) => {
   try {
     const response = await axiosInstance.get(`/suply/${id}`);
-    if (response.status === 200 && response.data.code === 0) {  
+    if (response.status === 200 && response.data.code === 0) {
       return response.data;
-    } else {
-      throw new Error('Failed to fetch suply details');
     }
+    return null;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch suply details');
-    } else {
-      throw new Error('An unexpected error occurred');
-    }
+    handleApiError(error, '获取质押币种详情失败');
   }
 };
 
-// 新增示例接口：Ping
+// Ping服务器
 export const pingServer = async () => {
   try {
     const response = await axiosInstance.get('/v1/ping');
-    if (response.status === 200 && response.data.code === 0) {  
+    if (response.status === 200 && response.data.code === 0) {
       return response.data;
-    } else {
-      throw new Error('Failed to ping server');
     }
+    return null;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'Failed to ping server');
-    } else {
-      throw new Error('An unexpected error occurred');
-    }
+    handleApiError(error, '服务器连接失败');
   }
 };
 
-//接口：判断某个地址是不是管理员
+// 判断是否为管理员
 export const isAdmin = async (address: string) => {
-  const response = await axiosInstance.get(`/isAdmin/${address}`);
-  if (response.status === 200 && response.data.code === 0) {
-    return response.data;
-  } else {
-    throw new Error('Failed to check if address is admin');
+  try {
+    const response = await axiosInstance.get(`/isAdmin/${address}`);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data;
+    }
+    return null;
+  } catch (error) {
+    handleApiError(error, '检查管理员权限失败');
   }
-};  
+};
 
+// 获取分类列表
 export const getCategoryList = async () => {
-  const response = await axiosInstance.get('/v1/categories');
-  if (response.status === 200 && response.data.code === 0) {
-    return response.data.data.categories;
-  } else {
-    throw new Error('Failed to fetch category list');
-  } 
+  try {
+    const response = await axiosInstance.get('/v1/categories');
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data.categories;
+    }
+    return [];
+  } catch (error) {
+    handleApiError(error, '获取分类列表失败');
+    return [];
+  }
 };
 
 

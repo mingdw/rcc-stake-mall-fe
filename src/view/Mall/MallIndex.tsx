@@ -245,58 +245,118 @@ useEffect(() => {
   const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] => {
     // 如果是全部商品或没有选择分类，返回所有一级分类目录的标签组
     if (!categoryKey || categoryKey === 'all') {
-      // 初始化一个 Map 来存储合并后的标签组
       const mergedGroups = new Map<string, AttrGroup>();
-
-      // 遍历所有一级分类
+      
       categories.forEach(category => {
-        // 确保只处理一级分类
         if (category.attrGroups && Array.isArray(category.attrGroups)) {
           category.attrGroups.forEach(group => {
             if (!mergedGroups.has(group.code)) {
-              // 如果这个标签组还不存在，直接添加
               mergedGroups.set(group.code, { ...group });
             } else {
-              // 如果标签组已存在，合并属性，去重
               const existingGroup = mergedGroups.get(group.code)!;
               const mergedAttrs = [...existingGroup.attrs];
-              
               group.attrs.forEach(attr => {
                 if (!mergedAttrs.some(existing => existing.code === attr.code)) {
                   mergedAttrs.push(attr);
                 }
               });
-              
               mergedGroups.set(group.code, {
                 ...existingGroup,
-                attrs: mergedAttrs.sort((a, b) => a.sort - b.sort) // 保持属性的排序
+                attrs: mergedAttrs.sort((a, b) => a.sort - b.sort)
               });
             }
           });
         }
       });
 
-      // 将 Map 转换回数组并按 sort 字段排序
-      return Array.from(mergedGroups.values())
-        .sort((a, b) => a.sort - b.sort);
+      return Array.from(mergedGroups.values()).sort((a, b) => a.sort - b.sort);
     }
 
-    // 查找当前分类
-    const findCategory = (key: string) => {
+    // 查找分类及其父级分类
+    const findCategoryWithParents = (key: string): {
+      firstLevel: CategoryResponse | null;
+      secondLevel: CategoryResponse | null;
+      thirdLevel: CategoryResponse | null;
+    } => {
       for (const category of categories) {
-        if (category.code === key) return category;
+        // 检查是否为一级分类
+        if (category.code === key) {
+          return {
+            firstLevel: category,
+            secondLevel: null,
+            thirdLevel: null
+          };
+        }
+        
+        // 检查二级分类
         for (const subCategory of category.children || []) {
-          if (subCategory.code === key) return subCategory;
+          if (subCategory.code === key) {
+            return {
+              firstLevel: category,
+              secondLevel: subCategory,
+              thirdLevel: null
+            };
+          }
+          
+          // 检查三级分类
           for (const thirdCategory of subCategory.children || []) {
-            if (thirdCategory.code === key) return thirdCategory;
+            if (thirdCategory.code === key) {
+              return {
+                firstLevel: category,
+                secondLevel: subCategory,
+                thirdLevel: thirdCategory
+              };
+            }
           }
         }
       }
-      return null;
+      return {
+        firstLevel: null,
+        secondLevel: null,
+        thirdLevel: null
+      };
     };
 
-    const currentCategory = findCategory(categoryKey);
-    return currentCategory?.attrGroups || [];
+    const { firstLevel, secondLevel, thirdLevel } = findCategoryWithParents(categoryKey);
+    
+    // 合并相关层级的属性组
+    const mergedGroups = new Map<string, AttrGroup>();
+    
+    // 添加属性组的辅助函数
+    const addAttrGroups = (category: CategoryResponse | null) => {
+      if (category?.attrGroups) {
+        category.attrGroups.forEach(group => {
+          if (!mergedGroups.has(group.code)) {
+            mergedGroups.set(group.code, { ...group });
+          } else {
+            const existingGroup = mergedGroups.get(group.code)!;
+            const mergedAttrs = [...existingGroup.attrs];
+            group.attrs.forEach(attr => {
+              if (!mergedAttrs.some(existing => existing.code === attr.code)) {
+                mergedAttrs.push(attr);
+              }
+            });
+            mergedGroups.set(group.code, {
+              ...existingGroup,
+              attrs: mergedAttrs.sort((a, b) => a.sort - b.sort)
+            });
+          }
+        });
+      }
+    };
+
+    // 按层级添加属性组
+    if (firstLevel) {
+      addAttrGroups(firstLevel);
+    }
+    if (secondLevel) {
+      addAttrGroups(secondLevel);
+    }
+    if (thirdLevel) {
+      addAttrGroups(thirdLevel);
+    }
+
+    return Array.from(mergedGroups.values()).sort((a, b) => a.sort - b.sort);
   }, [categories]);
 
   const handleAllCategoriesClick = () => {
