@@ -9,15 +9,13 @@ import {
   Tag,
   Button,
   InputNumber,
-  Descriptions,
-  Divider,
   message,
   Tabs,
-  Carousel,
   Rate,
   List,
   Space,
-  Avatar
+  Avatar,
+  Spin
 } from 'antd';
 import {
   ShoppingCartOutlined,
@@ -26,59 +24,110 @@ import {
   ShareAltOutlined,
   HomeOutlined,
   RightOutlined,
-
-  FireOutlined,
   LeftOutlined,
   SafetyOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  FireOutlined
 } from '@ant-design/icons';
-import { products, categories, Specification, Product } from '../../api/mockDatas';
+import { useQuery } from '@tanstack/react-query';
+import { 
+  CategoryResponse, 
+  getProductDetail, 
+  getCategoryList,
+  getProductList,
+  type ProductDetail,
+  type Product,
+} from '../../api/apiService';
 
 import styles from './ProductDetail.module.scss';
 import type { TabsProps } from 'antd';
-import ProductCard from '../../components/ProductCardComents';
+import ProductCard from '../../components/ProductCard';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-  const [isCollected, setIsCollected] = useState(false); // 添加收藏状态
+  const [isCollected, setIsCollected] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const [showZoom, setShowZoom] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
 
-  // 获取当前商品
-  const product = useMemo(() => {
-    return products.find(p => p.id === Number(id));
-  }, [id]);
+  // 获取商品详情
+  const { 
+    data: product,
+    isLoading: productLoading,
+    error: productError
+  } = useQuery<ProductDetail | null>({
+    queryKey: ['product', id],
+    queryFn: () => getProductDetail({ productId: Number(id), productCode: '' }),
+    enabled: !!id,
+  });
 
-  // 查找商品所属分类信息
-  const category = categories.find(c => c.key === product?.category);
-  const subCategory = category?.children?.find(sc => sc.key === product?.subCategory);
-  const thirdCategory = subCategory?.children?.find(tc => tc.key === product?.thirdCategory);
+  // 获取分类列表
+  const { data: categories = [] } = useQuery<CategoryResponse[]>({
+    queryKey: ['categories'],
+    queryFn: () => getCategoryList(),
+  });
 
-  // 获取同类商品（同一级目录下的所有商品，排除当前商品）
-  const relatedProducts = useMemo(() => {
-    if (!product) return [];
-    return products
-      .filter(p => 
-        // 确保是同一个一级目录
-        p.category === product.category && 
-        // 排除当前商品
-        p.id !== product.id
-      )
-      // 随机打乱顺序
-      .sort(() => Math.random() - 0.5)
-      // 取前4个
-      .slice(0, 4);
-  }, [product]);
+  // 查找分类信息
+  const categoryInfo = useMemo(() => {
+    if (!product || !categories.length) return {
+      category1: null,
+      category2: null,
+      category3: null
+    };
 
-  // 获取同类商品总数（同一级目录下的所有商品数量）
+    const category1 = categories.find(c => c.id === product.category1Id);
+    const category2 = category1?.children?.find(c => c.id === product.category2Id);
+    const category3 = category2?.children?.find(c => c.id === product.category3Id);
+
+    return {
+      category1,
+      category2,
+      category3
+    };
+  }, [product, categories]);
+
+  // 获取相关商品
+  const { data: relatedProducts = [] } = useQuery<Product[]>({
+    queryKey: ['relatedProducts', product?.category3Code],
+    queryFn: () => getProductList({
+      page: 1,
+      pageSize: 4,
+      categoryCodes: product?.category1Code || '',
+      productName: '',
+    }).then(res => {
+      // 从返回的分类中找到对应的商品列表
+      const categoryProducts = res.categories.find(
+        cat => cat.categoryCode === product?.category1Code
+      );
+      return categoryProducts?.products || [];
+    }),
+    enabled: !!product?.category3Code,  
+  });
+
+  // 获取同类商品总数
   const categoryProductsCount = useMemo(() => {
     if (!product) return 0;
-    return products.filter(p => p.category === product.category).length;
-  }, [product]);
+    return relatedProducts.length;
+  }, [relatedProducts]);
+
+  // 处理加载状态
+  if (productLoading) {
+    return <Spin size="large" className={styles.loading} />;
+  }
+
+  // 处理错误状态
+  useEffect(() => {
+    if (productError) {
+      message.error('商品不存在或已下架');
+      navigate('/mall');
+    }
+  }, [productError, navigate]);
+
+  // 如果没有商品数据，返回null
+  if (!product) return null;
 
   // 辅助函数：格式化以太坊地址
   const formatEthAddress = (address: string) => {
@@ -139,12 +188,12 @@ const ProductDetail: React.FC = () => {
         <div className={styles.detailContent}>
           {/* 商品参数 */}
           <div className={styles.parameters}>
-            <h3>规格参数</h3>
+            <h3>基本参数</h3>
             <ul className={styles.parameterList}>
-              {product?.specifications && product.specifications.map((spec: Specification) => (  
-                <li key={spec.id}>
-                  <span className={styles.paramKey}>{spec.label}：</span>
-                  <span className={styles.paramValue}>{spec.value}</span>
+              {product?.basicAttrs && Object.entries(product.basicAttrs).map(([key, value]) => (
+                <li key={key}>
+                  <span className={styles.paramKey}>{key}：</span>
+                  <span className={styles.paramValue}>{value}</span>
                 </li>
               ))}
             </ul>
@@ -165,23 +214,31 @@ const ProductDetail: React.FC = () => {
       children: (
         <div className={styles.specsContent}>
           <div className={styles.specSection}>
-            <h3>主体</h3>
+            <h3>销售属性</h3>
             <table className={styles.specTable}>
               <tbody>
-                <tr>
-                  <td className={styles.specLabel}>品牌</td>
-                  <td>示例品牌</td>
-                  <td className={styles.specLabel}>型号</td>
-                  <td>XX-123</td>
-                </tr>
-                {/* 添加更多规格行 */}
+                {product?.saleAttrs && Object.entries(product.saleAttrs).map(([key, value]) => (
+                  <tr key={key}>
+                    <td className={styles.specLabel}>{key}</td>
+                    <td>{value}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
           
-          <div className={styles.packageInfo}>
-            <h3>包装清单</h3>
-            <p>商品 x 1、说明书 x 1、保修卡 x 1</p>
+          <div className={styles.specSection}>
+            <h3>规格参数</h3>
+            <table className={styles.specTable}>
+              <tbody>
+                {product?.specAttrs && Object.entries(product.specAttrs).map(([key, value]) => (
+                  <tr key={key}>
+                    <td className={styles.specLabel}>{key}</td>
+                    <td>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       ),
@@ -282,15 +339,6 @@ const ProductDetail: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    if (!product) {
-      message.error('商品不存在');
-      navigate('/mall');
-    }
-  }, [product, navigate]);
-
-  if (!product) return null;
-
   const handleAddToCart = () => {
     message.success('已加入购物车');
   };
@@ -299,8 +347,8 @@ const ProductDetail: React.FC = () => {
     navigate(`/mall/exchange/${product.id}`);
   };
 
-  const handleCategoryClick = (categoryKey: string) => {
-    navigate(`/mall?category=${categoryKey}`);
+  const handleCategoryClick = (categoryCode: string) => {
+    navigate(`/mall?category=${categoryCode}`);
   };
 
   // 处理收藏点击
@@ -328,12 +376,14 @@ const ProductDetail: React.FC = () => {
 
   // 规格展示部分的更新
   const renderSpecifications = () => {
+    if (!product?.saleAttrs) return null;
+    
     return (
       <div className={styles.specifications}>
-        {product?.specifications?.map((spec) => (
-          <div key={spec.id} className={styles.specItem}>
-            <span className={styles.specLabel}>{spec.label}：</span>
-            <span className={styles.specValue}>{spec.value}</span>
+        {Object.entries(product.saleAttrs).map(([key, value]) => (
+          <div key={key} className={styles.specItem}>
+            <span className={styles.specLabel}>{key}：</span>
+            <span className={styles.specValue}>{value}</span>
           </div>
         ))}
       </div>
@@ -344,34 +394,34 @@ const ProductDetail: React.FC = () => {
     <div className={styles.container}>
       {/* 面包屑导航 */}
       <Breadcrumb className={styles.breadcrumb}>
-        <Breadcrumb.Item onClick={() => navigate('/mall')} className={styles.breadcrumbItem}>
+        <Breadcrumb.Item onClick={() => navigate('/mall')}>
           <HomeOutlined /> 商城首页
         </Breadcrumb.Item>
-        {category && (
-          <Breadcrumb.Item
-            onClick={() => handleCategoryClick(category.key)}
-            className={styles.breadcrumbItem}
+        {categoryInfo.category1 && (
+          <Breadcrumb.Item 
+            onClick={() => handleCategoryClick(categoryInfo.category1?.code || '')}
+            className={styles.breadcrumbLink}
           >
-            {category.title}
+            {categoryInfo.category1.name}
           </Breadcrumb.Item>
         )}
-        {subCategory && (
-          <Breadcrumb.Item
-            onClick={() => handleCategoryClick(subCategory.key)}
-            className={styles.breadcrumbItem}
+        {categoryInfo.category2 && (
+          <Breadcrumb.Item 
+            onClick={() => handleCategoryClick(categoryInfo.category2?.code || '')}
+            className={styles.breadcrumbLink}
           >
-            {subCategory.title}
+            {categoryInfo.category2.name}
           </Breadcrumb.Item>
         )}
-        {thirdCategory && (
-          <Breadcrumb.Item
-            onClick={() => handleCategoryClick(thirdCategory.key)}
-            className={styles.breadcrumbItem}
+        {categoryInfo.category3 && (
+          <Breadcrumb.Item 
+            onClick={() => handleCategoryClick(categoryInfo.category3?.code || '')}
+            className={styles.breadcrumbLink}
           >
-            {thirdCategory.title}
+            {categoryInfo.category3.name}
           </Breadcrumb.Item>
         )}
-        <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
+        <Breadcrumb.Item>{product?.name}</Breadcrumb.Item>
       </Breadcrumb>
 
       {/* 商品主信息 */}
@@ -477,9 +527,9 @@ const ProductDetail: React.FC = () => {
                     <span className={styles.symbol}>¥</span>
                     {product?.price}
                   </span>
-                  {product?.originalPrice && (
+                  {product?.realPrice && (
                     <span className={styles.originalPrice}>
-                      ¥{product.originalPrice}
+                      ¥{product.realPrice}
                     </span>
                   )}
                 </div>
@@ -571,7 +621,7 @@ const ProductDetail: React.FC = () => {
             </div>
             <Button 
               type="link" 
-              onClick={() => navigate(`/mall?category=${product?.category}`)}
+              onClick={() => navigate(`/mall?category=${product?.category3Code}`)}
               className={styles.moreButton}
             >
               查看更多 <RightOutlined />
@@ -592,11 +642,9 @@ const ProductDetail: React.FC = () => {
             xxl: 4,
           }}
           dataSource={relatedProducts}
-          renderItem={(item) => (
+          renderItem={(item: Product) => (
             <List.Item>
-              <ProductCard 
-                product={item}
-              />
+              <ProductCard product={item} />
             </List.Item>
           )}
         />

@@ -1,6 +1,127 @@
 import axiosInstance from './axiosInstance';
 import { message } from 'antd';
 
+// 基础属性接口
+interface Attr {
+  id: number;
+  name: string;
+  code: string;
+  sort: number;
+  status: number;
+  type: number;
+}
+
+// 属性组接口
+interface AttrGroup {
+  id: number;
+  name: string;
+  code: string;
+  status: number;
+  type: number;
+  sort: number;
+  attrs: Attr[];
+}
+
+// 分类响应接口
+interface CategoryResponse {
+  id: number;
+  name: string;
+  code: string;
+  level: number;
+  sort: number;
+  parentId: number;
+  icon?: string;
+  attrGroups?: AttrGroup[];
+  children?: CategoryResponse[];
+}
+
+// 商品属性接口
+interface ProductAttribute {
+  basicAttrs: string;
+  saleAttrs: string;
+  specAttrs: string;
+}
+
+// 商品接口
+interface Product {
+  id: number;
+  code: string;
+  name: string;
+  category1Id: number;
+  category1Code: string;
+  category2Id: number;
+  category2Code: string;
+  category3Id: number;
+  category3Code: string;
+  brand: string;
+  price: number;
+  realPrice: number;
+  totalSales: number;
+  totalStock: number;
+  status: number;
+  description: string;
+  attributes: ProductAttribute;
+  images: string[];
+  tags: string[];
+}
+
+// 分类商品接口
+interface CategoryProduct {
+  categoryId: number;
+  categoryCode: string;
+  categoryName: string;
+  productCount: number;
+  products: Product[] | null;
+}
+
+// 商品列表响应接口
+interface ProductListResponse {
+  total: number;
+  categories: CategoryProduct[];
+}
+
+// 商品列表请求参数接口
+interface ProductListRequest {
+  categoryCodes: string;
+  productName: string;
+  page: number;
+  pageSize: number;
+}
+
+// 商品明细请求接口参数
+interface ProductDetailRequest {
+  productId: number;
+  productCode: string;
+}
+
+// 商品详情接口
+export interface ProductDetail extends Omit<Product, 'images' | 'attributes'> {
+  images: string[];
+  basicAttrs: Record<string, string>;
+  saleAttrs: Record<string, string>;
+  specAttrs: Record<string, string>;
+  stock: number;
+  tags: string[];
+  specifications: Array<{
+    id: number;
+    label: string;
+    value: string;
+  }>;
+  detailImages: string[];
+  reviews: Array<{
+    id: number;
+    user: {
+      address: string;
+      avatar: string;
+    };
+    rating: number;
+    date: string;
+    content: string;
+    images: string[];
+    specs: string;
+  }>;
+}
+
 // 统一的错误处理函数
 const handleApiError = (error: any, customMessage?: string) => {
   if (error.response?.data?.message) {
@@ -64,7 +185,7 @@ export const isAdmin = async (address: string) => {
 };
 
 // 获取分类列表
-export const getCategoryList = async () => {
+export const getCategoryList = async (): Promise<CategoryResponse[]> => {
   try {
     const response = await axiosInstance.get('/v1/categories');
     if (response.status === 200 && response.data.code === 0) {
@@ -75,6 +196,53 @@ export const getCategoryList = async () => {
     handleApiError(error, '获取分类列表失败');
     return [];
   }
+};
+
+// 获取商品列表
+export const getProductList = async (params: ProductListRequest): Promise<ProductListResponse> => {
+  try {
+    const response = await axiosInstance.post('/v1/products', params);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+    return {
+      total: 0,
+      categories: []
+    };
+  } catch (error) {
+    handleApiError(error, '获取商品列表失败');
+    return {
+      total: 0,
+      categories: []
+    };
+  }
+};
+
+// 获取商品详情
+export const getProductDetail = async (params: ProductDetailRequest): Promise<ProductDetail | null> => {
+  try {
+    const response = await axiosInstance.post(`/v1/products/getProductDetails`, { params });
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    handleApiError(error, '获取商品详情失败');
+    return null;
+  }
+};
+
+
+// 导出接口类型
+export type {
+  Attr,
+  AttrGroup,
+  CategoryResponse,
+  Product,
+  ProductAttribute,
+  CategoryProduct,
+  ProductListResponse,
+  ProductListRequest
 };
 
 
