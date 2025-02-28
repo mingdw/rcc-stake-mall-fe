@@ -136,10 +136,7 @@ const ProductDetail: React.FC = () => {
     const items = [
       {
         title: (
-          <span 
-            onClick={() => navigate('/mall')} 
-            className={styles.breadcrumbLink}
-          >
+          <span onClick={() => navigate('/mall')} className={styles.breadcrumbLink}>
             全部商品
           </span>
         ),
@@ -150,7 +147,7 @@ const ProductDetail: React.FC = () => {
       items.push({
         title: (
           <span 
-            onClick={() => handleCategoryClick(categoryInfo.category1?.code || '')}
+            onClick={() => navigate(`/mall?category=${categoryInfo.category1?.code}&scroll=true`)} 
             className={styles.breadcrumbLink}
           >
             {categoryInfo.category1.name}
@@ -163,7 +160,7 @@ const ProductDetail: React.FC = () => {
       items.push({
         title: (
           <span 
-            onClick={() => handleCategoryClick(categoryInfo.category2?.code || '')}
+            onClick={() => navigate(`/mall?category=${categoryInfo.category2?.code}&scroll=true`)} 
             className={styles.breadcrumbLink}
           >
             {categoryInfo.category2.name}
@@ -176,7 +173,7 @@ const ProductDetail: React.FC = () => {
       items.push({
         title: (
           <span 
-            onClick={() => handleCategoryClick(categoryInfo.category3?.code || '')}
+            onClick={() => navigate(`/mall?category=${categoryInfo.category3?.code}&scroll=true`)} 
             className={styles.breadcrumbLink}
           >
             {categoryInfo.category3.name}
@@ -187,7 +184,7 @@ const ProductDetail: React.FC = () => {
 
     if (product?.productSpu.name) {
       items.push({
-        title: <span className={styles.breadcrumbLink}>{product.productSpu.name}</span>,
+        title: <span className={styles.currentItem}>{product.productSpu.name}</span>,
       });
     }
 
@@ -617,6 +614,31 @@ const ProductDetail: React.FC = () => {
     navigate(`/mall/exchange/${id}`);
   };
 
+  const renderQuantitySection = () => (
+    <div className={styles.quantitySection}>
+      <div className={styles.quantityRow}>
+        <div className={styles.quantityLeft}>
+          <span className={styles.quantityLabel}>数量</span>
+          <InputNumber
+            min={1}
+            max={selectedSku?.stock || 0}
+            value={quantity}
+            onChange={(value) => setQuantity(value || 1)}
+            className={styles.quantityInput}
+          />
+        </div>
+        <div className={styles.quantityRight}>
+          <span className={styles.stockInfo}>
+            库存: {selectedSku?.stock || 0}
+          </span>
+          <span className={styles.salesInfo}>
+            已售: {selectedSku?.sales || 0}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     if (!id || productLoading) {
       return <Spin size="large" className={styles.loading} />;
@@ -708,16 +730,7 @@ const ProductDetail: React.FC = () => {
                 </div>
 
                 <div className={styles.purchaseSection}>
-                  <div className={styles.quantity}>
-                    <span className={styles.quantityLabel}>数量</span>
-                    <InputNumber
-                      min={1}
-                      max={product?.productSpu.totalStock}
-                      value={quantity}
-                      onChange={(value) => setQuantity(value || 1)}
-                    />
-                  </div>
-
+                  {renderQuantitySection()}
                   <div className={styles.actionButtons}>
                     <Space direction="horizontal" size={40}>
                       <Button

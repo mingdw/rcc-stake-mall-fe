@@ -166,17 +166,31 @@ useEffect(() => {
   const location = useLocation();
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
-  // 从 URL 参数中获取分类
+  // 添加滚动到分类的处理函数
+  const scrollToCategory = useCallback((categoryCode: string) => {
+    const categoryRef = categoryRefs.current[categoryCode];
+    if (categoryRef?.current) {
+      categoryRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  }, []);
+
+  // 修改 URL 参数监听
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const categoryFromUrl = searchParams.get('category');
+    const shouldScroll = searchParams.get('scroll') === 'true';
+
     if (categoryFromUrl) {
       setSelectedCategory(categoryFromUrl);
-      setShowAllCategories(false); // 确保不显示全部商品视图
-      
+      setShowAllCategories(false);
+
       // 查找并设置一级分类为选中状态
       const firstLevelKey = getFirstLevelKey(categoryFromUrl);
       setActiveKey(firstLevelKey);
+
       // 展开对应的分类菜单
       const expandKeys: string[] = [];
       categories.forEach(cat => {
@@ -195,8 +209,23 @@ useEffect(() => {
         });
       });
       setExpandedKeys(expandKeys);
+
+      // 如果需要滚动，等待组件渲染完成后滚动到对应位置
+      if (shouldScroll) {
+        // 使用 setTimeout 确保在 DOM 更新后执行滚动
+        setTimeout(() => {
+          scrollToCategory(categoryFromUrl);
+          // 清除 scroll 参数
+          const newSearchParams = new URLSearchParams(location.search);
+          newSearchParams.delete('scroll');
+          navigate({
+            pathname: location.pathname,
+            search: newSearchParams.toString()
+          }, { replace: true });
+        }, 100);
+      }
     }
-  }, [location.search]);
+  }, [location.search, categories, navigate, scrollToCategory]);
 
   // 处理分类选择
   const onSelect = (selectedKeys: Key[], info: any) => {
@@ -585,6 +614,7 @@ useEffect(() => {
             .map(category => (
               <Card
                 key={category.code}
+                ref={categoryRefs.current[category.code]}
                 className={stylesCss.categoryCard}
                 title={
                   <CategoryCardTitle
