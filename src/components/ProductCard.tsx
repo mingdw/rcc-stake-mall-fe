@@ -6,13 +6,15 @@ import styles from './ProductCard.module.scss';
 import { Product } from '../api/apiService';
 
 interface ProductCardProps {
-  product: Product 
+  product: Product;
   showExchangeButton?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product,
-  showExchangeButton = true
+  showExchangeButton = false,
+  onClick
 }) => {
   const navigate = useNavigate();
 
@@ -35,11 +37,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const basicAttrValues = renderBasicAttrValues();
   const hasMoreAttrs = basicAttrValues.length > 4;
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      onClick(e);
+    } else {
+      navigate(`/mall/product/${product.id}`);
+    }
+  };
+
   return (
     <Card
       hoverable
       className={styles.productCard}
-      onClick={() => navigate(`/mall/product/${product.id}`)}
+      onClick={handleClick}
       cover={
         <div className={styles.imageWrapper}>
           <img 

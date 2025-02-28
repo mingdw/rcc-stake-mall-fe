@@ -94,32 +94,95 @@ interface ProductDetailRequest {
   productCode: string;
 }
 
-// 商品详情接口
-export interface ProductDetail extends Omit<Product, 'images' | 'attributes'> {
-  images: string[];
-  basicAttrs: Record<string, string>;
-  saleAttrs: Record<string, string>;
-  specAttrs: Record<string, string>;
+// 商品规格接口
+interface ProductSpec {
+  id: number;
+  label: string;
+  value: string;
+}
+
+// 商品SKU接口
+interface ProductSku {
+  id: number;
+  code: string;
+  price: number;
+  originalPrice: number;
   stock: number;
-  tags: string[];
-  specifications: Array<{
-    id: number;
-    label: string;
-    value: string;
-  }>;
-  detailImages: string[];
-  reviews: Array<{
-    id: number;
-    user: {
-      address: string;
-      avatar: string;
-    };
-    rating: number;
-    date: string;
-    content: string;
-    images: string[];
-    specs: string;
-  }>;
+  specs: Record<string, string>;
+}
+
+// 商品评价接口
+interface ProductReview {
+  id: number;
+  user: {
+    address: string;
+    avatar: string;
+  };
+  rating: number;
+  date: string;
+  content: string;
+  images: string[];
+  specs: string;
+}
+
+// 商品SPU接口
+interface ProductSpu {
+  id: number;
+  code: string;
+  name: string;
+  category1Id: number;
+  category1Code: string;
+  category2Id: number;
+  category2Code: string;
+  category3Id: number;
+  category3Code: string;
+  brand: string;
+  price: number;
+  realPrice: number;
+  description: string;
+  status: number;
+  images: string[];
+  totalSales: number;
+  totalStock: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 商品SPU详情接口
+interface ProductSpuDetail {
+  id: number;
+  productSpuId: number;
+  detail: string;
+  packingList: string;
+  afterSale: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: number;
+  creator: string;
+  updator: string;
+}
+
+// 商品属性参数接口
+interface ProductSpuAttrParams {
+  id: number;
+  productSpuId: number;
+  basicAttrs: string; // JSON string
+  saleAttrs: string; // JSON string
+  specAttrs: string; // JSON string
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: number;
+  creator: string;
+  updator: string;
+}
+
+// 商品详情响应接口
+export interface ProductDetailResponse {
+  reviews: ProductReview[];
+  productSpu: ProductSpu;
+  productSku: ProductSku[];
+  productSpuDetail: ProductSpuDetail;
+  productSpuAttrParams: ProductSpuAttrParams;
 }
 
 // 统一的错误处理函数
@@ -219,9 +282,9 @@ export const getProductList = async (params: ProductListRequest): Promise<Produc
 };
 
 // 获取商品详情
-export const getProductDetail = async (params: ProductDetailRequest): Promise<ProductDetail | null> => {
+export const getProductDetail = async (params: ProductDetailRequest): Promise<ProductDetailResponse | null> => {
   try {
-    const response = await axiosInstance.post(`/v1/products/getProductDetails`, { params });
+    const response = await axiosInstance.post('/v1/products/getProductDetails', params);
     if (response.status === 200 && response.data.code === 0) {
       return response.data.data;
     }
@@ -231,7 +294,6 @@ export const getProductDetail = async (params: ProductDetailRequest): Promise<Pr
     return null;
   }
 };
-
 
 // 导出接口类型
 export type {

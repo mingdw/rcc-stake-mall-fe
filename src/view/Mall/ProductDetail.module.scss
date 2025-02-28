@@ -167,12 +167,10 @@
 
     .title {
       font-size: 20px;
-      font-weight: bold;
-      color: #333;
-      line-height: 1.5;
+      font-weight: 500;
+      color: #262626;
       margin: 0;
-      flex: 1;
-      min-width: 0; // 确保文本可以正确换行
+      line-height: 1.4;
     }
 
     .tags {
@@ -846,5 +844,148 @@
         }
       }
     }
+  }
+}
+
+.specGroup {
+  margin-bottom: 16px;
+  
+  .specLabel {
+    display: inline-block;
+    width: 80px;
+    color: #666;
+  }
+  
+  .specOptions {
+    display: inline-block;
+    
+    .specOption {
+      margin-right: 8px;
+      padding: 4px 12px;
+      cursor: pointer;
+      
+      &.selected {
+        color: #1890ff;
+        border-color: #1890ff;
+        background: #e6f7ff;
+      }
+    }
+  }
+}
+
+.moreLink {
+  color: #1890ff;
+  cursor: pointer;
+  font-size: 14px;
+  
+  &:hover {
+    color: #40a9ff;
+  }
+}
+
+.parameterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.basicAttrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-shrink: 0;
+
+  .basicAttrTag {
+    margin: 0;
+    padding: 2px 8px;
+    background: #f0f7ff;
+    border: 1px solid #91caff;
+    border-radius: 4px;
+    color: #0958d9;
+    font-size: 12px;
+    transition: all 0.3s;
+    cursor: default;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.detailAttributes {
+  margin: 24px 0;
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 8px;
+
+  .attributeHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 500;
+      color: #262626;
+      margin: 0;
+    }
+
+    .moreLink {
+      color: #1890ff;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      &:hover {
+        color: #40a9ff;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .attributeList {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    .attributeItem {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      line-height: 1.5;
+
+      .attrKey {
+        color: #666;
+        margin-right: 8px;
+        min-width: 80px;
+      }
+
+      .attrValue {
+        color: #262626;
+      }
+    }
+  }
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  .title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #262626;
+    margin: 0;
+    line-height: 1.4;
+    flex: 1;
   }
 }
