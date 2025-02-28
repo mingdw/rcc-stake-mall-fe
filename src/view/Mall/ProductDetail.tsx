@@ -261,7 +261,7 @@ const ProductDetail: React.FC = () => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const reviews = [
+  const mockReviews = [
     {
       id: 1,
       user: {
@@ -541,13 +541,22 @@ const ProductDetail: React.FC = () => {
           <div className={styles.reviewsSummary}>
             <div className={styles.overallRating}>
               <div className={styles.ratingScore}>
-                {(product?.reviews?.reduce((acc, review) => acc + review.rating, 0) / 
-                  (product?.reviews?.length || 1)).toFixed(1)}
+                {(() => {
+                  const reviews = product?.reviews || mockReviews;
+                  if (!reviews.length) return "5.0";
+                  return (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
+                })()}
               </div>
               <div className={styles.ratingStars}>
-                <Rate disabled defaultValue={4.8} allowHalf />
+                <Rate 
+                  disabled 
+                  defaultValue={Number((product?.reviews || mockReviews)
+                    .reduce((acc, review) => acc + review.rating, 0) / 
+                    (product?.reviews?.length || mockReviews.length) || 5)} 
+                  allowHalf 
+                />
                 <div className={styles.ratingCount}>
-                  共 <span>{product?.reviews?.length || 0}</span> 条评价
+                  共 <span>{product?.reviews?.length || mockReviews.length}</span> 条评价
                 </div>
               </div>
             </div>
@@ -556,7 +565,7 @@ const ProductDetail: React.FC = () => {
           <List
             className={styles.reviewsList}
             itemLayout="vertical"
-            dataSource={product?.reviews || []}
+            dataSource={product?.reviews || mockReviews}
             renderItem={(review) => (
               <List.Item className={styles.reviewItem}>
                 <div className={styles.reviewHeader}>
