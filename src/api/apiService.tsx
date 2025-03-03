@@ -63,6 +63,7 @@ interface Product {
   attributes: ProductAttribute;
   images: string[];
   tags: string[];
+  skuList: ProductSku[];
 }
 
 // 分类商品接口
@@ -94,21 +95,29 @@ interface ProductDetailRequest {
   productCode: string;
 }
 
-// 商品规格接口
-interface ProductSpec {
-  id: number;
-  label: string;
-  value: string;
-}
 
 // 商品SKU接口
 interface ProductSku {
   id: number;
-  code: string;
+  productSpuId: number;
+  productSpuCode: string;
+  skuCode: string;
   price: number;
-  originalPrice: number;
   stock: number;
-  specs: Record<string, string>;
+  saleCount: number;
+  status: number;
+  indexs: string;
+  attrParams: string;
+  ownerParams: string;
+  images: string;
+  title: string;
+  subTitle: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: number;
+  creator: string;
+  updator: string;
 }
 
 // 商品评价接口
@@ -177,7 +186,7 @@ interface ProductSpuAttrParams {
 }
 
 // 商品详情响应接口
-export interface ProductDetailResponse {
+interface ProductDetailResponse {
   reviews: ProductReview[];
   productSpu: ProductSpu;
   productSku: ProductSku[];
@@ -301,10 +310,13 @@ export type {
   AttrGroup,
   CategoryResponse,
   Product,
+  ProductSpu,
+  ProductSku,
   ProductAttribute,
   CategoryProduct,
   ProductListResponse,
-  ProductListRequest
+  ProductListRequest,
+  ProductDetailResponse
 };
 
 

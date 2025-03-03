@@ -37,6 +37,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const basicAttrValues = renderBasicAttrValues();
   const hasMoreAttrs = basicAttrValues.length > 4;
 
+  // 获取最佳展示价格
+  const getBestPrice = () => {
+    if (product.skuList && product.skuList.length > 0) {
+      // 找出销量最高的SKU
+      const bestSellingSku = product.skuList.reduce((prev, current) => 
+        (prev.saleCount > current.saleCount) ? prev : current
+      );
+      return bestSellingSku.price;
+    }
+    // 如果没有SKU，返回SPU的价格
+    return product.realPrice || product.price;
+  };
+
+  // 获取原始价格
+  const getOriginalPrice = () => {
+    if (product.skuList && product.skuList.length > 0) {
+      const bestSellingSku = product.skuList.reduce((prev, current) => 
+        (prev.saleCount > current.saleCount) ? prev : current
+      );
+      return bestSellingSku.price > product.price ? bestSellingSku.price : product.price;
+    }
+    return product.realPrice > product.price ? product.realPrice : null;
+  };
+
+  const displayPrice = getBestPrice();
+  const originalPrice = getOriginalPrice();
+
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {
       onClick(e);
@@ -95,10 +122,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className={styles.priceStatisticsRow}>
           <div className={styles.priceInfo}>
             <span className={styles.currency}>¥</span>
-            <span className={styles.currentPrice}>{product.price}</span>
-            {product.realPrice > product.price && (
+            <span className={styles.currentPrice}>{displayPrice}</span>
+            {originalPrice && originalPrice > displayPrice && (
               <span className={styles.originalPrice}>
-                ¥{product.realPrice}
+                ¥{originalPrice}
               </span>
             )}
           </div>

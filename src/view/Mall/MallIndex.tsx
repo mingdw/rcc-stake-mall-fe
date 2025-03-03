@@ -48,7 +48,7 @@ const MallIndex: React.FC = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8); // 修改默认每页显示数量为8
+  const PAGE_SIZE = 8; // 添加统一的页面大小常量
   const [total, setTotal] = useState(0);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -68,19 +68,16 @@ const MallIndex: React.FC = () => {
     fetchCategories();
   }, []);
 
-  // 修改获取商品数据的函数
+  // 简化获取商品数据的函数
   const fetchProducts = useCallback(async (params: Partial<ProductListRequest> = {}) => {
     try {
       setLoading(true);
-      
-      // 根据是否为全部商品视图决定每页显示数量
-      const currentPageSize = showAllCategories ? 4 : 8;
       
       const requestParams: ProductListRequest = {
         categoryCodes: params.categoryCodes || selectedCategory || '',
         productName: params.productName || searchText || '',
         page: params.page || currentPage,
-        pageSize: params.pageSize || currentPageSize,
+        pageSize: PAGE_SIZE, // 统一使用8条
       };
 
       const data = await getProductList(requestParams);
@@ -104,23 +101,19 @@ const MallIndex: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, showAllCategories, selectedCategory, searchText]);
+  }, [currentPage, selectedCategory, searchText]);
 
   // 初始加载
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // 修改分页处理函数
-  const handlePageChange = (page: number, size?: number) => {
+  // 简化分页处理函数
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    if (size) {
-      setPageSize(size);
-    }
-    
     fetchProducts({ 
       page,
-      pageSize: size || (showAllCategories ? 4 : 8),
+      pageSize: PAGE_SIZE,
       categoryCodes: selectedCategory,
       productName: searchText
     });
@@ -137,7 +130,7 @@ const MallIndex: React.FC = () => {
       productName: trimmedValue,
       categoryCodes: selectedCategory,
       page: 1,
-      pageSize: showAllCategories ? 4 : 8
+      pageSize: PAGE_SIZE
     });
   };
 
@@ -500,11 +493,11 @@ useEffect(() => {
     fetchProducts({
       categoryCodes: categoryCode,
       page: 1,
-      pageSize: 8
+      pageSize: PAGE_SIZE
     });
   };
 
-  // 修改分类选择处理函数
+  // 简化菜单点击处理
   const handleMenuClick = ({ key }: { key: string }) => {
     const firstLevelKey = getFirstLevelKey(key);
     
@@ -529,7 +522,7 @@ useEffect(() => {
     fetchProducts({
       categoryCodes: isAllProducts ? '' : key,
       page: 1,
-      pageSize: isAllProducts ? 4 : 8
+      pageSize: PAGE_SIZE
     });
   };
 
@@ -543,7 +536,7 @@ useEffect(() => {
     fetchProducts({
       categoryCodes: '',
       page: 1,
-      pageSize: 4
+      pageSize: PAGE_SIZE
     });
   };
 
@@ -662,13 +655,13 @@ useEffect(() => {
     }
   };
 
-  // 抽取商品内容渲染逻辑
+  // 简化渲染商品列表的逻辑
   const renderProductContent = () => {
     if (products.length > 0) {
       return (
         <>
           <Row gutter={[16, 16]}>
-            {products.slice(0, 8).map(product => (
+            {products.slice(0, PAGE_SIZE).map(product => (
               <Col span={6} key={product.id}>
                 <ProductCard 
                   product={product}
@@ -677,12 +670,12 @@ useEffect(() => {
               </Col>
             ))}
           </Row>
-          {total > 0 && (
+          {total > PAGE_SIZE && (
             <div className={stylesCss.pagination}>
               <Pagination
                 current={currentPage}
                 total={total}
-                pageSize={8}
+                pageSize={PAGE_SIZE}
                 onChange={handlePageChange}
                 showTotal={(total) => `共 ${total} 条`}
               />

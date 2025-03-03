@@ -26,8 +26,7 @@ import {
   RightOutlined,
   LeftOutlined,
   SafetyOutlined,
-  CheckCircleOutlined,
-  FireOutlined
+  CheckCircleOutlined
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { 
@@ -35,8 +34,8 @@ import {
   getProductDetail, 
   getCategoryList,
   getProductList,
-  type ProductDetailResponse,
   type Product,
+  type ProductSku
 } from '../../api/apiService';
 
 import styles from './ProductDetail.module.scss';
@@ -51,11 +50,13 @@ const ProductDetail: React.FC = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [showZoom, setShowZoom] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [selectedSku, setSelectedSku] = useState<any>(null);
+  const [selectedSku, setSelectedSku] = useState<ProductSku | null>(null);
   const [activeTab, setActiveTab] = useState('detail');
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
+  const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
+
 
   const { 
     data: product, 
@@ -83,10 +84,6 @@ const ProductDetail: React.FC = () => {
     queryFn: () => getCategoryList(),
   });
 
-  const isHotSelling = useMemo(() => {
-    if (!product?.productSpu?.totalSales) return false;
-    return product.productSpu.totalSales > 100;
-  }, [product?.productSpu?.totalSales]);
 
   const parsedAttributes = useMemo(() => {
     try {
@@ -133,6 +130,8 @@ const ProductDetail: React.FC = () => {
   }, [product, categories]);
 
   const breadcrumbItems = useMemo(() => {
+    if (!product || !categories) return [];
+
     const items = [
       {
         title: (
@@ -143,43 +142,43 @@ const ProductDetail: React.FC = () => {
       }
     ];
 
-    if (categoryInfo.category1) {
-      items.push({
-        title: (
-          <span 
-            onClick={() => navigate(`/mall?category=${categoryInfo.category1?.code}&scroll=true`)} 
-            className={styles.breadcrumbLink}
-          >
-            {categoryInfo.category1.name}
-          </span>
-        ),
-      });
-    }
+    if (Array.isArray(categories) && product.productSpu?.category1Id) {
+      const category1 = categories.find(c => c.id === product.productSpu.category1Id);
+      const category2 = category1?.children?.find(c => c.id === product.productSpu.category2Id);
+      const category3 = category2?.children?.find(c => c.id === product.productSpu.category3Id);
 
-    if (categoryInfo.category2) {
-      items.push({
-        title: (
-          <span 
-            onClick={() => navigate(`/mall?category=${categoryInfo.category2?.code}&scroll=true`)} 
-            className={styles.breadcrumbLink}
-          >
-            {categoryInfo.category2.name}
-          </span>
-        ),
-      });
-    }
+      if (category1) {
+        items.push({
+          title: (
+            <span onClick={() => navigate(`/mall?category=${category1.code}&scroll=true`)} 
+              className={styles.breadcrumbLink}>
+              {category1.name}
+            </span>
+          ),
+        });
+      }
 
-    if (categoryInfo.category3) {
-      items.push({
-        title: (
-          <span 
-            onClick={() => navigate(`/mall?category=${categoryInfo.category3?.code}&scroll=true`)} 
-            className={styles.breadcrumbLink}
-          >
-            {categoryInfo.category3.name}
-          </span>
-        ),
-      });
+      if (category2) {
+        items.push({
+          title: (
+            <span onClick={() => navigate(`/mall?category=${category2.code}&scroll=true`)} 
+              className={styles.breadcrumbLink}>
+              {category2.name}
+            </span>
+          ),
+        });
+      }
+
+      if (category3) {
+        items.push({
+          title: (
+            <span onClick={() => navigate(`/mall?category=${category3.code}&scroll=true`)} 
+              className={styles.breadcrumbLink}>
+              {category3.name}
+            </span>
+          ),
+        });
+      }
     }
 
     if (product?.productSpu.name) {
@@ -189,7 +188,7 @@ const ProductDetail: React.FC = () => {
     }
 
     return items;
-  }, [categoryInfo, product, navigate]);
+  }, [categories, product, navigate]);
 
   const categoryProductsCount = useMemo(() => {
     return relatedProducts.length;
@@ -208,11 +207,18 @@ const ProductDetail: React.FC = () => {
           productName: '',
         });
 
-        const categoryProducts = response.categories.find(
-          cat => cat.categoryCode === product.productSpu.category1Code
-        );
-        
-        setRelatedProducts(categoryProducts?.products || []);
+        if (response?.categories) {
+          const categoryProducts = response.categories.find(
+            cat => cat.categoryCode === product.productSpu.category1Code
+          );
+          
+          // 添加空值检查
+          const filteredProducts = categoryProducts?.products?.filter(
+            p => p.id !== product.productSpu.id
+          ) || [];
+          
+          setRelatedProducts(filteredProducts);
+        }
       } catch (error) {
         console.error('Failed to fetch related products:', error);
       } finally {
@@ -225,7 +231,11 @@ const ProductDetail: React.FC = () => {
 
   useEffect(() => {
     if (product?.productSku?.length) {
-      setSelectedSku(product.productSku[0]);
+      // 获取销量最高的SKU
+      const bestSellingSku = product.productSku.reduce((prev, current) => 
+        (prev.saleCount > current.saleCount) ? prev : current
+      );
+      setSelectedSku(bestSellingSku);
     }
   }, [product]);
 
@@ -234,6 +244,67 @@ const ProductDetail: React.FC = () => {
       message.error('获取商品详情失败');
     }
   }, [productError]);
+
+  useEffect(() => {
+    if (product?.productSpuAttrParams?.specAttrs) {
+      try {
+        const specAttrs = JSON.parse(product.productSpuAttrParams.specAttrs);
+        const initialSpecs: Record<string, string> = {};
+        
+        Object.entries(specAttrs).forEach(([key, values]) => {
+          if (Array.isArray(values) && values.length > 0) {
+            initialSpecs[key] = values[0];
+          }
+        });
+        
+        setSelectedSpecs(initialSpecs);
+        
+        const matchingSku = product.productSku?.find(sku => {
+          const skuIndexs = JSON.parse(sku.indexs || '{}');
+          return Object.entries(initialSpecs).every(([key, value]) => {
+            const specValues = specAttrs[key];
+            return specValues[skuIndexs[key]] === value;
+          });
+        });
+        
+        if (matchingSku) {
+          setSelectedSku(matchingSku);
+        }
+      } catch (error) {
+        console.error('初始化规格选择失败:', error);
+      }
+    }
+  }, [product?.productSpuAttrParams?.specAttrs, product?.productSku]);
+
+  const handleSpecChange = useCallback((specKey: string, specValue: string) => {
+    if (!product?.productSku || !product.productSpuAttrParams?.specAttrs) return;
+    
+    try {
+      const specAttrs = JSON.parse(product.productSpuAttrParams.specAttrs);
+      const newSelectedSpecs = {
+        ...selectedSpecs,
+        [specKey]: specValue
+      };
+      setSelectedSpecs(newSelectedSpecs);
+      
+      const matchingSku = product.productSku.find(sku => {
+        const skuIndexs = JSON.parse(sku.indexs || '{}');
+        return Object.entries(newSelectedSpecs).every(([key, value]) => {
+          const specValues = specAttrs[key];
+          return specValues[skuIndexs[key]] === value;
+        });
+      });
+      
+      if (matchingSku) {
+        setSelectedSku(matchingSku);
+        if (quantity > matchingSku.stock) {
+          setQuantity(matchingSku.stock);
+        }
+      }
+    } catch (error) {
+      console.error('规格切换失败:', error);
+    }
+  }, [product?.productSku, product?.productSpuAttrParams?.specAttrs, selectedSpecs, quantity]);
 
   const handleCategoryClick = useCallback((categoryCode: string) => {
     if (!categoryCode) return;
@@ -335,12 +406,12 @@ const ProductDetail: React.FC = () => {
             <div key={key} className={styles.specGroup}>
               <span className={styles.specLabel}>{key}：</span>
               <div className={styles.specOptions}>
-                {values.map((value) => (
+                {values.map((value, index) => (
                   value && (
                     <Tag
                       key={value}
                       className={`${styles.specOption} ${
-                        selectedSku?.specs?.[key] === value ? styles.selected : ''
+                        selectedSpecs[key] === value ? styles.selected : ''
                       }`}
                       onClick={() => handleSpecChange(key, value)}
                     >
@@ -436,38 +507,47 @@ const ProductDetail: React.FC = () => {
     </div>
   );
 
+  const productImages = useMemo(() => {
+    if (selectedSku?.images) {
+      const skuImages = selectedSku.images.split(',').filter(Boolean);
+      return skuImages.length > 0 ? skuImages : product?.productSpu.images || [];
+    }
+    return product?.productSpu.images || [];
+  }, [selectedSku, product?.productSpu.images]);
+
+  useEffect(() => {
+    setCurrentImage(0);
+  }, [selectedSku]);
+
   const renderPrice = () => (
     <div className={styles.priceBlock}>
       <div className={styles.priceRow}>
         <span className={styles.priceLabel}>价格</span>
-        <span className={styles.price}>
-          <span className={styles.symbol}>¥</span>
-          {product?.productSpu.realPrice}
-        </span>
-        {product?.productSpu.price && (
+        {selectedSku ? (
+          <span className={styles.price}>
+            <span className={styles.symbol}>¥</span>
+            {selectedSku.price}
+          </span>
+        ) : (
+          <span className={styles.price}>
+            <span className={styles.symbol}>¥</span>
+            {product?.productSpu.realPrice}
+          </span>
+        )}
+        {selectedSku && product?.productSpu.price && selectedSku.price !== product.productSpu.price && (
           <span className={styles.originalPrice}>
             ¥{product.productSpu.price}
           </span>
         )}
+        <span className={styles.stockInfo}>
+          库存: {selectedSku?.stock ?? '-'}
+        </span>
+        <span className={styles.salesInfo}>
+          已售: {selectedSku?.saleCount ?? '-'}
+        </span>
       </div>
     </div>
   );
-
-  const handleSpecChange = useCallback((specKey: string, specValue: string) => {
-    if (!product?.productSku) return;
-    const newSelectedSpecs = {
-      ...selectedSku?.specs || {},
-      [specKey]: specValue
-    };
-    const matchingSku = product.productSku.find(sku => {
-      return Object.entries(newSelectedSpecs).every(([key, value]) => 
-        sku.specs[key] === value
-      );
-    });
-    if (matchingSku) {
-      setSelectedSku(matchingSku);
-    }
-  }, [product?.productSku, selectedSku]);
 
   const handleCollect = () => {
     setIsCollected(!isCollected);
@@ -479,6 +559,8 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!showZoom) return;
+    
     if (imageRef.current) {
       const { left, top, width, height } = imageRef.current.getBoundingClientRect();
       const x = ((e.clientX - left) / width) * 100;
@@ -487,7 +569,170 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const productImages = product?.productSpu.images || [];
+  const handleMouseEnter = () => {
+    setShowZoom(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowZoom(false);
+  };
+
+  const renderTitle = () => (
+    <div className={styles.titleRow}>
+      <h1 className={styles.title}>
+        {selectedSku?.title || product?.productSpu.name}
+        {selectedSku?.subTitle && (
+          <span className={styles.subTitle}>{selectedSku.subTitle}</span>
+        )}
+      </h1>
+      {renderBasicAttributes()}
+    </div>
+  );
+
+  const renderProductImages = () => (
+    <div className={styles.imageWrapper}>
+      <div className={styles.mainImageContainer}>
+        <div 
+          ref={imageRef}
+          className={styles.imageBox}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <Image
+            src={productImages[currentImage]}
+            alt={selectedSku?.title || product?.productSpu.name}
+            className={styles.mainImage}
+            preview={false}
+          />
+        </div>
+        {showZoom && (
+          <div className={styles.zoomContainer}>
+            <div 
+              className={styles.zoomImage}
+              style={{
+                backgroundImage: `url(${productImages[currentImage]})`,
+                backgroundPosition: `${mousePosition.x}% ${mousePosition.y}%`
+              }}
+            />
+          </div>
+        )}
+      </div>
+      
+      {productImages.length > 1 && (
+        <div className={styles.thumbnailContainer}>
+          <Button 
+            className={styles.navButton} 
+            icon={<LeftOutlined />}
+            onClick={() => {
+              const container = document.querySelector(`.${styles.thumbnailScroll}`);
+              if (container) {
+                container.scrollLeft -= 80;
+              }
+            }}
+          />
+          <div className={styles.thumbnailScroll}>
+            {productImages.map((image: string, index: number) => (
+              <div
+                key={index}
+                className={`${styles.thumbnail} ${currentImage === index ? styles.active : ''}`}
+                onClick={() => setCurrentImage(index)}
+              >
+                <Image
+                  src={image}
+                  alt={`缩略图${index + 1}`}
+                  preview={false}
+                />
+              </div>
+            ))}
+          </div>
+          <Button 
+            className={styles.navButton} 
+            icon={<RightOutlined />}
+            onClick={() => {
+              const container = document.querySelector(`.${styles.thumbnailScroll}`);
+              if (container) {
+                container.scrollLeft += 80;
+              }
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+
+  const renderSummary = () => (
+    <div className={styles.summary}>
+      {selectedSku?.description || product?.productSpu.description}
+    </div>
+  );
+
+  const renderServicePromise = () => (
+    <div className={styles.servicePromise}>
+      <div className={styles.promiseItem}>
+        <CheckCircleOutlined />
+        <span>企业认证</span>
+      </div>
+      <div className={styles.promiseItem}>
+        <SafetyOutlined />
+        <span>正品保障</span>
+      </div>
+    </div>
+  );
+
+  const renderPurchaseSection = () => (
+    <div className={styles.purchaseSection}>
+      <div className={styles.quantitySection}>
+        <div className={styles.quantityRow}>
+          <div className={styles.quantityLeft}>
+            <span className={styles.quantityLabel}>数量</span>
+            <InputNumber
+              min={1}
+              max={selectedSku?.stock || 0}
+              value={quantity}
+              onChange={(value) => {
+                const newValue = value || 1;
+                setQuantity(Math.min(newValue, selectedSku?.stock || 0));
+              }}
+              className={styles.quantityInput}
+              disabled={!selectedSku || selectedSku.stock <= 0}
+            />
+          </div>
+        </div>
+      </div>
+      <div className={styles.actionButtons}>
+        <Space direction="horizontal" size={40}>
+          <Button
+            type="primary"
+            size="middle"
+            icon={<ShoppingCartOutlined />}
+            onClick={handleBuyNow}
+            disabled={!selectedSku || selectedSku.stock <= 0}
+            className={styles.exchangeButton}
+          >
+            {!selectedSku ? '请选择规格' : 
+             selectedSku.stock <= 0 ? '已售罄' : '立即兑换'}
+          </Button>
+
+          <Button
+            type="text"
+            size="middle"
+            icon={isCollected ? <HeartFilled className={styles.collected} /> : <HeartOutlined />}
+            onClick={handleCollect}
+            className={styles.iconButton}
+          />
+
+          <Button
+            type="text"
+            size="middle"
+            icon={<ShareAltOutlined />}
+            onClick={handleShare}
+            className={styles.iconButton}
+          />
+        </Space>
+      </div>
+    </div>
+  );
 
   const tabItems: TabsProps['items'] = [
     {
@@ -611,33 +856,16 @@ const ProductDetail: React.FC = () => {
       message.error('商品ID不能为空');
       return;
     }
+    if (!selectedSku) {
+      message.warning('请选择商品规格');
+      return;
+    }
+    if (selectedSku.stock <= 0) {
+      message.warning('该规格商品已售罄');
+      return;
+    }
     navigate(`/mall/exchange/${id}`);
   };
-
-  const renderQuantitySection = () => (
-    <div className={styles.quantitySection}>
-      <div className={styles.quantityRow}>
-        <div className={styles.quantityLeft}>
-          <span className={styles.quantityLabel}>数量</span>
-          <InputNumber
-            min={1}
-            max={selectedSku?.stock || 0}
-            value={quantity}
-            onChange={(value) => setQuantity(value || 1)}
-            className={styles.quantityInput}
-          />
-        </div>
-        <div className={styles.quantityRight}>
-          <span className={styles.stockInfo}>
-            库存: {selectedSku?.stock || 0}
-          </span>
-          <span className={styles.salesInfo}>
-            已售: {selectedSku?.sales || 0}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
 
   const renderContent = () => {
     if (!id || productLoading) {
@@ -654,115 +882,17 @@ const ProductDetail: React.FC = () => {
         <div className={styles.mainContent}>
           <Row gutter={40}>
             <Col span={10}>
-              <div className={styles.imageWrapper}>
-                <div className={styles.mainImageContainer}>
-                  <Image
-                    src={productImages[currentImage]}
-                    alt={product?.productSpu.name}
-                    className={styles.mainImage}
-                  />
-                </div>
-                
-                <div className={styles.thumbnailContainer}>
-                  <Button 
-                    className={styles.navButton} 
-                    icon={<LeftOutlined />}
-                    onClick={() => {
-                      const container = document.querySelector(`.${styles.thumbnailScroll}`);
-                      if (container) {
-                        container.scrollLeft -= 80;
-                      }
-                    }}
-                  />
-                  <div className={styles.thumbnailScroll}>
-                    {productImages.map((image, index) => (
-                      <div
-                        key={index}
-                        className={`${styles.thumbnail} ${currentImage === index ? styles.active : ''}`}
-                        onClick={() => setCurrentImage(index)}
-                      >
-                        <Image
-                          src={image}
-                          alt={`缩略图${index + 1}`}
-                          preview={false}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <Button 
-                    className={styles.navButton} 
-                    icon={<RightOutlined />}
-                    onClick={() => {
-                      const container = document.querySelector(`.${styles.thumbnailScroll}`);
-                      if (container) {
-                        container.scrollLeft += 80;
-                      }
-                    }}
-                  />
-                </div>
-              </div>
+              {renderProductImages()}
             </Col>
             
             <Col span={14}>
               <div className={styles.productInfo}>
-                <div className={styles.titleRow}>
-                  <h1 className={styles.title}>{product?.productSpu.name}</h1>
-                  {renderBasicAttributes()}
-                </div>
-
-                <div className={styles.summary}>
-                  {product?.productSpu.description}
-                </div>
-
+                {renderTitle()}
+                {renderSummary()}
                 {renderPrice()}
-
                 {renderSaleAttributes()}
-
-                <div className={styles.servicePromise}>
-                  <div className={styles.promiseItem}>
-                    <CheckCircleOutlined />
-                    <span>企业认证</span>
-                  </div>
-                  <div className={styles.promiseItem}>
-                    <SafetyOutlined />
-                    <span>正品保障</span>
-                  </div>
-                </div>
-
-                <div className={styles.purchaseSection}>
-                  {renderQuantitySection()}
-                  <div className={styles.actionButtons}>
-                    <Space direction="horizontal" size={40}>
-                      <Button
-                        type="primary"
-                        size="middle"
-                        icon={<ShoppingCartOutlined />}
-                        onClick={handleBuyNow}
-                        disabled={!id}
-                        className={styles.exchangeButton}
-                      >
-                        立即兑换
-                      </Button>
-
-                      <Button
-                        type="text"
-                        size="middle"
-                        icon={isCollected ? <HeartFilled className={styles.collected} /> : <HeartOutlined />}
-                        onClick={handleCollect}
-                        className={styles.iconButton}
-                      />
-
-                      <Button
-                        type="text"
-                        size="middle"
-                        icon={<ShareAltOutlined />}
-                        onClick={handleShare}
-                        className={styles.iconButton}
-                      />
-                    </Space>
-
-                  </div>
-                </div>
+                {renderServicePromise()}
+                {renderPurchaseSection()}
               </div>
             </Col>
           </Row>
