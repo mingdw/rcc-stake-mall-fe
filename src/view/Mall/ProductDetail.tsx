@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Breadcrumb,
   Card,
@@ -30,10 +30,7 @@ import {
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { 
-  CategoryResponse, 
   getProductDetail, 
-  getCategoryList,
-  getProductList,
   type Product,
   type ProductSku
 } from '../../api/apiService';
@@ -45,6 +42,7 @@ import ProductCard from '../../components/ProductCard';
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [quantity, setQuantity] = useState(1);
   const [isCollected, setIsCollected] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
@@ -57,7 +55,10 @@ const ProductDetail: React.FC = () => {
   const imageRef = useRef<HTMLDivElement>(null);
   const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
 
-
+  // 从路由状态中获取分类和商品数据
+  const categories = location.state?.categories || [];
+  const categoryProducts = location.state?.categoryProducts || [];
+  
   const { 
     data: product, 
     isLoading: productLoading,
@@ -78,12 +79,6 @@ const ProductDetail: React.FC = () => {
       }
     },
   });
-
-  const { data: categories = [] } = useQuery<CategoryResponse[]>({
-    queryKey: ['categories'],
-    queryFn: () => getCategoryList(),
-  });
-
 
   const parsedAttributes = useMemo(() => {
     try {
@@ -118,9 +113,9 @@ const ProductDetail: React.FC = () => {
       category3: null
     };
 
-    const category1 = categories.find(c => c.id === product.productSpu.category1Id);
-    const category2 = category1?.children?.find(c => c.id === product.productSpu.category2Id);
-    const category3 = category2?.children?.find(c => c.id === product.productSpu.category3Id);
+    const category1 = categories.find((c: { code: string; }) => c.code === product.productSpu.category1Code);
+    const category2 = category1?.children?.find((c: { code: string; }) => c.code === product.productSpu.category2Code);
+    const category3 = category2?.children?.find((c: { code: string; }) => c.code === product.productSpu.category3Code);
 
     return {
       category1,
@@ -142,16 +137,18 @@ const ProductDetail: React.FC = () => {
       }
     ];
 
-    if (Array.isArray(categories) && product.productSpu?.category1Id) {
-      const category1 = categories.find(c => c.id === product.productSpu.category1Id);
-      const category2 = category1?.children?.find(c => c.id === product.productSpu.category2Id);
-      const category3 = category2?.children?.find(c => c.id === product.productSpu.category3Id);
+    if (Array.isArray(categories) && product.productSpu?.category1Code) {
+      const category1 = categories.find((c: { code: string; }) => c.code === product.productSpu.category1Code);
+      const category2 = category1?.children?.find((c: { code: string; }) => c.code === product.productSpu.category2Code);
+      const category3 = category2?.children?.find((c: { code: string; }) => c.code === product.productSpu.category3Code);
 
       if (category1) {
         items.push({
           title: (
-            <span onClick={() => navigate(`/mall?category=${category1.code}&scroll=true`)} 
-              className={styles.breadcrumbLink}>
+            <span 
+              onClick={() => navigate(`/mall?category=${category1.code}&scroll=true`)} 
+              className={styles.breadcrumbLink}
+            >
               {category1.name}
             </span>
           ),
@@ -161,8 +158,10 @@ const ProductDetail: React.FC = () => {
       if (category2) {
         items.push({
           title: (
-            <span onClick={() => navigate(`/mall?category=${category2.code}&scroll=true`)} 
-              className={styles.breadcrumbLink}>
+            <span 
+              onClick={() => navigate(`/mall?category=${category2.code}&scroll=true`)} 
+              className={styles.breadcrumbLink}
+            >
               {category2.name}
             </span>
           ),
@@ -172,8 +171,10 @@ const ProductDetail: React.FC = () => {
       if (category3) {
         items.push({
           title: (
-            <span onClick={() => navigate(`/mall?category=${category3.code}&scroll=true`)} 
-              className={styles.breadcrumbLink}>
+            <span 
+              onClick={() => navigate(`/mall?category=${category3.code}&scroll=true`)} 
+              className={styles.breadcrumbLink}
+            >
               {category3.name}
             </span>
           ),
@@ -195,39 +196,14 @@ const ProductDetail: React.FC = () => {
   }, [relatedProducts]);
 
   useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!product?.productSpu.category1Code) return;
-
-      try {
-        setLoadingRelated(true);
-        const response = await getProductList({
-          page: 1,
-          pageSize: 8,
-          categoryCodes: product.productSpu.category1Code,
-          productName: '',
-        });
-
-        if (response?.categories) {
-          const categoryProducts = response.categories.find(
-            cat => cat.categoryCode === product.productSpu.category1Code
-          );
-          
-          // 添加空值检查
-          const filteredProducts = categoryProducts?.products?.filter(
-            p => p.id !== product.productSpu.id
-          ) || [];
-          
-          setRelatedProducts(filteredProducts);
-        }
-      } catch (error) {
-        console.error('Failed to fetch related products:', error);
-      } finally {
-        setLoadingRelated(false);
-      }
-    };
-
-    fetchRelatedProducts();
-  }, [product?.productSpu.category1Code]);
+    if (product?.productSpu.category1Code && categoryProducts.length > 0) {
+      // 过滤掉当前商品
+      const filteredProducts = categoryProducts.filter(
+        (        p: { id: number; }) => p.id !== product.productSpu.id
+      );
+      setRelatedProducts(filteredProducts);
+    }
+  }, [product?.productSpu.category1Code, categoryProducts]);
 
   useEffect(() => {
     if (product?.productSku?.length) {
@@ -260,10 +236,15 @@ const ProductDetail: React.FC = () => {
         setSelectedSpecs(initialSpecs);
         
         const matchingSku = product.productSku?.find(sku => {
-          const skuIndexs = JSON.parse(sku.indexs || '{}');
-          return Object.entries(initialSpecs).every(([key, value]) => {
+          if (!sku.indexs) return true; // 如果没有 indexs，说明是默认 SKU
+          
+          // 将 indexs 字符串转换为数组
+          const indexArray = sku.indexs.split('_').map(Number);
+          
+          // 按顺序检查每个规格是否匹配
+          return Object.entries(initialSpecs).every(([key, value], index) => {
             const specValues = specAttrs[key];
-            return specValues[skuIndexs[key]] === value;
+            return specValues[indexArray[index]] === value;
           });
         });
         
@@ -276,6 +257,23 @@ const ProductDetail: React.FC = () => {
     }
   }, [product?.productSpuAttrParams?.specAttrs, product?.productSku]);
 
+  // 修改生成 indexs 的工具函数
+  const generateSkuIndexs = (specs: Record<string, string>, specAttrs: Record<string, string[]>): string => {
+    if (Object.keys(specs).length === 0) return '';
+    
+    // 按照键名排序，确保生成的 indexs 顺序一致
+    const sortedKeys = Object.keys(specAttrs).sort();
+    const indexes = sortedKeys.map(key => {
+      const values = specAttrs[key];
+      const selectedValue = specs[key];
+      const index = values.indexOf(selectedValue);
+      return index === -1 ? 0 : index; // 如果找不到对应的值，默认使用 0
+    });
+    
+    return indexes.join('_');
+  };
+
+  // 修改规格切换处理函数
   const handleSpecChange = useCallback((specKey: string, specValue: string) => {
     if (!product?.productSku || !product.productSpuAttrParams?.specAttrs) return;
     
@@ -287,16 +285,19 @@ const ProductDetail: React.FC = () => {
       };
       setSelectedSpecs(newSelectedSpecs);
       
+      // 生成新选择的规格组合的 indexs
+      const newIndexs = generateSkuIndexs(newSelectedSpecs, specAttrs);
+      
+      // 通过 indexs 快速匹配 SKU
       const matchingSku = product.productSku.find(sku => {
-        const skuIndexs = JSON.parse(sku.indexs || '{}');
-        return Object.entries(newSelectedSpecs).every(([key, value]) => {
-          const specValues = specAttrs[key];
-          return specValues[skuIndexs[key]] === value;
-        });
+        // 处理空字符串的情况
+        if (!sku.indexs && newIndexs === '') return true;
+        return sku.indexs === newIndexs;
       });
       
       if (matchingSku) {
         setSelectedSku(matchingSku);
+        // 如果当前数量超过新 SKU 的库存，调整数量
         if (quantity > matchingSku.stock) {
           setQuantity(matchingSku.stock);
         }
@@ -305,6 +306,50 @@ const ProductDetail: React.FC = () => {
       console.error('规格切换失败:', error);
     }
   }, [product?.productSku, product?.productSpuAttrParams?.specAttrs, selectedSpecs, quantity]);
+  
+
+  // 修改初始 SKU 选择逻辑
+  useEffect(() => {
+    if (product?.productSpuAttrParams?.specAttrs && product.productSku?.length) {
+      try {
+        const specAttrs = JSON.parse(product.productSpuAttrParams.specAttrs);
+        
+        // 初始化选择第一个可用的 SKU 的规格组合
+        const firstAvailableSku = product.productSku.find(sku => sku.stock > 0) || product.productSku[0];
+        
+        if (firstAvailableSku) {
+          // 处理空字符串的情况
+          if (!firstAvailableSku.indexs) {
+            // 如果没有 indexs，使用第一个规格值
+            const initialSpecs: Record<string, string> = {};
+            Object.keys(specAttrs).forEach(key => {
+              const values = specAttrs[key];
+              if (Array.isArray(values) && values.length > 0) {
+                initialSpecs[key] = values[0];
+              }
+            });
+            setSelectedSpecs(initialSpecs);
+          } else {
+            // 从 indexs 还原规格选择
+            const indexes = firstAvailableSku.indexs.split('_').map(Number);
+            const initialSpecs: Record<string, string> = {};
+            
+            Object.keys(specAttrs).forEach((key, i) => {
+              const values = specAttrs[key];
+              if (Array.isArray(values) && typeof indexes[i] === 'number') {
+                initialSpecs[key] = values[indexes[i]] || values[0];
+              }
+            });
+            
+            setSelectedSpecs(initialSpecs);
+          }
+          setSelectedSku(firstAvailableSku);
+        }
+      } catch (error) {
+        console.error('初始化规格选择失败:', error);
+      }
+    }
+  }, [product?.productSpuAttrParams?.specAttrs, product?.productSku]);
 
   const handleCategoryClick = useCallback((categoryCode: string) => {
     if (!categoryCode) return;
@@ -315,8 +360,16 @@ const ProductDetail: React.FC = () => {
     setCurrentImage(0);
     setSelectedSku(null);
     setActiveTab('detail');
-    navigate(`/mall/product/${productId}`, { replace: true });
-  }, [navigate]);
+    
+    // 在导航时传递categories数据
+    navigate(`/mall/product/${productId}`, { 
+      replace: true,
+      state: {
+        categories: categories, // 传递当前页面的categories数据
+        categoryProducts: categoryProducts // 保持当前的categoryProducts数据
+      }
+    });
+  }, [navigate, categories, categoryProducts]);
 
   useEffect(() => {
     if (!id) {
@@ -394,6 +447,7 @@ const ProductDetail: React.FC = () => {
     );
   };
 
+  // 修改规格渲染函数
   const renderSaleAttributes = () => {
     const { specAttrs } = parsedAttributes;
     if (!specAttrs || Object.keys(specAttrs).length === 0) return null;
@@ -406,19 +460,28 @@ const ProductDetail: React.FC = () => {
             <div key={key} className={styles.specGroup}>
               <span className={styles.specLabel}>{key}：</span>
               <div className={styles.specOptions}>
-                {values.map((value, index) => (
-                  value && (
+                {values.map((value, index) => {
+                  if (!value) return null;
+                  
+                  // 检查该规格值是否有对应的可用 SKU
+                  const tempSpecs = { ...selectedSpecs, [key]: value };
+                  const tempIndexs = generateSkuIndexs(tempSpecs, specAttrs);
+                  const matchingSku = product?.productSku?.find(sku => sku.indexs === tempIndexs);
+                  const isOutOfStock = matchingSku && matchingSku.stock <= 0;
+                  
+                  return (
                     <Tag
                       key={value}
-                      className={`${styles.specOption} ${
-                        selectedSpecs[key] === value ? styles.selected : ''
-                      }`}
-                      onClick={() => handleSpecChange(key, value)}
+                      className={`${styles.specOption} 
+                        ${selectedSpecs[key] === value ? styles.selected : ''} 
+                        ${isOutOfStock ? styles.disabled : ''}`}
+                      onClick={() => !isOutOfStock && handleSpecChange(key, value)}
                     >
                       {value}
+                      {isOutOfStock && <span className={styles.outOfStock}>已售罄</span>}
                     </Tag>
-                  )
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
@@ -519,6 +582,7 @@ const ProductDetail: React.FC = () => {
     setCurrentImage(0);
   }, [selectedSku]);
 
+  // 修改价格显示组件，优化价格和库存信息的展示
   const renderPrice = () => (
     <div className={styles.priceBlock}>
       <div className={styles.priceRow}>
@@ -526,25 +590,24 @@ const ProductDetail: React.FC = () => {
         {selectedSku ? (
           <span className={styles.price}>
             <span className={styles.symbol}>¥</span>
-            {selectedSku.price}
+            {selectedSku.price.toFixed(2)}
           </span>
         ) : (
           <span className={styles.price}>
             <span className={styles.symbol}>¥</span>
-            {product?.productSpu.realPrice}
+            {product?.productSpu.realPrice.toFixed(2)}
           </span>
         )}
         {selectedSku && product?.productSpu.price && selectedSku.price !== product.productSpu.price && (
           <span className={styles.originalPrice}>
-            ¥{product.productSpu.price}
+            ¥{product.productSpu.price.toFixed(2)}
           </span>
         )}
-        <span className={styles.stockInfo}>
-          库存: {selectedSku?.stock ?? '-'}
-        </span>
-        <span className={styles.salesInfo}>
-          已售: {selectedSku?.saleCount ?? '-'}
-        </span>
+        <div className={styles.stockInfo}>
+          <span>库存: {selectedSku?.stock ?? '-'}</span>
+          <span className={styles.divider}>|</span>
+          <span>已售: {selectedSku?.saleCount ?? '-'}</span>
+        </div>
       </div>
     </div>
   );
@@ -867,6 +930,12 @@ const ProductDetail: React.FC = () => {
     navigate(`/mall/exchange/${id}`);
   };
 
+  // 修改推荐商品区域的标题显示
+  const renderRecommendTitle = () => {
+    const category1 = categories.find((c: { code: string | undefined; }) => c.code === product?.productSpu.category1Code);
+    return category1 ? `${category1.name}` : '同类商品推荐';
+  };
+
   const renderContent = () => {
     if (!id || productLoading) {
       return <Spin size="large" className={styles.loading} />;
@@ -910,7 +979,7 @@ const ProductDetail: React.FC = () => {
           title={
             <div className={styles.recommendTitle}>
               <div className={styles.titleLeft}>
-                <span className={styles.mainTitle}>同类商品推荐</span>
+                <span className={styles.mainTitle}>{renderRecommendTitle()}</span>
                 <span className={styles.subTitle}>
                   共 {categoryProductsCount} 件商品
                 </span>

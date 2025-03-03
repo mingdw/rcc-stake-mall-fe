@@ -53,20 +53,94 @@ const MallIndex: React.FC = () => {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cachedCategories, setCachedCategories] = useState<CategoryResponse[]>([]);
+  const [cachedProducts, setCachedProducts] = useState<{ [key: string]: Product[] }>({});
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeKey, setActiveKey] = useState<string>('all'); // 添加选中状态
+  const [sortType, setSortType] = useState<string>('default');
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
+
+  // 修改初始化加载逻辑
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchInitialData = async () => {
       try {
-        const data = await getCategoryList();
-        setCategories(Array.isArray(data) ? data : []);
+        setLoading(true);
+        
+        // 并行获取分类和商品数据
+        const [categoryData, productData] = await Promise.all([
+          getCategoryList(),
+          getProductList({
+            categoryCodes: '',
+            productName: '',
+            page: 1,
+            pageSize: 999 // 获取所有商品
+          })
+        ]);
+
+        // 处理分类数据
+        const categoriesArray = Array.isArray(categoryData) ? categoryData : [];
+        setCategories(categoriesArray);
+        setCachedCategories(categoriesArray);
+
+        // 处理商品数据
+        if (productData?.categories) {
+          const allProducts = productData.categories
+            .filter(cat => cat.products !== null)
+            .flatMap(cat => cat.products || []);
+
+          // 按一级分类组织商品数据
+          const productsByCategory = allProducts.reduce((acc, product) => {
+            const category1Code = product.category1Code || '';
+            if (!acc[category1Code]) {
+              acc[category1Code] = [];
+            }
+            acc[category1Code].push(product);
+            return acc;
+          }, {} as { [key: string]: Product[] });
+
+          setProducts(allProducts);
+          setTotal(productData.total || 0);
+          setCachedProducts({
+            '': allProducts, // 所有商品
+            ...productsByCategory // 按一级分类缓存的商品
+          });
+        }
       } catch (err) {
-        console.error('Failed to fetch categories:', err);
-        setCategories([]); // 错误时设置为空数组
+        console.error('Failed to fetch initial data:', err);
+        message.error('获取数据失败');
+      } finally {
+        setLoading(false);
       }
     };
-  
-    fetchCategories();
-  }, []);
+
+    fetchInitialData();
+  }, []); // 只在组件挂载时执行一次
+
+  // 修改商品点击处理函数
+  const handleProductClick = useCallback((product: Product) => {
+    // 获取当前商品所属的一级分类商品列表
+    const categoryProducts = cachedProducts[product.category1Code] || [];
+    
+    navigate(`/mall/product/${product.id}`, {
+      state: {
+        categories: cachedCategories,
+        categoryProducts: categoryProducts,
+        currentProduct: product
+      }
+    });
+  }, [navigate, cachedCategories, cachedProducts]);
+
+  // 修改 ProductCard 组件的使用
+  const renderProductCard = (product: Product) => (
+    <ProductCard 
+      key={product.id}
+      product={product}
+      showExchangeButton={true}
+      onClick={() => handleProductClick(product)}
+    />
+  );
 
   // 简化获取商品数据的函数
   const fetchProducts = useCallback(async (params: Partial<ProductListRequest> = {}) => {
@@ -153,11 +227,6 @@ useEffect(() => {
     [category.code]: React.createRef<HTMLDivElement>()
   }), {});
 }, [categories]);
-  const [activeKey, setActiveKey] = useState<string>('all'); // 添加选中状态
-  const [sortType, setSortType] = useState<string>('default');
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
   // 添加滚动到分类的处理函数
   const scrollToCategory = useCallback((categoryCode: string) => {
@@ -622,10 +691,7 @@ useEffect(() => {
                     .slice(0, 4)
                     .map(product => (
                       <Col span={6} key={product.id}>
-                        <ProductCard 
-                          product={product}
-                          showExchangeButton={true}
-                        />
+                        {renderProductCard(product)}
                       </Col>
                     ))}
                 </Row>
@@ -663,10 +729,7 @@ useEffect(() => {
           <Row gutter={[16, 16]}>
             {products.slice(0, PAGE_SIZE).map(product => (
               <Col span={6} key={product.id}>
-                <ProductCard 
-                  product={product}
-                  showExchangeButton={true}
-                />
+                {renderProductCard(product)}
               </Col>
             ))}
           </Row>
