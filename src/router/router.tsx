@@ -19,6 +19,8 @@ import PrivateRoute from "../components/PrivateRoute";
 import Mall from "../view/mall/MallIndex";
 import Budding from "../view/budding";
 import ProductDetail from "../view/mall/ProductDetail";
+import OrderConfirm from "../view/mall/OrderConfirm";
+import OrderSuccess from "../view/mall/OrderSuccess";
 
 
 
@@ -55,20 +57,26 @@ const router = createBrowserRouter([
                 path: '/mall',
                 element: (
                         <Mall/>
-                ),
-                children:[
-                    {
-                        path: 'mall/budding',
-                        element: <Budding/>
-                    }
-                    
-                ]
+                )
+               
+            },
+            {
+                path: '/mall/budding',
+                element: <Budding/>
             },
             {
                 path: '/mall/product/:id',
                 element: (
-                        <ProductDetail/>
-                )
+                    <ProductDetail/>
+                )      
+            },
+            {
+                path: '/mall/order/confirm/:id',
+                element: <OrderConfirm/>
+            },
+            {
+                path: '/mall/order/success',
+                element: <OrderSuccess/>
             },
             {
                 path: '/about',

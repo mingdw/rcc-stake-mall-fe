@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Tag, Tooltip, Button } from 'antd';
+import { Card, Tag, Tooltip, Button, Image } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCartOutlined, FireOutlined } from '@ant-design/icons';
 import styles from './ProductCard.module.scss';
@@ -17,6 +17,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onClick
 }) => {
   const navigate = useNavigate();
+
+  // 添加默认图片
+  const defaultImage = '../../../public/vite.svg'; // 替换为你的默认图片路径
+
 
   // 处理基础属性值，最多显示4个
   const renderBasicAttrValues = () => {
@@ -79,11 +83,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
       onClick={handleClick}
       cover={
         <div className={styles.imageWrapper}>
-          <img 
-            alt={product.name} 
-            src={product.images[0]} 
+          <Image
+            src={product.images?.[0]}
+            alt={product.name}
+            fallback={defaultImage}
+            preview={false}
+            className={styles.productImage}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = '../../../public/vite.svg';
+              console.error('Image load failed:', e);
             }}
           />
           {product.totalSales > 100 && (

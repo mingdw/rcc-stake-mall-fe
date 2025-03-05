@@ -39,6 +39,15 @@ import styles from './ProductDetail.module.scss';
 import type { TabsProps } from 'antd';
 import ProductCard from '../../components/ProductCard';
 
+interface NestedAttrs {
+  [key: string]: string | string[] | number | boolean | NestedAttrs;
+}
+
+interface ParsedAttr {
+  key: string;
+  value: string;
+}
+
 const ProductDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -54,6 +63,13 @@ const ProductDetail: React.FC = () => {
   const [loadingRelated, setLoadingRelated] = useState(false);
   const imageRef = useRef<HTMLDivElement>(null);
   const [selectedSpecs, setSelectedSpecs] = useState<Record<string, string>>({});
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  // 为每个 tab 创建独立的 ref
+  const detailTabRef = useRef<HTMLDivElement>(null);
+  const specsTabRef = useRef<HTMLDivElement>(null);
+  const serviceTabRef = useRef<HTMLDivElement>(null);
+  const reviewsTabRef = useRef<HTMLDivElement>(null);
 
   // 从路由状态中获取分类和商品数据
   const categories = location.state?.categories || [];
@@ -207,11 +223,34 @@ const ProductDetail: React.FC = () => {
 
   useEffect(() => {
     if (product?.productSku?.length) {
-      // 获取销量最高的SKU
-      const bestSellingSku = product.productSku.reduce((prev, current) => 
-        (prev.saleCount > current.saleCount) ? prev : current
-      );
-      setSelectedSku(bestSellingSku);
+      try {
+        // 找出销量最高的 SKU
+        const defaultSku = product.productSku.reduce((prev, current) => {
+          return (prev.saleCount || 0) > (current.saleCount || 0) ? prev : current;
+        });
+
+        if (defaultSku) {
+          setSelectedSku(defaultSku);
+          
+          // 如果有规格属性，根据 indexs 设置选中状态
+          if (product.productSpuAttrParams?.specAttrs && defaultSku.indexs) {
+            const specAttrs = JSON.parse(product.productSpuAttrParams.specAttrs);
+            const indexes = defaultSku.indexs.split('_').map(Number);
+            const initialSpecs: Record<string, string> = {};
+            
+            Object.keys(specAttrs).forEach((key, i) => {
+              const values = specAttrs[key];
+              if (Array.isArray(values) && typeof indexes[i] === 'number') {
+                initialSpecs[key] = values[indexes[i]];
+              }
+            });
+            
+            setSelectedSpecs(initialSpecs);
+          }
+        }
+      } catch (error) {
+        console.error('初始化规格选择失败:', error);
+      }
     }
   }, [product]);
 
@@ -463,17 +502,20 @@ const ProductDetail: React.FC = () => {
                 {values.map((value, index) => {
                   if (!value) return null;
                   
-                  // 检查该规格值是否有对应的可用 SKU
+                  // 生成当前规格组合的 indexs
                   const tempSpecs = { ...selectedSpecs, [key]: value };
                   const tempIndexs = generateSkuIndexs(tempSpecs, specAttrs);
-                  const matchingSku = product?.productSku?.find(sku => sku.indexs === tempIndexs);
+                  
+                  // 检查是否有对应的 SKU 且有库存
+                  const matchingSku = product?.productSku.find(sku => sku.indexs === tempIndexs);
                   const isOutOfStock = matchingSku && matchingSku.stock <= 0;
+                  const isSelected = selectedSpecs[key] === value;
                   
                   return (
                     <Tag
                       key={value}
                       className={`${styles.specOption} 
-                        ${selectedSpecs[key] === value ? styles.selected : ''} 
+                        ${isSelected ? styles.selected : ''} 
                         ${isOutOfStock ? styles.disabled : ''}`}
                       onClick={() => !isOutOfStock && handleSpecChange(key, value)}
                     >
@@ -490,83 +532,125 @@ const ProductDetail: React.FC = () => {
     );
   };
 
-  const renderSpecsTab = () => {
-    const { basicAttrs, specAttrs } = parsedAttributes;
-
-    return (
-      <div className={styles.specsContent}>
-        <div className={styles.specSection}>
-          <h3>基础参数</h3>
-          <table className={styles.specTable}>
-            <tbody>
-              {Object.entries(basicAttrs).map(([key, value]) => (
-                <tr key={key}>
-                  <td className={styles.specLabel}>{key}</td>
-                  <td>{value as string}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className={styles.specSection}>
-          <h3>规格参数</h3>
-          <table className={styles.specTable}>
-            <tbody>
-              {Object.entries(specAttrs).map(([key, values]) => (
-                <tr key={key}>
-                  <td className={styles.specLabel}>{key}</td>
-                  <td>{Array.isArray(values) ? values.join('、') : values as string}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+  const renderNestedAttrs = (
+    attrs: NestedAttrs,
+    prefix = ''
+  ): ParsedAttr[] => {
+    if (!attrs || typeof attrs !== 'object') return [];
+    
+    return Object.entries(attrs).flatMap(([key, value]): ParsedAttr[] => {
+      // 如果值是对象且不是数组，递归处理
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return renderNestedAttrs(value as NestedAttrs, prefix ? `${prefix}-${key}` : key);
+      }
+      
+      // 处理各种可能的值类型
+      let displayValue: string;
+      if (Array.isArray(value)) {
+        displayValue = value.join('、');
+      } else if (value === null || value === undefined) {
+        displayValue = '';
+      } else {
+        displayValue = String(value);
+      }
+      
+      return [{
+        key: prefix ? `${prefix}-${key}` : key,
+        value: displayValue
+      }];
+    });
   };
 
-  const renderDetailAttributes = () => {
-    try {
-      if (!product?.productSpuAttrParams?.basicAttrs) return null;
-      const basicAttrs = JSON.parse(product.productSpuAttrParams.basicAttrs);
-      
-      return (
-        <div className={styles.detailAttributes}>
-          <div className={styles.attributeHeader}>
-            <h3>基本参数</h3>
+  const renderSpecsTab = () => (
+    <div className={styles.specsContent}>
+      {/* 规格参数 */}
+      <div className={styles.specSection}>
+        <h3 className={styles.sectionTitle}>规格参数</h3>
+        <table className={styles.specTable}>
+          <tbody>
+            {/* 基础属性 */}
+            {renderNestedAttrs(parsedAttributes.basicAttrs).map(({ key, value }: { key: string; value: string }) => (
+              <tr key={`basic-${key}`}>
+                <td className={styles.specLabel}>{key}</td>
+                <td>{value}</td>
+              </tr>
+            ))}
+            
+            {/* 销售属性 */}
+            {renderNestedAttrs(parsedAttributes.saleAttrs).map(({ key, value }: { key: string; value: string }) => (
+              <tr key={`sale-${key}`}>
+                <td className={styles.specLabel}>{key}</td>
+                <td>{value}</td>
+              </tr>
+            ))}
+            
+            {/* 当前选中 SKU 的规格 */}
+            {selectedSku && Object.entries(selectedSpecs).map(([key, value]) => (
+              <tr key={`spec-${key}`}>
+                <td className={styles.specLabel}>{key}</td>
+                <td>{value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 包装清单 */}
+      <div className={styles.packingSection}>
+        <h3 className={styles.sectionTitle}>包装清单</h3>
+        {product?.productSpuDetail?.packingList ? (
+          <div 
+            className={styles.packingContent}
+            dangerouslySetInnerHTML={{ __html: product.productSpuDetail.packingList }}
+          />
+        ) : (
+          <Empty 
+            className={styles.emptyPacking}
+            description="暂无包装清单信息" 
+          />
+        )}
+      </div>
+    </div>
+  );
+
+  const renderDetailTab = () => (
+    <div className={styles.detailContent}>
+      {/* 基本属性展示 */}
+      {product?.productSpuAttrParams?.basicAttrs && (
+        <div className={styles.basicAttributesWrapper}>
+          <div className={styles.basicAttributes}>
+            {Object.entries(JSON.parse(product.productSpuAttrParams.basicAttrs))
+              .filter(([_, value]) => value) // 过滤掉空值
+              .map(([key, value], index) => (
+                <div key={index} className={styles.attributeItem}>
+                  <span className={styles.attrKey}>{key}：</span>
+                  <span className={styles.attrValue}>{value as string}</span>
+                </div>
+              ))}
+          </div>
+          <div className={styles.viewMoreWrapper}>
             <span 
-              className={styles.moreLink}
+              className={styles.viewMore}
               onClick={() => setActiveTab('specs')}
             >
               查看更多参数 <RightOutlined />
             </span>
           </div>
-          <div className={styles.attributeList}>
-            {Object.entries(basicAttrs).map(([key, value], index) => (
-              <div key={index} className={styles.attributeItem}>
-                <span className={styles.attrKey}>{key}</span>
-                <span className={styles.attrValue}>{value as string}</span>
-              </div>
-            ))}
-          </div>
         </div>
-      );
-    } catch (error) {
-      console.error('解析基础属性失败:', error);
-      return null;
-    }
-  };
+      )}
 
-  const renderDetailTab = () => (
-    <div className={styles.detailContent}>
-      {renderDetailAttributes()}
-
-      <div className={styles.detailContent}>
-        {product?.productSpuDetail.detail && (
-          <div dangerouslySetInnerHTML={{ __html: product.productSpuDetail.detail }} />
-        )}
-      </div>
+      {/* 商品详情展示 */}
+      {product?.productSpuDetail?.detail ? (
+        <div 
+          className={styles.detailHtml}
+          dangerouslySetInnerHTML={{ __html: product.productSpuDetail.detail }} 
+        />
+      ) : (
+        <Empty 
+          className={styles.emptyDetail}
+          description="暂无商品详情" 
+        />
+      )}
     </div>
   );
 
@@ -582,31 +666,39 @@ const ProductDetail: React.FC = () => {
     setCurrentImage(0);
   }, [selectedSku]);
 
-  // 修改价格显示组件，优化价格和库存信息的展示
+  // 修改价格展示组件
   const renderPrice = () => (
     <div className={styles.priceBlock}>
       <div className={styles.priceRow}>
         <span className={styles.priceLabel}>价格</span>
-        {selectedSku ? (
-          <span className={styles.price}>
-            <span className={styles.symbol}>¥</span>
-            {selectedSku.price.toFixed(2)}
-          </span>
-        ) : (
-          <span className={styles.price}>
-            <span className={styles.symbol}>¥</span>
-            {product?.productSpu.realPrice.toFixed(2)}
-          </span>
-        )}
-        {selectedSku && product?.productSpu.price && selectedSku.price !== product.productSpu.price && (
-          <span className={styles.originalPrice}>
-            ¥{product.productSpu.price.toFixed(2)}
-          </span>
-        )}
+        <div className={styles.priceWrapper}>
+          {product?.productSku?.length ? (
+            // 有 SKU 时显示选中 SKU 的价格
+            <span className={styles.price}>
+              <span className={styles.symbol}>¥</span>
+              {selectedSku?.price.toFixed(2) || product.productSpu.realPrice.toFixed(2)}
+            </span>
+          ) : (
+            // 无 SKU 时显示 SPU 价格
+            <span className={styles.price}>
+              <span className={styles.symbol}>¥</span>
+              {product?.productSpu.realPrice.toFixed(2)}
+            </span>
+          )}
+          {selectedSku && product?.productSpu.price && selectedSku.price !== product.productSpu.price && (
+            <span className={styles.originalPrice}>
+              ¥{product.productSpu.price.toFixed(2)}
+            </span>
+          )}
+        </div>
         <div className={styles.stockInfo}>
-          <span>库存: {selectedSku?.stock ?? '-'}</span>
+          <span className={styles.infoItem}>
+            库存: {product?.productSku?.length ? (selectedSku?.stock ?? '-') : (product?.productSpu.totalStock ?? '-')}
+          </span>
           <span className={styles.divider}>|</span>
-          <span>已售: {selectedSku?.saleCount ?? '-'}</span>
+          <span className={styles.infoItem}>
+            月销: {product?.productSku?.length ? (selectedSku?.saleCount ?? '-') : (product?.productSpu.totalSales ?? '-')}
+          </span>
         </div>
       </div>
     </div>
@@ -751,14 +843,19 @@ const ProductDetail: React.FC = () => {
             <span className={styles.quantityLabel}>数量</span>
             <InputNumber
               min={1}
-              max={selectedSku?.stock || 0}
+              max={product?.productSku?.length ? (selectedSku?.stock || 0) : (product?.productSpu?.totalStock || 0)}
               value={quantity}
               onChange={(value) => {
                 const newValue = value || 1;
-                setQuantity(Math.min(newValue, selectedSku?.stock || 0));
+                const maxStock = product?.productSku?.length ? 
+                  (selectedSku?.stock || 0) : 
+                  (product?.productSpu.totalStock || 0);
+                setQuantity(Math.min(newValue, maxStock));
               }}
               className={styles.quantityInput}
-              disabled={!selectedSku || selectedSku.stock <= 0}
+              disabled={product?.productSku?.length ? 
+                (!selectedSku || selectedSku.stock <= 0) : 
+                (!product?.productSpu?.totalStock || product.productSpu.totalStock <= 0)}
             />
           </div>
         </div>
@@ -770,11 +867,17 @@ const ProductDetail: React.FC = () => {
             size="middle"
             icon={<ShoppingCartOutlined />}
             onClick={handleBuyNow}
-            disabled={!selectedSku || selectedSku.stock <= 0}
+            disabled={product?.productSku?.length ? 
+              (!selectedSku || selectedSku.stock <= 0) : 
+              (!product?.productSpu?.totalStock || product.productSpu.totalStock <= 0)}
             className={styles.exchangeButton}
           >
-            {!selectedSku ? '请选择规格' : 
-             selectedSku.stock <= 0 ? '已售罄' : '立即兑换'}
+            {product?.productSku?.length ? (
+              !selectedSku ? '请选择规格' : 
+              selectedSku.stock <= 0 ? '已售罄' : '立即兑换'
+            ) : (
+              (!product?.productSpu?.totalStock || product.productSpu.totalStock <= 0) ? '已售罄' : '立即兑换'
+            )}
           </Button>
 
           <Button
@@ -801,37 +904,47 @@ const ProductDetail: React.FC = () => {
     {
       key: 'detail',
       label: '商品详情',
-      children: renderDetailTab()
+      children: (
+        <div ref={detailTabRef} className={styles.tabContent}>
+          {renderDetailTab()}
+        </div>
+      )
     },
     {
       key: 'specs',
       label: '规格与包装',
-      children: renderSpecsTab()
+      children: (
+        <div ref={specsTabRef} className={styles.tabContent}>
+          {renderSpecsTab()}
+        </div>
+      )
     },
     {
       key: 'service',
       label: '售后保障',
       children: (
-        <div className={styles.serviceContent}>
-          <div className={styles.serviceItem}>
-            <h4><SafetyOutlined /> 厂家服务</h4>
-            <p>本产品全国联保，享受三包服务</p>
-          </div>
-          
-          <div className={styles.serviceItem}>
-            <h4><CheckCircleOutlined /> 正品保证</h4>
-            <p>商城向您保证所售商品均为正品行货</p>
-          </div>
-          
-          <div className={styles.guaranteeInfo}>
-            <h4>权益保障</h4>
-            <ul>
-              <li>商品自签收后7天内可申请无理由退换货</li>
-              <li>在线支付购买商品，支持7天无理由退换货</li>
-            </ul>
+        <div ref={serviceTabRef} className={styles.tabContent}>
+          <div className={styles.serviceContent}>
+            <div className={styles.serviceItem}>
+              <h4><SafetyOutlined /> 厂家服务</h4>
+              <p>本产品全国联保，享受三包服务</p>
+            </div>
+            
+            <div className={styles.serviceItem}>
+              <h4><CheckCircleOutlined /> 正品保证</h4>
+              <p>商城向您保证所售商品均为正品行货</p>
+            </div>
+            
+            <div className={styles.guaranteeInfo}>
+              <h4>权益保障</h4>
+              <ul>
+                <li>商品自签收后7天内可申请无理由退换货</li>
+                <li>在线支付购买商品，支持7天无理由退换货</li>
+              </ul>
+            </div>
           </div>
         </div>
-      ),
+      )
     },
     {
       key: 'reviews',
@@ -842,71 +955,73 @@ const ProductDetail: React.FC = () => {
         </span>
       ),
       children: (
-        <div className={styles.reviewsContent}>
-          <div className={styles.reviewsSummary}>
-            <div className={styles.overallRating}>
-              <div className={styles.ratingScore}>
-                {(() => {
-                  const reviews = product?.reviews || mockReviews;
-                  if (!reviews.length) return "5.0";
-                  return (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
-                })()}
-              </div>
-              <div className={styles.ratingStars}>
-                <Rate 
-                  disabled 
-                  defaultValue={Number((product?.reviews || mockReviews)
-                    .reduce((acc, review) => acc + review.rating, 0) / 
-                    (product?.reviews?.length || mockReviews.length) || 5)} 
-                  allowHalf 
-                />
-                <div className={styles.ratingCount}>
-                  共 <span>{product?.reviews?.length || mockReviews.length}</span> 条评价
+        <div ref={reviewsTabRef} className={styles.tabContent}>
+          <div className={styles.reviewsContent}>
+            <div className={styles.reviewsSummary}>
+              <div className={styles.overallRating}>
+                <div className={styles.ratingScore}>
+                  {(() => {
+                    const reviews = product?.reviews || mockReviews;
+                    if (!reviews.length) return "5.0";
+                    return (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
+                  })()}
+                </div>
+                <div className={styles.ratingStars}>
+                  <Rate 
+                    disabled 
+                    defaultValue={Number((product?.reviews || mockReviews)
+                      .reduce((acc, review) => acc + review.rating, 0) / 
+                      (product?.reviews?.length || mockReviews.length) || 5)} 
+                    allowHalf 
+                  />
+                  <div className={styles.ratingCount}>
+                    共 <span>{product?.reviews?.length || mockReviews.length}</span> 条评价
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <List
-            className={styles.reviewsList}
-            itemLayout="vertical"
-            dataSource={product?.reviews || mockReviews}
-            renderItem={(review) => (
-              <List.Item className={styles.reviewItem}>
-                <div className={styles.reviewHeader}>
-                  <div className={styles.userInfo}>
-                    <Avatar src={review.user.avatar} size={40} />
-                    <div className={styles.userMeta}>
-                      <span className={styles.userName}>
-                        {formatEthAddress(review.user.address)}
-                      </span>
-                      <Rate disabled defaultValue={review.rating} />
+            <List
+              className={styles.reviewsList}
+              itemLayout="vertical"
+              dataSource={product?.reviews || mockReviews}
+              renderItem={(review) => (
+                <List.Item className={styles.reviewItem}>
+                  <div className={styles.reviewHeader}>
+                    <div className={styles.userInfo}>
+                      <Avatar src={review.user.avatar} size={40} />
+                      <div className={styles.userMeta}>
+                        <span className={styles.userName}>
+                          {formatEthAddress(review.user.address)}
+                        </span>
+                        <Rate disabled defaultValue={review.rating} />
+                      </div>
                     </div>
+                    <div className={styles.reviewDate}>{review.date}</div>
                   </div>
-                  <div className={styles.reviewDate}>{review.date}</div>
-                </div>
-                <div className={styles.reviewSpecs}>{review.specs}</div>
-                <div className={styles.reviewContent}>{review.content}</div>
-                {review.images.length > 0 && (
-                  <div className={styles.reviewImages}>
-                    <Image.PreviewGroup>
-                      {review.images.map((image, index) => (
-                        <Image
-                          key={index}
-                          src={image}
-                          width={100}
-                          height={100}
-                          className={styles.reviewImage}
-                        />
-                      ))}
-                    </Image.PreviewGroup>
-                  </div>
-                )}
-              </List.Item>
-            )}
-          />
+                  <div className={styles.reviewSpecs}>{review.specs}</div>
+                  <div className={styles.reviewContent}>{review.content}</div>
+                  {review.images.length > 0 && (
+                    <div className={styles.reviewImages}>
+                      <Image.PreviewGroup>
+                        {review.images.map((image, index) => (
+                          <Image
+                            key={index}
+                            src={image}
+                            width={100}
+                            height={100}
+                            className={styles.reviewImage}
+                          />
+                        ))}
+                      </Image.PreviewGroup>
+                    </div>
+                  )}
+                </List.Item>
+              )}
+            />
+          </div>
         </div>
-      ),
+      )
     },
   ];
 
@@ -919,15 +1034,34 @@ const ProductDetail: React.FC = () => {
       message.error('商品ID不能为空');
       return;
     }
-    if (!selectedSku) {
-      message.warning('请选择商品规格');
-      return;
+
+    // 判断是否有 SKU
+    if (product?.productSku?.length) {
+      // 有 SKU 时的逻辑
+      if (!selectedSku) {
+        message.warning('请选择商品规格');
+        return;
+      }
+      if (selectedSku.stock <= 0) {
+        message.warning('该规格商品已售罄');
+        return;
+      }
+    } else {
+      // 无 SKU 时直接判断 SPU 库存
+      if (!product?.productSpu?.totalStock || product.productSpu.totalStock <= 0) {
+        message.warning('商品已售罄');
+        return;
+      }
     }
-    if (selectedSku.stock <= 0) {
-      message.warning('该规格商品已售罄');
-      return;
-    }
-    navigate(`/mall/exchange/${id}`);
+    
+    // 更新跳转路径
+    navigate(`/mall/order/confirm/${id}`, {
+      state: {
+        quantity: quantity,
+        selectedSku: selectedSku,
+        product: product
+      }
+    });
   };
 
   // 修改推荐商品区域的标题显示
@@ -971,7 +1105,8 @@ const ProductDetail: React.FC = () => {
           <Tabs 
             activeKey={activeTab}
             onChange={setActiveTab}
-            items={tabItems} 
+            items={tabItems}
+            destroyInactiveTabPane
           />
         </Card>
 

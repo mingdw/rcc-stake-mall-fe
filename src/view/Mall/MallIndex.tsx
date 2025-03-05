@@ -12,7 +12,7 @@ import { Header } from 'antd/es/layout/layout';
 
 import { AttrGroup, CategoryProduct, CategoryResponse, getCategoryList, getProductList, Product, ProductListRequest, Attr } from "../../api/apiService";
 
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Key } from 'antd/es/table/interface';
 import { message } from 'antd';
 import ProductCard from '../../components/ProductCard';
@@ -958,6 +958,7 @@ useEffect(() => {
         )}
       </div>
     </Layout>
+   
   )
 };
 

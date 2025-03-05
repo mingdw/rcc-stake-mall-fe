@@ -304,6 +304,25 @@ export const getProductDetail = async (params: ProductDetailRequest): Promise<Pr
   }
 };
 
+// 提交订单
+export const submitOrder = async (orderData: any) => {
+  try {
+    // 这里应该是实际的API调用
+    // 目前使用模拟数据
+    return {
+      success: true,
+      orderId: 'ORD' + Date.now(),
+      message: '订单提交成功'
+    };
+  } catch (error) {
+    console.error('提交订单失败:', error);
+    return {
+      success: false,
+      message: '订单提交失败，请重试'
+    };
+  }
+};
+
 // 导出接口类型
 export type {
   Attr,

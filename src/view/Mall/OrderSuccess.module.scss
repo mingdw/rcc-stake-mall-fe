@@ -1,0 +1,33 @@
+.successContainer {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.successIcon {
+  color: #52c41a;
+  font-size: 72px;
+}
+
+.orderInfoCard {
+  margin-top: 30px;
+  border-radius: 8px;
+}
+
+.orderDetail {
+  padding: 10px 0;
+}
+
+.detailItem {
+  display: flex;
+  margin-bottom: 15px;
+  
+  strong {
+    min-width: 100px;
+  }
+}
+
+.notice {
+  text-align: center;
+  margin-top: 20px;
+} 
