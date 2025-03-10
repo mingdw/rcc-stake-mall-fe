@@ -44,6 +44,24 @@ const PAGE_SIZE = 8; // 每页8个商品
 const ITEMS_PER_ROW = 4; // 每行4个商品
 const MAX_ITEMS_PER_CATEGORY = 8; // 每个分类最多显示8个商品（2行）
 
+// 防抖函数
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null;
+  
+  return function(...args: Parameters<T>) {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    
+    timeout = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+}
+
 const MallIndex: React.FC = () => {
   const [showAllCategories, setShowAllCategories] = useState(true); // 默认为 true
   const [selectedScenes, setSelectedScenes] = useState<string[]>([]);
@@ -59,6 +77,7 @@ const MallIndex: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [cachedCategories, setCachedCategories] = useState<CategoryResponse[]>([]);
   const [cachedProducts, setCachedProducts] = useState<{ [key: string]: Product[] }>({});
+  const [categoryProducts, setCategoryProducts] = useState<CategoryProduct[]>([]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,7 +98,7 @@ const MallIndex: React.FC = () => {
             categoryCodes: '',
             productName: '',
             page: 1,
-            pageSize: 999 // 获取所有商品
+            pageSize: 8 // 获取所有商品
           })
         ]);
 
@@ -124,17 +143,18 @@ const MallIndex: React.FC = () => {
 
   // 修改商品点击处理函数
   const handleProductClick = useCallback((product: Product) => {
-    // 获取当前商品所属的一级分类商品列表
-    const categoryProducts = cachedProducts[product.category1Code] || [];
+    // 从 categoryProducts 中找到当前商品所属的分类数据
+    const categoryData = categoryProducts.find(cat => cat.categoryCode === product.category1Code);
     
     navigate(`/mall/product/${product.id}`, {
       state: {
-        categories: cachedCategories,
-        categoryProducts: categoryProducts,
-        currentProduct: product
+        categories: categories,
+        categoryProducts: products, // 传递当前页面的所有商品
+        // 传递 API 返回的该分类的商品总数
+        totalCategoryProductCount: categoryData?.productCount || 0
       }
     });
-  }, [navigate, cachedCategories, cachedProducts]);
+  }, [navigate, categories, products, categoryProducts]);
 
   // 修改 ProductCard 组件的使用
   const renderProductCard = (product: Product, index: number) => (
@@ -146,7 +166,7 @@ const MallIndex: React.FC = () => {
     />
   );
 
-  // 修改 fetchProducts 函数，更新 total 的设置
+  // 修改 fetchProducts 函数，保存 API 返回的总数
   const fetchProducts = useCallback(async (params: Partial<ProductListRequest> = {}) => {
     try {
       setLoading(true);
@@ -166,16 +186,20 @@ const MallIndex: React.FC = () => {
           .flatMap((cat: CategoryProduct) => cat.products || []);
         
         setProducts(allProducts);
-        // 更新 total 为实际的商品数量
-        setTotal(allProducts.length);
+        // 保存原始的 categories 数据，包含 productCount
+        setCategoryProducts(data.categories);
+        // 更新 total 为 API 返回的总数
+        setTotal(data.total || 0);
       } else {
         setProducts([]);
+        setCategoryProducts([]);
         setTotal(0);
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
       message.error('获取商品列表失败，请稍后重试');
       setProducts([]);
+      setCategoryProducts([]);
       setTotal(0);
     } finally {
       setLoading(false);
@@ -673,36 +697,48 @@ useEffect(() => {
     });
   };
 
-  // 修改 CategoryCardTitle 组件，使用筛选后的商品数量
+  // 修改 CategoryCardTitle 组件，使用 API 返回的 productCount
   const CategoryCardTitle: React.FC<CategoryTitleProps> = ({ 
     category, 
     total, 
     onViewMore,
     searchText 
-  }) => (
-    <div className={stylesCss.categoryTitle}>
-      <div className={stylesCss.titleLeft}>
-        <span className={stylesCss.mainTitle}>
-          {category.name}
-          {searchText && (
-            <span className={stylesCss.searchText}>
-              搜索"{searchText}"
-            </span>
-          )}
-        </span>
-        <span className={stylesCss.subTitle}>共 {total} 件商品</span>
+  }) => {
+    // 从 categoryProducts 中查找对应分类的 productCount
+    const categoryProductCount = useMemo(() => {
+      if (category.code === 'search' || category.code === '') {
+        return total; // 搜索结果或全部商品使用传入的 total
+      }
+      
+      const categoryData = categoryProducts.find(cat => cat.categoryCode === category.code);
+      return categoryData?.productCount || total; // 如果找不到，回退到传入的 total
+    }, [category.code, categoryProducts, total]);
+
+    return (
+      <div className={stylesCss.categoryTitle}>
+        <div className={stylesCss.titleLeft}>
+          <span className={stylesCss.mainTitle}>
+            {category.name}
+            {searchText && (
+              <span className={stylesCss.searchText}>
+                搜索"{searchText}"
+              </span>
+            )}
+          </span>
+          <span className={stylesCss.subTitle}>共 {categoryProductCount} 件商品</span>
+        </div>
+        {onViewMore && categoryProductCount > MAX_ITEMS_PER_CATEGORY && (
+          <Button 
+            type="link" 
+            onClick={onViewMore}
+            className={stylesCss.moreButton}
+          >
+            查看更多 <RightOutlined />
+          </Button>
+        )}
       </div>
-      {onViewMore && total > MAX_ITEMS_PER_CATEGORY && (
-        <Button 
-          type="link" 
-          onClick={onViewMore}
-          className={stylesCss.moreButton}
-        >
-          查看更多 <RightOutlined />
-        </Button>
-      )}
-    </div>
-  );
+    );
+  };
 
   // 修改 renderProductList 函数中的商品数量显示
   const renderProductList = () => {
@@ -718,7 +754,7 @@ useEffect(() => {
                 name: currentCategory?.name || '全部商品',
                 icon: currentCategory?.icon
               }}
-              total={filteredTagProducts.length} // 使用筛选后的商品数量
+              total={filteredTagProducts.length}
               searchText={searchText}
             />
           }
@@ -750,7 +786,7 @@ useEffect(() => {
                   title={
                     <CategoryCardTitle
                       category={category}
-                      total={categoryProducts.length} // 使用实际的商品总数
+                      total={categoryProducts.length} // 使用分类下的商品数量作为备选
                       onViewMore={() => handleViewMore(category.code)}
                     />
                   }
@@ -779,7 +815,7 @@ useEffect(() => {
                 name: currentCategory?.name || '商品列表',
                 icon: currentCategory?.icon
               }}
-              total={filteredTagProducts.length} // 使用筛选后的商品数量
+              total={filteredTagProducts.length} // 使用筛选后的商品数量作为备选
             />
           }
         >
@@ -977,18 +1013,6 @@ useEffect(() => {
       }
     }
     return key; // 如果找不到对应的一级分类，返回原key
-  };
-
-  // 添加样式类
-  const styles = {
-    // ... existing styles ...
-    viewMoreContainer: {
-      textAlign: 'center',
-      marginTop: '16px',
-    },
-    viewMoreButton: {
-      fontSize: '14px',
-    },
   };
 
   return (

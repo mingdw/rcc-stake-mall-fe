@@ -32,7 +32,9 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   getProductDetail, 
   type Product,
-  type ProductSku
+  type ProductSku,
+  getProductList,
+  type CategoryProduct
 } from '../../api/apiService';
 
 import styles from './ProductDetail.module.scss';
@@ -71,9 +73,10 @@ const ProductDetail: React.FC = () => {
   const serviceTabRef = useRef<HTMLDivElement>(null);
   const reviewsTabRef = useRef<HTMLDivElement>(null);
 
-  // 从路由状态中获取分类和商品数据
+  // 从路由状态中获取分类和商品数据以及总数
   const categories = location.state?.categories || [];
   const categoryProducts = location.state?.categoryProducts || [];
+  const totalCategoryProductCount = location.state?.totalCategoryProductCount || 0;
   
   const { 
     data: product, 
@@ -209,12 +212,73 @@ const ProductDetail: React.FC = () => {
     return items;
   }, [categories, product, navigate]);
 
-  const categoryProductsCount = useMemo(() => {
-    // 返回原始分类商品数量，而不是限制后的数量
-    return categoryProducts.filter(
-      (p: { id: number; }) => p.id !== product?.productSpu?.id
-    ).length;
-  }, [categoryProducts, product?.productSpu?.id]);
+  // 修改相关商品逻辑
+  const fetchRelatedProducts = useCallback(async () => {
+    if (!product?.productSpu?.category1Code) return;
+    
+    try {
+      setLoadingRelated(true);
+      
+      // 如果有传递总数，且有足够的同类商品，直接使用
+      if (totalCategoryProductCount > 0 && categoryProducts.length > 0) {
+        const filteredProducts = categoryProducts.filter(
+          (p: { id: number; }) => p.id !== product.productSpu.id
+        );
+        setRelatedProducts(filteredProducts.slice(0, 8));
+        // 使用 API 返回的总数减1
+        setCategoryProductsCount(totalCategoryProductCount - 1);
+        return;
+      }
+      
+      // 否则，通过API获取同类商品
+      const relatedData = await getProductList({
+        categoryCodes: product.productSpu.category1Code,
+        productName: '',
+        page: 1,
+        pageSize: 9 // 多获取一个，以便过滤当前商品后仍有8个
+      });
+      
+      if (relatedData?.categories && relatedData.categories.length > 0) {
+        const allRelatedProducts = relatedData.categories
+          .filter((cat: CategoryProduct) => cat.products !== null)
+          .flatMap((cat: CategoryProduct) => cat.products || []);
+        
+        // 过滤掉当前商品
+        const filteredProducts = allRelatedProducts.filter(
+          (p: Product) => p.id !== product.productSpu.id
+        );
+        
+        setRelatedProducts(filteredProducts.slice(0, 8));
+        
+        // 从API响应中获取该分类的总商品数
+        const categoryData = relatedData.categories.find(
+          (cat: CategoryProduct) => cat.categoryCode === product.productSpu.category1Code
+        );
+        
+        if (categoryData) {
+          // 使用API返回的总数减1
+          setCategoryProductsCount(categoryData.productCount - 1);
+        } else {
+          // 如果找不到分类数据，使用过滤后的数量
+          setCategoryProductsCount(filteredProducts.length);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch related products:', error);
+    } finally {
+      setLoadingRelated(false);
+    }
+  }, [product?.productSpu?.id, product?.productSpu?.category1Code, categoryProducts, totalCategoryProductCount]);
+
+  // 添加状态来存储分类商品总数
+  const [categoryProductsCount, setCategoryProductsCount] = useState(0);
+
+  // 修改useEffect，调用获取相关商品的函数
+  useEffect(() => {
+    if (product?.productSpu?.id) {
+      fetchRelatedProducts();
+    }
+  }, [product?.productSpu?.id, fetchRelatedProducts]);
 
   useEffect(() => {
     if (product?.productSpu.category1Code && categoryProducts.length > 0) {
@@ -401,20 +465,22 @@ const ProductDetail: React.FC = () => {
     navigate(`/mall/category/${categoryCode}`);
   }, [navigate]);
 
+  // 修改推荐商品点击处理函数，传递总数
   const handleRecommendClick = useCallback(async (productId: number) => {
     setCurrentImage(0);
     setSelectedSku(null);
     setActiveTab('detail');
     
-    // 在导航时传递categories数据
+    // 在导航时传递categories数据和总数
     navigate(`/mall/product/${productId}`, { 
       replace: true,
       state: {
-        categories: categories, // 传递当前页面的categories数据
-        categoryProducts: categoryProducts // 保持当前的categoryProducts数据
+        categories: categories,
+        categoryProducts: categoryProducts,
+        totalCategoryProductCount: totalCategoryProductCount // 保持总数不变
       }
     });
-  }, [navigate, categories, categoryProducts]);
+  }, [navigate, categories, categoryProducts, totalCategoryProductCount]);
 
   useEffect(() => {
     if (!id) {
@@ -1074,7 +1140,26 @@ const ProductDetail: React.FC = () => {
 
   // 修改推荐商品区域的标题显示
   const renderRecommendTitle = () => {
-    return '同类商品推荐';
+    const categoryName = categoryInfo.category1?.name || '同类商品';
+    return (
+      <div className={styles.recommendTitle}>
+        <div className={styles.titleLeft}>
+          <span className={styles.mainTitle}>{categoryName}推荐</span>
+          <span className={styles.subTitle}>
+            共 {categoryProductsCount} 件商品
+          </span>
+        </div>
+        {categoryProductsCount > 8 && (
+          <Button 
+            type="link" 
+            onClick={() => navigate(`/mall?category=${product?.productSpu.category1Code}`)}
+            className={styles.moreButton}
+          >
+            查看更多 <RightOutlined />
+          </Button>
+        )}
+      </div>
+    );
   };
 
   const renderContent = () => {
@@ -1118,25 +1203,7 @@ const ProductDetail: React.FC = () => {
         </Card>
 
         <Card
-          title={
-            <div className={styles.recommendTitle}>
-              <div className={styles.titleLeft}>
-                <span className={styles.mainTitle}>同类商品推荐</span>
-                <span className={styles.subTitle}>
-                  共 {categoryProductsCount} 件商品
-                </span>
-              </div>
-              {categoryProductsCount > 8 && (
-                <Button 
-                  type="link" 
-                  onClick={() => navigate(`/mall?category=${product?.productSpu.category1Code}`)}
-                  className={styles.moreButton}
-                >
-                  查看更多 <RightOutlined />
-                </Button>
-              )}
-            </div>
-          }
+          title={renderRecommendTitle()}
           className={styles.recommendCard}
         >
           <List
