@@ -123,15 +123,17 @@ const ProductDetail: React.FC = () => {
   }, [product?.productSpuAttrParams]);
 
   const categoryInfo = useMemo(() => {
-    if (!product || !categories.length) return {
-      category1: null,
-      category2: null,
-      category3: null
-    };
+    if (!product || !categories || !Array.isArray(categories) || categories.length === 0) {
+      return {
+        category1: null,
+        category2: null,
+        category3: null
+      };
+    }
 
-    const category1 = categories.find((c: { code: string; }) => c.code === product.productSpu.category1Code);
-    const category2 = category1?.children?.find((c: { code: string; }) => c.code === product.productSpu.category2Code);
-    const category3 = category2?.children?.find((c: { code: string; }) => c.code === product.productSpu.category3Code);
+    const category1 = categories.find((c: { code: string; }) => c.code === product.productSpu?.category1Code);
+    const category2 = category1?.children?.find((c: { code: string; }) => c.code === product.productSpu?.category2Code);
+    const category3 = category2?.children?.find((c: { code: string; }) => c.code === product.productSpu?.category3Code);
 
     return {
       category1,
@@ -141,7 +143,7 @@ const ProductDetail: React.FC = () => {
   }, [product, categories]);
 
   const breadcrumbItems = useMemo(() => {
-    if (!product || !categories) return [];
+    if (!product || !categories || !Array.isArray(categories)) return [];
 
     const items = [
       {
@@ -153,7 +155,7 @@ const ProductDetail: React.FC = () => {
       }
     ];
 
-    if (Array.isArray(categories) && product.productSpu?.category1Code) {
+    if (product.productSpu?.category1Code) {
       const category1 = categories.find((c: { code: string; }) => c.code === product.productSpu.category1Code);
       const category2 = category1?.children?.find((c: { code: string; }) => c.code === product.productSpu.category2Code);
       const category3 = category2?.children?.find((c: { code: string; }) => c.code === product.productSpu.category3Code);
@@ -208,16 +210,20 @@ const ProductDetail: React.FC = () => {
   }, [categories, product, navigate]);
 
   const categoryProductsCount = useMemo(() => {
-    return relatedProducts.length;
-  }, [relatedProducts]);
+    // 返回原始分类商品数量，而不是限制后的数量
+    return categoryProducts.filter(
+      (p: { id: number; }) => p.id !== product?.productSpu?.id
+    ).length;
+  }, [categoryProducts, product?.productSpu?.id]);
 
   useEffect(() => {
     if (product?.productSpu.category1Code && categoryProducts.length > 0) {
       // 过滤掉当前商品
       const filteredProducts = categoryProducts.filter(
-        (        p: { id: number; }) => p.id !== product.productSpu.id
+        (p: { id: number; }) => p.id !== product.productSpu.id
       );
-      setRelatedProducts(filteredProducts);
+      // 限制最多显示 8 件推荐商品
+      setRelatedProducts(filteredProducts.slice(0, 8));
     }
   }, [product?.productSpu.category1Code, categoryProducts]);
 
@@ -507,7 +513,9 @@ const ProductDetail: React.FC = () => {
                   const tempIndexs = generateSkuIndexs(tempSpecs, specAttrs);
                   
                   // 检查是否有对应的 SKU 且有库存
-                  const matchingSku = product?.productSku.find(sku => sku.indexs === tempIndexs);
+                  const matchingSku = product?.productSku && Array.isArray(product.productSku) 
+                    ? product.productSku.find(sku => sku.indexs === tempIndexs)
+                    : null;
                   const isOutOfStock = matchingSku && matchingSku.stock <= 0;
                   const isSelected = selectedSpecs[key] === value;
                   
@@ -1066,8 +1074,7 @@ const ProductDetail: React.FC = () => {
 
   // 修改推荐商品区域的标题显示
   const renderRecommendTitle = () => {
-    const category1 = categories.find((c: { code: string | undefined; }) => c.code === product?.productSpu.category1Code);
-    return category1 ? `${category1.name}` : '同类商品推荐';
+    return '同类商品推荐';
   };
 
   const renderContent = () => {
@@ -1114,18 +1121,20 @@ const ProductDetail: React.FC = () => {
           title={
             <div className={styles.recommendTitle}>
               <div className={styles.titleLeft}>
-                <span className={styles.mainTitle}>{renderRecommendTitle()}</span>
+                <span className={styles.mainTitle}>同类商品推荐</span>
                 <span className={styles.subTitle}>
                   共 {categoryProductsCount} 件商品
                 </span>
               </div>
-              <Button 
-                type="link" 
-                onClick={() => navigate(`/mall/category/${product?.productSpu.category1Code}`)}
-                className={styles.moreButton}
-              >
-                查看更多 <RightOutlined />
-              </Button>
+              {categoryProductsCount > 8 && (
+                <Button 
+                  type="link" 
+                  onClick={() => navigate(`/mall?category=${product?.productSpu.category1Code}`)}
+                  className={styles.moreButton}
+                >
+                  查看更多 <RightOutlined />
+                </Button>
+              )}
             </div>
           }
           className={styles.recommendCard}

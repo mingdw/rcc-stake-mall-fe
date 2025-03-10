@@ -252,7 +252,7 @@
     }
     
     .ant-card-body {
-      padding: 24px;
+      padding: 16px;
     }
     
     .ant-empty {
@@ -624,7 +624,7 @@
 
 .pagination {
   margin-top: 24px;
-  text-align: right;
+  text-align: center;
 }
 
 .content {
@@ -938,6 +938,21 @@
   &:hover {
     color: #f5222d;
     border-color: #f5222d;
+  }
+}
+
+.viewMoreContainer {
+  text-align: center;
+  margin-top: 16px;
+  padding: 8px 0;
+}
+
+.viewMoreButton {
+  font-size: 14px;
+  color: #1890ff;
+  
+  &:hover {
+    color: #40a9ff;
   }
 }
 

@@ -39,6 +39,11 @@ interface CategoryTitleProps {
   searchText?: string; // 添加搜索文本属性
 }
 
+// 修改常量定义
+const PAGE_SIZE = 8; // 每页8个商品
+const ITEMS_PER_ROW = 4; // 每行4个商品
+const MAX_ITEMS_PER_CATEGORY = 8; // 每个分类最多显示8个商品（2行）
+
 const MallIndex: React.FC = () => {
   const [showAllCategories, setShowAllCategories] = useState(true); // 默认为 true
   const [selectedScenes, setSelectedScenes] = useState<string[]>([]);
@@ -48,7 +53,6 @@ const MallIndex: React.FC = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 8; // 添加统一的页面大小常量
   const [total, setTotal] = useState(0);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -133,7 +137,7 @@ const MallIndex: React.FC = () => {
   }, [navigate, cachedCategories, cachedProducts]);
 
   // 修改 ProductCard 组件的使用
-  const renderProductCard = (product: Product) => (
+  const renderProductCard = (product: Product, index: number) => (
     <ProductCard 
       key={product.id}
       product={product}
@@ -142,7 +146,7 @@ const MallIndex: React.FC = () => {
     />
   );
 
-  // 简化获取商品数据的函数
+  // 修改 fetchProducts 函数，更新 total 的设置
   const fetchProducts = useCallback(async (params: Partial<ProductListRequest> = {}) => {
     try {
       setLoading(true);
@@ -151,7 +155,7 @@ const MallIndex: React.FC = () => {
         categoryCodes: params.categoryCodes || selectedCategory || '',
         productName: params.productName || searchText || '',
         page: params.page || currentPage,
-        pageSize: PAGE_SIZE, // 统一使用8条
+        pageSize: PAGE_SIZE,
       };
 
       const data = await getProductList(requestParams);
@@ -162,7 +166,8 @@ const MallIndex: React.FC = () => {
           .flatMap((cat: CategoryProduct) => cat.products || []);
         
         setProducts(allProducts);
-        setTotal(data.total || 0);
+        // 更新 total 为实际的商品数量
+        setTotal(allProducts.length);
       } else {
         setProducts([]);
         setTotal(0);
@@ -317,11 +322,11 @@ useEffect(() => {
     }, {} as { [key: string]: Product[] });
   }, [categories, products]);
 
-  // 修改过滤商品的逻辑
+  // 优化 filteredTagProducts 函数，简化匹配逻辑
   const filteredTagProducts = useMemo(() => {
     // 获取当前需要过滤的商品列表
     let productsToFilter = showSearchResults ? searchResults : products;
-  
+
     // 如果选择了分类，先按分类筛选
     if (selectedCategory && !showSearchResults) {
       productsToFilter = productsToFilter.filter(product => {
@@ -349,37 +354,80 @@ useEffect(() => {
       });
     }
 
-  // 应用标签过滤 - 使用基础属性进行过滤
-  return productsToFilter.filter(product => {
-    const basicAttrs = product.attributes || {};
-    
-    // 检查是否满足所有选中的场景标签
-    const matchesScenes = selectedScenes.length === 0 || 
-      selectedScenes.some(scene => 
-        Object.values(basicAttrs).some(value => 
-          value.toString().toLowerCase().includes(scene.toLowerCase())
-        )
-      );
-
-    // 检查是否满足所有选中的风格标签
-    const matchesStyles = selectedStyles.length === 0 || 
-      selectedStyles.some(style => 
-        Object.values(basicAttrs).some(value => 
-          value.toString().toLowerCase().includes(style.toLowerCase())
-        )
-      );
-
-    return matchesScenes && matchesStyles;
-  });
-}, [
-  selectedScenes, 
-  selectedStyles, 
-  showSearchResults, 
-  searchResults, 
-  products,
-  selectedCategory,
-  categories
-]);
+    // 应用标签过滤 - 使用基础属性进行过滤
+    return productsToFilter.filter(product => {
+      // 如果没有选择任何标签，返回所有商品
+      if (selectedScenes.length === 0 && selectedStyles.length === 0) {
+        return true;
+      }
+      
+      // 获取商品的基础属性
+      let basicAttrsObj = {};
+      
+      // 处理 basicAttrs
+      if (product.attributes?.basicAttrs) {
+        // 如果 basicAttrs 是字符串，尝试解析为对象
+        if (typeof product.attributes.basicAttrs === 'string') {
+          try {
+            basicAttrsObj = JSON.parse(product.attributes?.basicAttrs);
+          } catch (e) {
+            console.error('解析商品基础属性失败:', e, product.attributes?.basicAttrs);
+          }
+        } else if (typeof product.attributes?.basicAttrs === 'object') {
+          // 如果已经是对象，直接使用
+          basicAttrsObj = product.attributes?.basicAttrs;
+        }
+      }
+      
+      // 如果没有基础属性，检查 attributes
+      if (Object.keys(basicAttrsObj).length === 0 && product.attributes) {
+        if (typeof product.attributes === 'string') {
+          try {
+            basicAttrsObj = JSON.parse(product.attributes);
+          } catch (e) {
+            console.error('解析商品属性失败:', e, product.attributes);
+          }
+        } else if (typeof product.attributes === 'object') {
+          basicAttrsObj = product.attributes;
+        }
+      }
+      
+      // 如果没有任何属性，则不匹配任何标签
+      if (Object.keys(basicAttrsObj).length === 0) {
+        return false;
+      }
+      
+      // 获取所有属性值组成的数组，用于匹配
+      const allValues = Object.values(basicAttrsObj).flatMap(value => {
+        if (Array.isArray(value)) {
+          return value.map(v => String(v).toLowerCase());
+        }
+        return [String(value).toLowerCase()];
+      });
+      
+      // 检查是否满足选中的场景标签
+      const matchesScenes = selectedScenes.length === 0 || 
+        selectedScenes.some(scene => 
+          allValues.some(value => value.includes(scene.toLowerCase()))
+        );
+      
+      // 检查是否满足选中的风格标签
+      const matchesStyles = selectedStyles.length === 0 || 
+        selectedStyles.some(style => 
+          allValues.some(value => value.includes(style.toLowerCase()))
+        );
+      
+      return matchesScenes && matchesStyles;
+    });
+  }, [
+    selectedScenes, 
+    selectedStyles, 
+    showSearchResults, 
+    searchResults, 
+    products,
+    selectedCategory,
+    categories
+  ]);
 
   // 获取标签函数
   const getTagsByCategory = useCallback((categoryKey: string | null): AttrGroup[] => {
@@ -409,7 +457,12 @@ useEffect(() => {
         }
       });
 
-      return Array.from(mergedGroups.values()).sort((a, b) => a.sort - b.sort);
+      return Array.from(mergedGroups.values())
+        .sort((a, b) => a.sort - b.sort)
+        .map(group => ({
+          ...group,
+          attrs: group.attrs || [] // 确保 attrs 始终是数组
+        }));
     }
 
     // 查找分类及其父级分类
@@ -496,28 +549,39 @@ useEffect(() => {
       addAttrGroups(thirdLevel);
     }
 
-    return Array.from(mergedGroups.values()).sort((a, b) => a.sort - b.sort);
+    return Array.from(mergedGroups.values())
+      .sort((a, b) => a.sort - b.sort)
+      .map(group => ({
+        ...group,
+        attrs: group.attrs || [] // 确保 attrs 始终是数组
+      }));
   }, [categories]);
 
   const handleAllCategoriesClick = () => {
     setShowAllCategories(!showAllCategories);
   };
 
-  // 处理标签选择
+  // 修改 handleSceneSelect 和 handleStyleSelect 函数，确保筛选后更新商品列表
   const handleSceneSelect = useCallback((code: string) => {
-    setSelectedScenes(prev => 
-      prev.includes(code)
+    setSelectedScenes(prev => {
+      const newSelectedScenes = prev.includes(code)
         ? prev.filter(s => s !== code)
-        : [...prev, code]
-    );
+        : [...prev, code];
+      
+      // 更新筛选后的商品列表
+      return newSelectedScenes;
+    });
   }, []);
 
   const handleStyleSelect = useCallback((code: string) => {
-    setSelectedStyles(prev => 
-      prev.includes(code)
+    setSelectedStyles(prev => {
+      const newSelectedStyles = prev.includes(code)
         ? prev.filter(s => s !== code)
-        : [...prev, code]
-    );
+        : [...prev, code];
+      
+      // 更新筛选后的商品列表
+      return newSelectedStyles;
+    });
   }, []);
 
   // 清空标签
@@ -609,7 +673,7 @@ useEffect(() => {
     });
   };
 
-  // 分类标题组件
+  // 修改 CategoryCardTitle 组件，使用筛选后的商品数量
   const CategoryCardTitle: React.FC<CategoryTitleProps> = ({ 
     category, 
     total, 
@@ -628,7 +692,7 @@ useEffect(() => {
         </span>
         <span className={stylesCss.subTitle}>共 {total} 件商品</span>
       </div>
-      {onViewMore && (
+      {onViewMore && total > MAX_ITEMS_PER_CATEGORY && (
         <Button 
           type="link" 
           onClick={onViewMore}
@@ -640,11 +704,10 @@ useEffect(() => {
     </div>
   );
 
-  // 渲染商品列表
+  // 修改 renderProductList 函数中的商品数量显示
   const renderProductList = () => {
     if (showSearchResults) {
       const currentCategory = getCurrentCategory();
-      // 搜索结果视图
       return (
         <Card
           className={stylesCss.categoryCard}
@@ -655,12 +718,12 @@ useEffect(() => {
                 name: currentCategory?.name || '全部商品',
                 icon: currentCategory?.icon
               }}
-              total={total}
+              total={filteredTagProducts.length} // 使用筛选后的商品数量
               searchText={searchText}
             />
           }
         >
-          {renderProductContent()}
+          {renderProductContent(filteredTagProducts)}
         </Card>
       );
     } else if (showAllCategories) {
@@ -673,30 +736,35 @@ useEffect(() => {
               const categoryProducts = groupedProducts[category.code];
               return categoryProducts && categoryProducts.length > 0;
             })
-            .map(category => (
-              <Card
-                key={category.code}
-                ref={categoryRefs.current[category.code]}
-                className={stylesCss.categoryCard}
-                title={
-                  <CategoryCardTitle
-                    category={category}
-                    total={groupedProducts[category.code]?.length || 0}
-                    onViewMore={() => handleViewMore(category.code)}
-                  />
-                }
-              >
-                <Row gutter={[16, 16]}>
-                  {(groupedProducts[category.code] || [])
-                    .slice(0, 4)
-                    .map(product => (
-                      <Col span={6} key={product.id}>
-                        {renderProductCard(product)}
+            .map(category => {
+              // 获取当前分类的商品
+              const categoryProducts = groupedProducts[category.code] || [];
+              // 获取实际显示的商品数量（最多显示8个）
+              const displayProducts = categoryProducts.slice(0, MAX_ITEMS_PER_CATEGORY);
+              
+              return (
+                <Card
+                  key={category.code}
+                  ref={categoryRefs.current[category.code]}
+                  className={stylesCss.categoryCard}
+                  title={
+                    <CategoryCardTitle
+                      category={category}
+                      total={categoryProducts.length} // 使用实际的商品总数
+                      onViewMore={() => handleViewMore(category.code)}
+                    />
+                  }
+                >
+                  <Row gutter={[16, 16]}>
+                    {displayProducts.map((product, index) => (
+                      <Col span={24 / ITEMS_PER_ROW} key={`${category.code}-${product.id}-${index}`}>
+                        {renderProductCard(product, index)}
                       </Col>
                     ))}
-                </Row>
-              </Card>
-            ))}
+                  </Row>
+                </Card>
+              );
+            })}
         </>
       );
     } else {
@@ -711,33 +779,38 @@ useEffect(() => {
                 name: currentCategory?.name || '商品列表',
                 icon: currentCategory?.icon
               }}
-              total={total}
+              total={filteredTagProducts.length} // 使用筛选后的商品数量
             />
           }
         >
-          {renderProductContent()}
+          {renderProductContent(filteredTagProducts)}
         </Card>
       );
     }
   };
 
-  // 简化渲染商品列表的逻辑
-  const renderProductContent = () => {
-    if (products.length > 0) {
+  // 修改 renderProductContent 函数，使用筛选后的商品数量
+  const renderProductContent = (productsToRender = filteredTagProducts) => {
+    if (productsToRender.length > 0) {
+      // 计算当前页应显示的商品
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      const currentPageProducts = productsToRender.slice(startIndex, endIndex);
+      
       return (
         <>
           <Row gutter={[16, 16]}>
-            {products.slice(0, PAGE_SIZE).map(product => (
-              <Col span={6} key={product.id}>
-                {renderProductCard(product)}
+            {currentPageProducts.map((product, index) => (
+              <Col span={24 / ITEMS_PER_ROW} key={`${product.id}-${index}`}>
+                {renderProductCard(product, index)}
               </Col>
             ))}
           </Row>
-          {total > PAGE_SIZE && (
+          {productsToRender.length > PAGE_SIZE && (
             <div className={stylesCss.pagination}>
               <Pagination
                 current={currentPage}
-                total={total}
+                total={productsToRender.length} // 使用筛选后的商品数量
                 pageSize={PAGE_SIZE}
                 onChange={handlePageChange}
                 showTotal={(total) => `共 ${total} 条`}
@@ -767,7 +840,7 @@ useEffect(() => {
     }
   };
 
-  // 修改 TagFilter 组件
+  // 修改 TagFilter 组件，添加对 null/undefined 的检查
   const TagFilter: React.FC<{
     tagGroup: AttrGroup;
     selectedTags: string[];
@@ -777,6 +850,9 @@ useEffect(() => {
     const [isExpanded, setIsExpanded] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
     const [needsExpansion, setNeedsExpansion] = useState(false);
+
+    // 确保 tagGroup.attrs 存在
+    const attrs = tagGroup.attrs || [];
 
     // 检测是否需要展开按钮
     useEffect(() => {
@@ -788,7 +864,7 @@ useEffect(() => {
           setIsExpanded(true);
         }
       }
-    }, [tagGroup.attrs, selectedTags]);
+    }, [attrs, selectedTags]);
 
     return (
       <div className={stylesCss.tagFilterSection}>
@@ -800,7 +876,7 @@ useEffect(() => {
           className={`${stylesCss.tagFilterContent} ${isExpanded ? stylesCss.expanded : ''}`}
         >
           <div className={stylesCss.tagList}>
-            {tagGroup.attrs.map((tag: Attr) => (
+            {attrs.map((tag: Attr) => (
               <Tag
                 key={tag.code}
                 className={`${stylesCss.filterTag} ${selectedTags.includes(tag.code) ? stylesCss.active : ''}`}
@@ -833,26 +909,36 @@ useEffect(() => {
     );
   };
 
-  // 修改渲染标签过滤器的容器
+  // 修改 renderTagFilters 函数，添加额外的检查
   const renderTagFilters = useCallback(() => {
     const currentTags = getTagsByCategory(activeKey === 'all' ? null : selectedCategory);
     
-    if (!currentTags || (!currentTags.length)) {
+    if (!currentTags || !currentTags.length) {
       return null;
     }
 
     return (
       <div className={stylesCss.filterContainer}>
         <div className={stylesCss.filterHeader}>
-        {currentTags.map(tagGroup => (
-          <TagFilter
-            key={tagGroup.code}
-            tagGroup={tagGroup}
-            selectedTags={tagGroup.code === 'scene' ? selectedScenes : selectedStyles}
-            onTagSelect={tagGroup.code === 'scene' ? handleSceneSelect : handleStyleSelect}
-            onClear={tagGroup.code === 'scene' ? handleClearScenes : handleClearStyles}
-          />
-        ))}
+          {currentTags.map(tagGroup => {
+            // 确保 tagGroup 和 tagGroup.attrs 都存在
+            if (!tagGroup || !tagGroup.attrs) {
+              return null;
+            }
+            
+            return (
+              <TagFilter
+                key={tagGroup.code}
+                tagGroup={{
+                  ...tagGroup,
+                  attrs: tagGroup.attrs || [] // 确保 attrs 始终是数组
+                }}
+                selectedTags={tagGroup.code === 'scene' ? selectedScenes : selectedStyles}
+                onTagSelect={tagGroup.code === 'scene' ? handleSceneSelect : handleStyleSelect}
+                onClear={tagGroup.code === 'scene' ? handleClearScenes : handleClearStyles}
+              />
+            );
+          })}
         </div>
       </div>
     );
@@ -891,6 +977,18 @@ useEffect(() => {
       }
     }
     return key; // 如果找不到对应的一级分类，返回原key
+  };
+
+  // 添加样式类
+  const styles = {
+    // ... existing styles ...
+    viewMoreContainer: {
+      textAlign: 'center',
+      marginTop: '16px',
+    },
+    viewMoreButton: {
+      fontSize: '14px',
+    },
   };
 
   return (
