@@ -1,31 +1,28 @@
 .exchangeContainer {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    padding-bottom: 80px;
-    background-color: #f6f6f6;
+    margin: 20px auto;
+    padding: 0 20px;
   }
   
   .pageTitle {
-    margin-bottom: 10px;
-    font-size: 16px;
+    margin-bottom: 24px;
     color: #333;
-    font-weight: normal;
+    font-weight: 500;
   }
   
   .addressCard,
   .productCard,
   .orderCard {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     background-color: #fff;
-    border: none;
-    border-radius: 2px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   
     :global {
       .ant-card-head {
         min-height: 40px;
-        padding: 0 15px;
-        border-bottom: 2px solid #f6f6f6;
+        padding: 16px 24px;
+        border-bottom: 1px solid #f0f0f0;
         
         .ant-card-head-title {
           padding: 10px 0;
@@ -43,24 +40,26 @@
   
   .addressGroup {
     width: 100%;
+    padding: 16px 0;
   }
   
   .addressItem {
     width: 100%;
-    margin-bottom: 10px;
-    padding: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
+    padding: 16px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    transition: all 0.3s;
     cursor: pointer;
   
     &:hover {
-      border-color: #e1251b;
-      background-color: #fff;
+      border-color: #1890ff;
+      background: #f6f9ff;
     }
   
-    &:global(.ant-radio-wrapper-checked) {
-      border-color: #e1251b;
-      background-color: #fff;
+    &.selected {
+      border-color: #1890ff;
+      background: #f6f9ff;
     }
   }
   
@@ -73,37 +72,48 @@
   }
   
   .addressName {
-    font-size: 14px;
-    font-weight: normal;
+    font-size: 16px;
+    font-weight: 500;
     margin-right: 12px;
   }
   
   .addressPhone {
-    color: #999;
-    margin-right: 12px;
+    color: #666;
   }
   
   .defaultTag {
-    background-color: #ffecec;
-    color: #e1251b;
-    padding: 1px 6px;
+    margin-left: auto;
+    padding: 2px 8px;
+    background: #fff1f0;
     border-radius: 2px;
+    color: #ff4d4f;
     font-size: 12px;
   }
   
   .addressDetail {
     color: #666;
+    font-size: 14px;
+    line-height: 1.5;
     display: flex;
     align-items: flex-start;
   }
   
   .addressIcon {
-    margin-right: 5px;
+    margin-right: 8px;
     margin-top: 3px;
+    color: #999;
   }
   
   .addAddressBtn {
-    margin-top: 10px;
+    color: #1890ff;
+    font-size: 14px;
+    padding: 16px 24px;
+    border-top: 1px solid #f0f0f0;
+    display: block;
+  
+    &:hover {
+      background: #f6f9ff;
+    }
   }
   
   .productItem {
@@ -131,16 +141,16 @@
   }
   
   .productName {
-    font-size: 14px;
+    font-size: 16px;
     color: #333;
-    margin-bottom: 6px;
-    line-height: 1.4;
+    margin-bottom: 8px;
+    font-weight: 500;
   }
   
   .productSpecs {
-    color: #999;
-    font-size: 12px;
-    margin-bottom: 6px;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 8px;
   }
   
   .productPrice {
@@ -151,20 +161,20 @@
   }
   
   .price {
-    color: #e1251b;
-    font-size: 14px;
-    font-weight: normal;
+    color: #ff4d4f;
+    font-size: 18px;
+    font-weight: 500;
     
     &::before {
       content: '¥';
-      font-size: 12px;
+      font-size: 14px;
       margin-right: 2px;
     }
   }
   
   .quantity {
     color: #999;
-    font-size: 12px;
+    font-size: 14px;
   }
   
   .orderCard {
@@ -181,8 +191,8 @@
   
   .summaryItem {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
+    justify-content: space-between;
+    margin-bottom: 12px;
     color: #666;
     font-size: 14px;
     
@@ -193,22 +203,27 @@
   
   .totalItem {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #f6f6f6;
-    font-size: 14px;
-  }
-  
-  .totalPrice {
-    color: #e1251b;
-    font-size: 18px;
-    font-weight: bold;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
     
-    &::before {
-      content: '¥';
-      font-size: 14px;
-      margin-right: 2px;
+    span {
+      font-size: 16px;
+      color: #333;
+      
+      &.totalPrice {
+        color: #ff4d4f;
+        font-size: 24px;
+        font-weight: 500;
+        
+        &::before {
+          content: '¥';
+          font-size: 16px;
+          margin-right: 2px;
+        }
+      }
     }
   }
   
@@ -217,30 +232,35 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 50px;
-    background-color: #fff;
-    padding: 0 20px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.06);
+    background: #fff;
+    padding: 16px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
     z-index: 100;
   }
   
+  .bottomContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  
   .totalSection {
-    margin-right: 20px;
+    margin-right: 24px;
+    text-align: right;
   }
   
   .totalLabel {
+    color: #666;
     font-size: 14px;
-    color: #999;
     margin-right: 8px;
   }
   
   .totalAmount {
-    color: #e1251b;
-    font-size: 20px;
-    font-weight: bold;
+    color: #ff4d4f;
+    font-size: 24px;
+    font-weight: 500;
     
     &::before {
       content: '¥';
@@ -250,22 +270,14 @@
   }
   
   .submitButton {
-    width: 130px;
+    min-width: 120px;
     height: 40px;
     font-size: 16px;
-    border-radius: 2px;
-    background-color: #e1251b;
-    border-color: #e1251b;
-  
-    &:hover,
-    &:focus {
-      background-color: #c81623;
-      border-color: #c81623;
-    }
-  
-    &:active {
-      background-color: #b61d1d;
-      border-color: #b61d1d;
+    
+    &[disabled] {
+      background: #f5f5f5;
+      border-color: #d9d9d9;
+      color: rgba(0, 0, 0, 0.25);
     }
   }
   

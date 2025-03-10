@@ -1,0 +1,53 @@
+.addressFormModal {
+    :global {
+      .ant-modal-content {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        
+        .ant-modal-header {
+          border-bottom: 1px solid #e8e8e8;
+          padding: 20px 24px;
+          border-radius: 12px 12px 0 0;
+        }
+        
+        .ant-modal-body {
+          padding: 24px;
+        }
+        
+        .ant-form-item-label {
+          font-weight: 600;
+          color: #262626;
+        }
+        
+        .ant-input-prefix {
+          color: #8c8c8c;
+        }
+
+        .ant-form-item {
+          margin-bottom: 20px;
+        }
+
+        .ant-input {
+          border-radius: 6px;
+          
+          &:hover, &:focus {
+            border-color: #40a9ff;
+          }
+        }
+
+        .ant-input-textarea {
+          textarea {
+            border-radius: 6px;
+            
+            &:hover, &:focus {
+              border-color: #40a9ff;
+            }
+          }
+        }
+
+        .ant-radio-wrapper {
+          color: #595959;
+        }
+      }
+    }
+  }

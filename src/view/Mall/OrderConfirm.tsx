@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Card, Row, Col, Typography, Button, Form, Input, Radio, Space, Divider, message, Spin } from 'antd';
-import { ShoppingCartOutlined, EnvironmentOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
+import { Card, Typography, Button, Form, Input, Radio, Space, Divider, message, Spin } from 'antd';
+import {  EnvironmentOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getProductDetail, submitOrder } from '../../api/apiService';
 import styles from './OrderConfirm.module.scss';

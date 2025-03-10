@@ -40,17 +40,17 @@ const router = createBrowserRouter([
             {
                 path: '/suply',
                 element: (
-                    <PrivateRoute>
+                   
                         <Suply/>
-                    </PrivateRoute>
+                   
                 )
             },
             {
                 path:'/suply/details',
                 element: (
-                    <PrivateRoute>
+                   
                         <SuplyDetails/>
-                    </PrivateRoute>
+                    
                 )
             },
             {
@@ -85,9 +85,9 @@ const router = createBrowserRouter([
             {
                 path: '/transactionList',
                 element: (
-                    <PrivateRoute>
+                  
                         <TransactionList/>
-                    </PrivateRoute>
+                   
                 )
             },
             {
