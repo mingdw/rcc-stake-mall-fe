@@ -47,7 +47,7 @@
     width: 100%;
     padding: 16px;
     border: 1px solid #f0f0f0;
-    border-radius: 4px;
+    border-radius: 8px;
     margin-bottom: 12px;
     transition: all 0.3s;
     cursor: pointer;
@@ -68,40 +68,78 @@
   }
   
   .addressHeader {
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
   }
   
   .addressName {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
+    color: #333;
     margin-right: 12px;
   }
   
   .addressPhone {
+    font-size: 14px;
     color: #666;
   }
   
   .defaultTag {
-    margin-left: auto;
-    padding: 2px 8px;
+    margin-left: 12px;
+    padding: 1px 6px;
     background: #fff1f0;
+    border: 1px solid #ffccc7;
     border-radius: 2px;
     color: #ff4d4f;
     font-size: 12px;
   }
   
   .addressDetail {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
     color: #666;
     font-size: 14px;
     line-height: 1.5;
-    display: flex;
-    align-items: flex-start;
   }
   
   .addressIcon {
     margin-right: 8px;
     margin-top: 3px;
     color: #999;
+    flex-shrink: 0;
+  }
+  
+  .addressText {
+    flex: 1;
+    word-break: break-all;
+  }
+  
+  .addressActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+  
+    :global {
+      .ant-btn-link {
+        padding: 4px 8px;
+        height: auto;
+        font-size: 13px;
+      
+        &:hover {
+          background: rgba(24, 144, 255, 0.1);
+        }
+      }
+    
+      .ant-divider-vertical {
+        margin: 0 8px;
+        height: 14px;
+        background-color: #e8e8e8;
+      }
+    }
   }
   
   .addAddressBtn {

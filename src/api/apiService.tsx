@@ -194,6 +194,75 @@ interface ProductDetailResponse {
   productSpuAttrParams: ProductSpuAttrParams;
 }
 
+interface ListAddressRequest{
+  level: number;
+  parentCode: string;
+}
+
+interface AddressResponse {
+  addresses: Address[];
+}
+
+// 地址相关接口
+ interface Address {
+  id: number;
+  code: string;
+  name: string;
+  parentCode: string;
+  level: number;
+  provinceCode: string;
+  provinceName: string;
+  cityCode: string;
+  cityName: string;
+  districtCode: string;
+  districtName: string;
+  streetCode: string;
+  streetName: string;
+  fullAddress: string;
+  postcode: string;
+  sort: number;
+  createdAt?: string;
+  updatedAt?: string;
+  creator?: string;
+  updator?: string;
+  isDeleted?: number;
+  children?: Address[];
+}
+
+
+interface UserAddressListRequest {
+  userId? : number;
+  userCode? : string;
+}
+
+interface UserAddressListResponse {
+  userAddress: UserAddress[];
+}
+
+interface UserAddress {
+  id: number;
+  userId: number;
+  userCode: string;
+  phone: string;
+  nickname: string;
+  provinceCode: string;
+	ProvinceName: string;
+	CityCode: string;
+	CityName: string;
+	DistrictCode: string;
+	DistrictName: string;
+	StreetCode: string;
+	StreetName: string;
+  HouseAddress: string;
+  FullAddress: string;
+  IsDefault: number;
+  Longitude: string;
+  Latitude: string;
+  IsDeleted: number;
+  Creator: string;
+  Updator: string;
+}
+
 // 统一的错误处理函数
 const handleApiError = (error: any, customMessage?: string) => {
   if (error.response?.data?.message) {
@@ -323,6 +392,79 @@ export const submitOrder = async (orderData: any) => {
   }
 };
 
+
+
+// 获取地址列表
+export const getAddressList = async (params: ListAddressRequest) : Promise<AddressResponse> => {
+  try {
+    const response = await axiosInstance.post('/v1/address',  params );
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+  } catch (error) {
+    handleApiError(error, '获取省市区县数据失败');
+  }
+  return { addresses: [] };
+};
+
+export const getUserAddressList = async (params: UserAddressListRequest): Promise<UserAddress[]> => {
+  try {
+    const response = await axiosInstance.post('/v1/userAddress', params);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+  } catch (error) {
+    handleApiError(error, '获取用户地址列表失败');
+  }
+   
+  return []
+} 
+
+
+
+// 更新或者添加地址
+export const addOrUpdateUserAddress = async (addressData: UserAddress) => {
+  try {
+    const response = await axiosInstance.post('/v1/userAddress/addAndUpdate', addressData);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+    throw new Error(response.data.message || '添加地址失败');
+  } catch (error) {
+    handleApiError(error, '添加地址失败');
+    throw error;
+  }
+};
+
+
+// 删除地址
+export const deleteAddress = async (id: string) => {
+  try {
+    const response = await axiosInstance.delete(`/v1/user/addresses/${id}`);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    throw new Error(response.data.message || '删除地址失败');
+  } catch (error) {
+    handleApiError(error, '删除地址失败');
+    throw error;
+  }
+};
+
+// 设置默认地址
+export const setDefaultAddress = async (id: string) => {
+  try {
+    const response = await axiosInstance.put(`/v1/user/addresses/${id}/default`);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    throw new Error(response.data.message || '设置默认地址失败');
+  } catch (error) {
+    handleApiError(error, '设置默认地址失败');
+    throw error;
+  }
+};
+
 // 导出接口类型
 export type {
   Attr,
@@ -335,7 +477,13 @@ export type {
   CategoryProduct,
   ProductListResponse,
   ProductListRequest,
-  ProductDetailResponse
+  ProductDetailResponse,
+  Address,
+  ListAddressRequest,
+  AddressResponse,
+  UserAddressListRequest,
+  UserAddressListResponse,
+  UserAddress
 };
 
 

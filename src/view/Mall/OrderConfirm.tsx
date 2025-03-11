@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Card, Typography, Button, Form, Input, Radio, Space, Divider, message, Spin } from 'antd';
-import {  EnvironmentOutlined } from '@ant-design/icons';
+import { Card, Typography, Button, Form, Input, Radio, Space, Divider, message, Spin, Empty } from 'antd';
+import { EnvironmentOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { getProductDetail, submitOrder } from '../../api/apiService';
+import { getProductDetail, submitOrder, deleteAddress, getUserAddressList } from '../../api/apiService';
 import styles from './OrderConfirm.module.scss';
 import { useAuth } from '../../context/AuthContext';
+import AddressForm from './AddressForm';
+import type { UserAddress, UserAddressListResponse } from '../../api/apiService';
 
 const { Title, Text } = Typography;
 
@@ -17,7 +19,10 @@ const OrderConfirm: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const [addressFormVisible, setAddressFormVisible] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null);
   
   // 从路由状态获取数量和选中的SKU
   const { quantity = 1, selectedSku = null } = location.state || {};
@@ -34,19 +39,60 @@ const OrderConfirm: React.FC = () => {
     },
   });
 
-  // 模拟地址数据，实际应从API获取
-  const addresses = [
-    { id: '1', name: '张三', phone: '13800138000', address: '北京市朝阳区某某街道1号楼', isDefault: true },
-    { id: '2', name: '李四', phone: '13900139000', address: '上海市浦东新区某某路2号', isDefault: false },
-  ];
+  // 添加 console.log 来调试
+  console.log('authData:', authData);
 
+  // 获取用户地址列表
+  const { data: userAddressList, isLoading: addressLoading, refetch: refetchAddresses } = useQuery<
+    UserAddress[],  // 修改返回类型为 UserAddress 数组
+    Error
+  >({
+    queryKey: ['userAddresses'],
+    queryFn: async () => {
+      const response = await getUserAddressList({
+        userId: -1
+      });
+      console.log('Raw API response:', response); // 打印原始响应
+      return response; // API 直接返回地址数组
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // 使用 useEffect 处理数据变化
   useEffect(() => {
-    // 设置默认选中的地址
-    const defaultAddress = addresses.find(addr => addr.isDefault);
-    if (defaultAddress) {
-      setSelectedAddress(defaultAddress.id);
+    console.log('userAddressList in effect:', userAddressList);
+    if (userAddressList && userAddressList.length > 0) { // 直接检查数组
+      console.log('Setting addresses from:', userAddressList);
+      setAddresses(userAddressList);
+      // 如果有默认地址，自动选中
+      const defaultAddress = userAddressList.find(
+        (addr: UserAddress) => addr.IsDefault === 1
+      );
+      if (defaultAddress) {
+        setSelectedAddress(defaultAddress.userId);
+      }
     }
-  }, []);
+  }, [userAddressList]);
+
+  console.log('Current addresses state:', addresses);
+  console.log('Selected address:', selectedAddress);
+
+  // 编辑地址
+  const handleEditAddress = (address: UserAddress) => {
+    setEditingAddress(address);
+    setAddressFormVisible(true);
+  };
+
+  // 删除地址
+  const handleDeleteAddress = async (addressId: string) => {
+    try {
+      await deleteAddress(addressId);
+      message.success('删除地址成功');
+      refetchAddresses();
+    } catch (error) {
+      message.error('删除地址失败');
+    }
+  };
 
   // 计算订单总价
   const calculateTotal = () => {
@@ -77,7 +123,7 @@ const OrderConfirm: React.FC = () => {
         productId: Number(id),
         skuId: selectedSku ? selectedSku.id : null,
         quantity,
-        addressId: selectedAddress,
+        addressId: selectedAddress.toString(),
         remark: form.getFieldValue('remark') || '',
         paymentMethod: form.getFieldValue('paymentMethod') || 'wallet'
       };
@@ -126,33 +172,102 @@ const OrderConfirm: React.FC = () => {
     <div className={styles.exchangeContainer}>
       <Title level={4} className={styles.pageTitle}>确认兑换</Title>
       
-      {/* 收货地址 */}
-      <Card className={styles.addressCard} title="收货地址">
-        <Radio.Group 
-          value={selectedAddress} 
-          onChange={(e) => setSelectedAddress(e.target.value)}
-          className={styles.addressGroup}
-        >
-          <Space direction="vertical" style={{ width: '100%' }}>
-            {addresses.map(addr => (
-              <Radio key={addr.id} value={addr.id} className={styles.addressItem}>
-                <div className={styles.addressContent}>
-                  <div className={styles.addressHeader}>
-                    <span className={styles.addressName}>{addr.name}</span>
-                    <span className={styles.addressPhone}>{addr.phone}</span>
-                    {addr.isDefault && <span className={styles.defaultTag}>默认</span>}
+      {/* 收货地址卡片 */}
+      <Card 
+        className={styles.addressCard} 
+        title="收货地址"
+        extra={
+          <Button 
+            type="link" 
+            onClick={() => {
+              setEditingAddress(null);
+              setAddressFormVisible(true);
+            }}
+          >
+            + 添加新地址
+          </Button>
+        }
+        loading={addressLoading}
+      >
+        {addresses && addresses.length > 0 ? (
+          <Radio.Group 
+            value={selectedAddress} 
+            onChange={(e) => setSelectedAddress(e.target.value)}
+            className={styles.addressGroup}
+          >
+            <Space direction="vertical" style={{ width: '100%' }}>
+              {addresses.map(addr => (
+                <Radio key={addr.userId} value={addr.userId}>
+                  <div className={styles.addressItem}>
+                    <div className={styles.addressContent}>
+                      <div className={styles.addressHeader}>
+                        <span className={styles.addressName}>{addr.Creator}</span>
+                        <span className={styles.addressPhone}>{addr.userCode}</span>
+                        {addr.IsDefault === 1 && (
+                          <span className={styles.defaultTag}>默认地址</span>
+                        )}
+                      </div>
+                      <div className={styles.addressDetail}>
+                        <EnvironmentOutlined className={styles.addressIcon} />
+                        <span className={styles.addressText}>
+                          {addr.ProvinceName} {addr.CityName} {addr.DistrictName} {addr.HouseAddress}
+                        </span>
+                      </div>
+                      <div className={styles.addressActions}>
+                        <Button 
+                          type="link" 
+                          size="small" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEditAddress(addr);
+                          }}
+                        >
+                          编辑
+                        </Button>
+                        <Divider type="vertical" />
+                        <Button 
+                          type="link" 
+                          size="small" 
+                          danger
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteAddress(addr.userId.toString());
+                          }}
+                        >
+                          删除
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <div className={styles.addressDetail}>
-                    <EnvironmentOutlined className={styles.addressIcon} />
-                    {addr.address}
-                  </div>
-                </div>
-              </Radio>
-            ))}
-          </Space>
-        </Radio.Group>
-        <Button type="link" className={styles.addAddressBtn}>+ 添加新地址</Button>
+                </Radio>
+              ))}
+            </Space>
+          </Radio.Group>
+        ) : (
+          <Empty 
+            description="暂无收货地址" 
+            image={Empty.PRESENTED_IMAGE_SIMPLE} 
+          />
+        )}
       </Card>
+
+      {/* 地址表单 */}
+      <AddressForm
+        visible={addressFormVisible}
+        onCancel={() => {
+          setAddressFormVisible(false);
+          setEditingAddress(null);
+        }}
+        onSubmit={() => {
+          setAddressFormVisible(false);
+          setEditingAddress(null);
+          refetchAddresses();
+        }}
+        initialValues={editingAddress}
+        title={editingAddress ? '编辑收货地址' : '添加收货地址'}
+      />
       
       {/* 商品信息 */}
       <Card className={styles.productCard} title="商品信息">
