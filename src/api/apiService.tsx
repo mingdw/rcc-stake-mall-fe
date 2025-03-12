@@ -87,8 +87,6 @@ const getCurrentAddress = () => {
   // 如果没有地址，使用默认测试地址
   return authManager.address;
 };
-
-const defaultAddress = 0x67003e9d9B26Ed30B8AfeA6da762279D7c83abC2
 // 商品列表请求参数接口
 interface ProductListRequest {
   categoryCodes: string;
@@ -511,8 +509,7 @@ export type {
   AddressResponse,
   UserAddressListRequest,
   UserAddressListResponse,
-  UserAddress,
-  defaultAddress
+  UserAddress
 };
 
 

@@ -37,6 +37,12 @@ const OrderConfirm: React.FC = () => {
         productCode: '' 
       });
     },
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retry: false,
   });
 
   // 添加 console.log 来调试
@@ -257,24 +263,45 @@ const OrderConfirm: React.FC = () => {
       />
       
       {/* 商品信息 */}
-      <Card className={styles.productCard} title="商品信息">
-        <div className={styles.productItem}>
-          <img 
-            src={product.productSpu.images[0]} 
-            alt={product.productSpu.name} 
-            className={styles.productImage} 
-          />
-          <div className={styles.productInfo}>
-            <div className={styles.productName}>{product.productSpu.name}</div>
-            {selectedSku && (
-              <div className={styles.productSpecs}>
-                规格：{selectedSku.specs}
+      <Card 
+        className={styles.productCard} 
+        title="商品信息"
+      >
+        <div className={styles.productWrapper}>
+          <div className={styles.productItem}>
+            <div className={styles.productBasic}>
+              <img 
+                src={product.productSpu.images[0]} 
+                alt={product.productSpu.name} 
+                className={styles.productImage} 
+              />
+              <div className={styles.productInfo}>
+                <div className={styles.productMain}>
+                  <div className={styles.productName}>{product.productSpu.name}</div>
+                  <div className={styles.productPrice}>
+                    <span className={styles.price}>
+                      ¥{(selectedSku ? selectedSku.price : product.productSpu.realPrice).toFixed(2)}
+                    </span>
+                    <span className={styles.quantity}>x{quantity}</span>
+                  </div>
+                </div>
+                {selectedSku && (
+                  <div className={styles.productSpecs}>
+                    规格：{selectedSku.specs}
+                  </div>
+                )}
               </div>
-            )}
-            <div className={styles.productPrice}>
-              <span className={styles.price}>¥{selectedSku ? selectedSku.price.toFixed(2) : product.productSpu.realPrice.toFixed(2)}</span>
-              <span className={styles.quantity}>x {quantity}</span>
             </div>
+          </div>
+        </div>
+        <div className={styles.productSummary}>
+          <div className={styles.summaryRow}>
+            <span>商品总价</span>
+            <span className={styles.summaryPrice}>¥{calculateTotal().toFixed(2)}</span>
+          </div>
+          <div className={styles.summaryTotal}>
+            <span>应付总额：</span>
+            <span className={styles.totalPrice}>¥{calculateTotal().toFixed(2)}</span>
           </div>
         </div>
       </Card>
