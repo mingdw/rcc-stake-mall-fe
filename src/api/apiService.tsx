@@ -1,3 +1,5 @@
+import { useAuth } from '../context/AuthContext';
+import { authManager } from '../utils/authManager';
 import axiosInstance from './axiosInstance';
 import { message } from 'antd';
 
@@ -80,6 +82,11 @@ interface ProductListResponse {
   total: number;
   categories: CategoryProduct[];
 }
+
+const getCurrentAddress = () => {
+  // 如果没有地址，使用默认测试地址
+  return authManager.address;
+};
 
 const defaultAddress = 0x67003e9d9B26Ed30B8AfeA6da762279D7c83abC2
 // 商品列表请求参数接口
@@ -277,7 +284,11 @@ const handleApiError = (error: any, customMessage?: string) => {
 // 获取质押币种列表
 export const getSuplyList = async () => {
   try {
-    const response = await axiosInstance.get('/suply');
+    const response = await axiosInstance.get('/suply',{
+      headers: {
+        'x-address': getCurrentAddress()
+      }
+    });
     if (response.status === 200 && response.data.code === 0) {
       return response.data;
     }
@@ -363,7 +374,11 @@ export const getProductList = async (params: ProductListRequest): Promise<Produc
 // 获取商品详情
 export const getProductDetail = async (params: ProductDetailRequest): Promise<ProductDetailResponse | null> => {
   try {
-    const response = await axiosInstance.post('/v1/products/getProductDetails', params);
+    const response = await axiosInstance.post('/v1/products/getProductDetails', params,{
+      headers: {
+        'x-address': getCurrentAddress()
+      }
+    });
     if (response.status === 200 && response.data.code === 0) {
       return response.data.data;
     }
@@ -398,7 +413,11 @@ export const submitOrder = async (orderData: any) => {
 // 获取地址列表
 export const getAddressList = async (params: ListAddressRequest) : Promise<AddressResponse> => {
   try {
-    const response = await axiosInstance.post('/v1/address',  params );
+    const response = await axiosInstance.post('/v1/address',  params, {
+      headers: {
+        'x-address': getCurrentAddress()
+      }
+    });
     if (response.status === 200 && response.data.code === 0) {
       return response.data.data;
     }
@@ -410,7 +429,11 @@ export const getAddressList = async (params: ListAddressRequest) : Promise<Addre
 
 export const getUserAddressList = async (params: UserAddressListRequest): Promise<UserAddress[]> => {
   try {
-    const response = await axiosInstance.post('/v1/userAddress', params);
+    const response = await axiosInstance.post('/v1/userAddress', params, {
+      headers: {
+        'x-address': getCurrentAddress()
+      }
+    });
     if (response.status === 200 && response.data.code === 0) {
       return response.data.data;
     }
@@ -426,7 +449,11 @@ export const getUserAddressList = async (params: UserAddressListRequest): Promis
 // 更新或者添加地址
 export const addOrUpdateUserAddress = async (addressData: UserAddress) => {
   try {
-    const response = await axiosInstance.post('/v1/userAddress/addAndUpdate', addressData);
+    const response = await axiosInstance.post('/v1/userAddress/addAndUpdate', addressData, {
+      headers: {
+        'x-address': getCurrentAddress()
+      }
+    });
     if (response.status === 200 && response.data.code === 0) {
       return response.data.data;
     }
