@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Modal, Radio, Select, Space, message } from 'antd';
+import { Form, Input, Modal, Radio, Select, Space, message, Checkbox } from 'antd';
 import { UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import styles from './AddressForm.module.scss';
 import type { Address, ListAddressRequest, UserAddress } from '../../api/apiService';
@@ -49,13 +49,13 @@ const AddressForm: React.FC<AddressFormProps> = ({
             if (selectedProvince?.children) {
               setCityOptions(selectedProvince.children);
               
-              if (initialValues.CityCode) {
-                const selectedCity = selectedProvince.children.find(c => c.code === initialValues.CityCode);
+              if (initialValues.cityCode) {
+                const selectedCity = selectedProvince.children.find(c => c.code === initialValues.cityCode);
                 if (selectedCity?.children) {
                   setDistrictOptions(selectedCity.children);
                   
-                  if (initialValues.DistrictCode) {
-                    const selectedDistrict = selectedCity.children.find(d => d.code === initialValues.DistrictCode);
+                  if (initialValues.districtCode) {
+                    const selectedDistrict = selectedCity.children.find(d => d.code === initialValues.districtCode);
                     if (selectedDistrict?.children) {
                       setStreetOptions(selectedDistrict.children);
                     }
@@ -83,13 +83,21 @@ const AddressForm: React.FC<AddressFormProps> = ({
   useEffect(() => {
     if (visible && initialValues) {
       form.setFieldsValue({
-        Creator: initialValues.Creator,
+        userId: initialValues.userId,
         userCode: initialValues.userCode,
+        reciverName: initialValues.reciverName,
+        reciverPhone: initialValues.reciverPhone,
         provinceCode: initialValues.provinceCode,
-        cityCode: initialValues.CityCode,
-        districtCode: initialValues.DistrictCode,
-        HouseAddress: initialValues.HouseAddress,
-        IsDefault: initialValues.IsDefault === 1
+        provinceName: initialValues.provinceName,
+        cityCode: initialValues.cityCode,
+        cityName: initialValues.cityName,
+        districtCode: initialValues.districtCode,
+        districtName: initialValues.districtName,
+        streetCode: initialValues.streetCode,
+        streetName: initialValues.streetName,
+        fullAddress: initialValues.fullAddress,
+        houseAddress: initialValues.houseAddress,
+        isDefault: initialValues.isDefault === 1
       });
     } else {
       form.resetFields();
@@ -100,8 +108,11 @@ const AddressForm: React.FC<AddressFormProps> = ({
   const handleProvinceChange = (provinceCode: string) => {
     form.setFieldsValue({ 
       cityCode: undefined, 
+      cityName: undefined,
       districtCode: undefined,
-      streetCode: undefined
+      districtName: undefined,
+      streetCode: undefined,
+      streetName: undefined
     });
     setDistrictOptions([]);
     setStreetOptions([]);
@@ -118,7 +129,9 @@ const AddressForm: React.FC<AddressFormProps> = ({
   const handleCityChange = (cityCode: string) => {
     form.setFieldsValue({ 
       districtCode: undefined,
-      streetCode: undefined
+      districtName: undefined,
+      streetCode: undefined,
+      streetName: undefined
     });
     setStreetOptions([]);
     
@@ -134,7 +147,8 @@ const AddressForm: React.FC<AddressFormProps> = ({
   // 区县选择改变时
   const handleDistrictChange = (districtCode: string) => {
     form.setFieldsValue({ 
-      streetCode: undefined 
+      streetCode: undefined,
+      streetName: undefined
     });
     
     const selectedProvince = addressData.find(p => p.code === form.getFieldValue('provinceCode'));
@@ -147,6 +161,20 @@ const AddressForm: React.FC<AddressFormProps> = ({
     }
   };
 
+  // 街道选择改变时
+  const handleStreetChange = (streetCode: string) => {
+    const selectedProvince = addressData.find(p => p.code === form.getFieldValue('provinceCode'));
+    const selectedCity = selectedProvince?.children?.find(c => c.code === form.getFieldValue('cityCode'));
+    const selectedDistrict = selectedCity?.children?.find(d => d.code === form.getFieldValue('districtCode'));
+    const selectedStreet = selectedDistrict?.children?.find(s => s.code === streetCode);
+    
+    if (selectedStreet) {
+      form.setFieldsValue({ 
+        streetName: selectedStreet.name 
+      });
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -155,39 +183,34 @@ const AddressForm: React.FC<AddressFormProps> = ({
       const selectedProvince = addressData.find(p => p.code === values.provinceCode);
       const selectedCity = cityOptions.find(c => c.code === values.cityCode);
       const selectedDistrict = districtOptions.find(d => d.code === values.districtCode);
+      const selectedStreet = streetOptions.find(s => s.code === values.streetCode);
 
       const submitData: UserAddress = {
-        id: initialValues?.id || -1,
+        id: initialValues?.id || 0,
         userId: initialValues?.userId || -1,
         userCode: values.userCode || '0x324234',
-        phone: values.phone,
-        nickname: values.nickname,
+        reciverPhone: values.reciverPhone,
+        reciverName: values.reciverName,
         provinceCode: values.provinceCode,
-        ProvinceName: selectedProvince?.name || '',
-        CityCode: values.cityCode,
-        CityName: selectedCity?.name || '',
-        DistrictCode: values.districtCode,
-        DistrictName: selectedDistrict?.name || '',
-        StreetCode: values.streetCode,
-        StreetName: selectedDistrict?.name || '',
-        HouseAddress: values.houseAddress,
-        FullAddress: `${values.nickname} +","+${values.phone} +","+${selectedProvince?.name || ''}+" "+${selectedCity?.name || ''}+" "+${selectedDistrict?.name || ''}+" "+${values.houseAddress}`,
-        IsDefault: values.IsDefault ? 1 : 0,
-        Longitude: '',
-        Latitude: '',
-        IsDeleted: 0,
-        Creator: values.Creator,
-        Updator: values.Creator
+        provinceName: selectedProvince?.name || '',
+        cityCode: values.cityCode,
+        cityName: selectedCity?.name || '',
+        districtCode: values.districtCode,
+        districtName: selectedDistrict?.name || '',
+        streetCode: values.streetCode || '',
+        streetName: selectedStreet?.name || '',
+        houseAddress: values.houseAddress,
+        fullAddress: `${values.reciverName}, ${values.reciverPhone}, ${selectedProvince?.name || ''} ${selectedCity?.name || ''} ${selectedDistrict?.name || ''} ${selectedStreet?.name || ''} ${values.houseAddress}`,
+        isDefault: values.isDefault ? 1 : 0,
+        longitude: '',
+        latitude: '',
+        isDeleted:0,
+        creator: values.Creator,
+        updator: values.Creator
       };
 
-      if (initialValues?.id!=-1) {
-        await addOrUpdateUserAddress(submitData);
-        message.success('更新地址成功');
-      } else {
-        await addOrUpdateUserAddress(submitData);
-        message.success('添加地址成功');
-      }
-      
+      await addOrUpdateUserAddress(submitData);
+      message.success(initialValues?.id !== -1 ? '更新地址成功' : '添加地址成功');
       form.resetFields();
       onSubmit();
     } catch (error) {
@@ -214,7 +237,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
         initialValues={{ IsDefault: false }}
       >
         <Form.Item
-          name="nickname"
+          name="reciverName"
           label="收货人"
           rules={[{ required: true, message: '请输入收货人姓名' }]}
         >
@@ -222,7 +245,7 @@ const AddressForm: React.FC<AddressFormProps> = ({
         </Form.Item>
 
         <Form.Item
-          name="phone"
+          name="reciverPhone"
           label="联系电话"
           rules={[
             { required: true, message: '请输入联系电话' },
@@ -285,10 +308,10 @@ const AddressForm: React.FC<AddressFormProps> = ({
             <Form.Item
               name="streetCode"
               noStyle
-              rules={[{ required: false, message: '请选择街道' }]}
             >
               <Select
                 placeholder="街道"
+                onChange={handleStreetChange}
                 disabled={!form.getFieldValue('districtCode')}
               >
                 {streetOptions.map(street => (
@@ -310,8 +333,8 @@ const AddressForm: React.FC<AddressFormProps> = ({
           />
         </Form.Item>
 
-        <Form.Item name="IsDefault" valuePropName="checked">
-          <Radio>设为默认地址</Radio>
+        <Form.Item name="isDefault" valuePropName="checked">
+          <Checkbox>设为默认地址</Checkbox>
         </Form.Item>
       </Form>
     </Modal>

@@ -243,24 +243,24 @@ interface UserAddress {
   id: number;
   userId: number;
   userCode: string;
-  phone: string;
-  nickname: string;
+  reciverName: string;
+  reciverPhone: string;
   provinceCode: string;
-	ProvinceName: string;
-	CityCode: string;
-	CityName: string;
-	DistrictCode: string;
-	DistrictName: string;
-	StreetCode: string;
-	StreetName: string;
-  HouseAddress: string;
-  FullAddress: string;
-  IsDefault: number;
-  Longitude: string;
-  Latitude: string;
-  IsDeleted: number;
-  Creator: string;
-  Updator: string;
+	provinceName: string;
+	cityCode: string;
+	cityName: string;
+	districtCode: string;
+	districtName: string;
+	streetCode: string;
+	streetName: string;
+  houseAddress: string;
+	fullAddress: string;
+	isDefault: number;
+	longitude: string;
+	latitude: string;
+	isDeleted: number;
+	creator: string;
+	updator: string;
 }
 
 // 统一的错误处理函数
@@ -438,9 +438,9 @@ export const addOrUpdateUserAddress = async (addressData: UserAddress) => {
 
 
 // 删除地址
-export const deleteAddress = async (id: string) => {
+export const deleteAddress = async (id: number) => {
   try {
-    const response = await axiosInstance.delete(`/v1/user/addresses/${id}`);
+    const response = await axiosInstance.delete(`/v1/userAddress/delete/${id}`);
     if (response.status === 200 && response.data.code === 0) {
       return true;
     }

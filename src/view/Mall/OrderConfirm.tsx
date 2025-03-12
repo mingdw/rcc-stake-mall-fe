@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Card, Typography, Button, Form, Input, Radio, Space, Divider, message, Spin, Empty } from 'antd';
-import { EnvironmentOutlined } from '@ant-design/icons';
+import { Card, Typography, Button, Form, Input, Radio, Space, Divider, message, Spin, Empty, Tag } from 'antd';
+import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getProductDetail, submitOrder, deleteAddress, getUserAddressList } from '../../api/apiService';
 import styles from './OrderConfirm.module.scss';
@@ -60,22 +60,22 @@ const OrderConfirm: React.FC = () => {
 
   // 使用 useEffect 处理数据变化
   useEffect(() => {
-    console.log('userAddressList in effect:', userAddressList);
-    if (userAddressList && userAddressList.length > 0) { // 直接检查数组
-      console.log('Setting addresses from:', userAddressList);
+    if (userAddressList && userAddressList.length > 0) {
       setAddresses(userAddressList);
-      // 如果有默认地址，自动选中
+      // 如果有默认地址，自动选中默认地址，否则选择第一个地址
       const defaultAddress = userAddressList.find(
-        (addr: UserAddress) => addr.IsDefault === 1
+        (addr: UserAddress) => addr.isDefault === 1
       );
-      if (defaultAddress) {
-        setSelectedAddress(defaultAddress.userId);
-      }
+      setSelectedAddress(defaultAddress ? defaultAddress.id : userAddressList[0].id);
     }
   }, [userAddressList]);
 
-  console.log('Current addresses state:', addresses);
-  console.log('Selected address:', selectedAddress);
+  // 对地址列表进行排序，默认地址排在最前面
+  const sortedAddresses = [...addresses].sort((a, b) => {
+    if (a.isDefault === 1 && b.isDefault !== 1) return -1;
+    if (a.isDefault !== 1 && b.isDefault === 1) return 1;
+    return 0;
+  });
 
   // 编辑地址
   const handleEditAddress = (address: UserAddress) => {
@@ -84,7 +84,7 @@ const OrderConfirm: React.FC = () => {
   };
 
   // 删除地址
-  const handleDeleteAddress = async (addressId: string) => {
+  const handleDeleteAddress = async (addressId: number) => {
     try {
       await deleteAddress(addressId);
       message.success('删除地址成功');
@@ -175,7 +175,11 @@ const OrderConfirm: React.FC = () => {
       {/* 收货地址卡片 */}
       <Card 
         className={styles.addressCard} 
-        title="收货地址"
+        title={
+          <div className={styles.cardTitle}>
+            <EnvironmentOutlined /> 收货地址
+          </div>
+        }
         extra={
           <Button 
             type="link" 
@@ -183,74 +187,57 @@ const OrderConfirm: React.FC = () => {
               setEditingAddress(null);
               setAddressFormVisible(true);
             }}
+            icon={<PlusOutlined />}
           >
-            + 添加新地址
+            添加新地址
           </Button>
         }
         loading={addressLoading}
       >
-        {addresses && addresses.length > 0 ? (
-          <Radio.Group 
-            value={selectedAddress} 
-            onChange={(e) => setSelectedAddress(e.target.value)}
-            className={styles.addressGroup}
-          >
-            <Space direction="vertical" style={{ width: '100%' }}>
-              {addresses.map(addr => (
-                <Radio key={addr.userId} value={addr.userId}>
-                  <div className={styles.addressItem}>
-                    <div className={styles.addressContent}>
-                      <div className={styles.addressHeader}>
-                        <span className={styles.addressName}>{addr.Creator}</span>
-                        <span className={styles.addressPhone}>{addr.userCode}</span>
-                        {addr.IsDefault === 1 && (
-                          <span className={styles.defaultTag}>默认地址</span>
-                        )}
-                      </div>
-                      <div className={styles.addressDetail}>
-                        <EnvironmentOutlined className={styles.addressIcon} />
-                        <span className={styles.addressText}>
-                          {addr.ProvinceName} {addr.CityName} {addr.DistrictName} {addr.HouseAddress}
-                        </span>
-                      </div>
-                      <div className={styles.addressActions}>
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleEditAddress(addr);
-                          }}
-                        >
-                          编辑
-                        </Button>
-                        <Divider type="vertical" />
-                        <Button 
-                          type="link" 
-                          size="small" 
-                          danger
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleDeleteAddress(addr.userId.toString());
-                          }}
-                        >
-                          删除
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </Radio>
-              ))}
-            </Space>
-          </Radio.Group>
-        ) : (
-          <Empty 
-            description="暂无收货地址" 
-            image={Empty.PRESENTED_IMAGE_SIMPLE} 
-          />
-        )}
+        <div className={styles.addressGroup}>
+          {sortedAddresses.map(addr => (
+            <div 
+              key={addr.id}
+              className={`${styles.addressItem} ${selectedAddress === addr.id ? styles.selected : ''}`}
+              onClick={() => setSelectedAddress(addr.id)}
+              data-default={addr.isDefault === 1}
+            >
+              <div className={styles.addressContent}>
+                <div className={styles.addressInfo}>
+                  {addr.isDefault === 1 && (
+                    <span className={styles.defaultTag}>默认地址</span>
+                  )}
+                  <span className={styles.name}>{addr.reciverName}</span>
+                  <span className={styles.phone}>{addr.reciverPhone}</span>
+                  <span className={styles.addressDetail}>
+                    {addr.provinceName} {addr.cityName} {addr.districtName} {addr.streetName} {addr.houseAddress}
+                  </span>
+                </div>
+                <div className={styles.addressActions}>
+                  <Button 
+                    type="link" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditAddress(addr);
+                    }}
+                  >
+                    编辑
+                  </Button>
+                  <Divider type="vertical" />
+                  <Button 
+                    type="link" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteAddress(addr.id);
+                    }}
+                  >
+                    删除
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </Card>
 
       {/* 地址表单 */}
