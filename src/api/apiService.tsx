@@ -81,6 +81,7 @@ interface ProductListResponse {
   categories: CategoryProduct[];
 }
 
+const defaultAddress = 0x67003e9d9B26Ed30B8AfeA6da762279D7c83abC2
 // 商品列表请求参数接口
 interface ProductListRequest {
   categoryCodes: string;
@@ -483,7 +484,8 @@ export type {
   AddressResponse,
   UserAddressListRequest,
   UserAddressListResponse,
-  UserAddress
+  UserAddress,
+  defaultAddress
 };
 
 
