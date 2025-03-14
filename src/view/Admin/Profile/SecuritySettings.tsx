@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LockOutlined } from '@ant-design/icons';
-import AdminContentCard from '../AdminContentCard';
 import { Form, Input, Button, Switch, message } from 'antd';
+import AdminContentCard from '../AdminContentCard';
 
 const SecuritySettings: React.FC = () => {
     const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);

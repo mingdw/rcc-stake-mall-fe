@@ -1,7 +1,7 @@
 import React from 'react';
 import { HistoryOutlined } from '@ant-design/icons';
-import AdminContentCard from '../AdminContentCard';
 import { List } from 'antd';
+import AdminContentCard from '../AdminContentCard';
 
 const TransactionHistory: React.FC = () => {
     // 示例数据

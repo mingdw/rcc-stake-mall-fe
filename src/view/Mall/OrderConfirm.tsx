@@ -5,9 +5,9 @@ import { EnvironmentOutlined, PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { getProductDetail, submitOrder, deleteAddress, getUserAddressList } from '../../api/apiService';
 import styles from './OrderConfirm.module.scss';
-import { useAuth } from '../../context/AuthContext';
 import AddressForm from './AddressForm';
 import type { UserAddress, UserAddressListResponse } from '../../api/apiService';
+import { authManager } from '../../utils/authManager';
 
 const { Title, Text } = Typography;
 
@@ -15,7 +15,6 @@ const OrderConfirm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const { authData } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -45,8 +44,6 @@ const OrderConfirm: React.FC = () => {
     retry: false,
   });
 
-  // 添加 console.log 来调试
-  console.log('authData:', authData);
 
   // 获取用户地址列表
   const { data: userAddressList, isLoading: addressLoading, refetch: refetchAddresses } = useQuery<
@@ -112,7 +109,7 @@ const OrderConfirm: React.FC = () => {
     try {
       await form.validateFields();
       
-      if (!authData.address) {
+      if (!authManager.address) {
         message.error('请先连接钱包');
         return;
       }
@@ -372,7 +369,7 @@ const OrderConfirm: React.FC = () => {
           className={styles.submitButton}
           onClick={handleSubmit}
           loading={submitting}
-          disabled={!authData.address}
+          disabled={!authManager.address}
         >
           提交订单
         </Button>

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAccount, useBalance, useChainId } from 'wagmi';
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { formatBalance } from "../utils/common";
-import { useAuth } from "../context/AuthContext";
+import { authManager } from "../utils/authManager";
 
 const NotConnected: React.FC = () => {
     const location = useLocation();
@@ -14,7 +14,6 @@ const NotConnected: React.FC = () => {
     const { openConnectModal } = useConnectModal();
     const { isConnected, address } = useAccount(); // 获取连接状态和地址
     const { data: balance, isLoading, isError, refetch } = useBalance({ address,query:{enabled:true} });
-    const { authData, setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
     // 监听连接状态变化
     React.useEffect(() => {
         if (isConnected) {
@@ -31,14 +30,10 @@ const NotConnected: React.FC = () => {
                 openConnectModal?.();
               }else{
                 //  如果连接成功，setAuthData
-                setAuthData({
-                  address: address,
-                  balance: formatBalance(balance?.value.toString() || '0'),
-                  chainID: chainId,
-                  name: '',
-                  isAdmin: false,
-                });
-                console.log(" 连接成功: " + JSON.stringify(authData));
+                authManager.setAddress(address || '');
+                authManager.setBalance(formatBalance(balance?.value.toString() || '0'));
+                await authManager.setUserInfoByAddress(address || '');
+                console.log(" 连接成功: " + JSON.stringify(authManager.userInfo));
               }
         } catch (error) {
             console.error('连接钱包失败:', error);

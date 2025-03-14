@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import { QuestionOutlined, LogoutOutlined, CheckOutlined, HomeOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined, DownOutlined ,ShopOutlined} from '@ant-design/icons';
+import { QuestionOutlined, LogoutOutlined, CheckOutlined, HomeOutlined, AppstoreOutlined, TransactionOutlined, TeamOutlined, UserOutlined, CopyOutlined, DownOutlined, ShopOutlined } from '@ant-design/icons';
 import { MenuProps, Avatar, message, Input } from 'antd';
 import { Col, Row, Layout, Menu, Space, Select, Button, Dropdown, Typography } from 'antd';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -9,12 +9,12 @@ import mainCss from './MainLayout.module.scss';
 import { useTranslation } from 'react-i18next';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useAccount, useBalance, useChainId, useChains, useDisconnect, useSwitchChain } from 'wagmi';
-import { useAuth } from '../context/AuthContext';
 import { formatBalance, shortenAddress } from '../utils/common';
 import { ABOUT_PATH_NAME, chainIcons, HOME_PATH_NAME, SMALL_PATH_NAME, SUPLY_PATH_NAME } from '../config/valiable';
+import { authManager } from '../utils/authManager';
+import { getUserInfo, isAdmin } from '../api/apiService';
 
 const { Header, Content, Footer } = Layout;
-
 
 const languges = [{
   value: 'zh',
@@ -26,17 +26,15 @@ const languges = [{
 },
 ];
 
-
 const MainLayout: FC = () => {
   const chainId = useChainId();
   type MenuItem = Required<MenuProps>['items'][number];
-  const { openConnectModal } = useConnectModal(); // 调用 useConnectModal
-  const { isConnected, address } = useAccount(); // 获取连接状态和地址
-  const { disconnect } = useDisconnect(); // 获取 disconnect 方法
-  const { data: balance, refetch } = useBalance({ address,query:{enabled:true} });
+  const { openConnectModal } = useConnectModal();
+  const { isConnected, address } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { data: balance, refetch } = useBalance({ address, query: { enabled: true } });
   const { switchChain } = useSwitchChain();
-  const chains = useChains(); // 获取可用的链
-  const { authData, setAuthData } = useAuth(); // 使用 useAuth 获取 setAuthData 函数
+  const chains = useChains();
 
   // 监听账户变化
   useEffect(() => {
@@ -49,17 +47,41 @@ const MainLayout: FC = () => {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       }
     };
-    
   }, []);
 
-  
+  // 初始化用户信息
+  useEffect(() => {
+    const initUserInfo = async () => {
+      if (isConnected && address) {
+        try {
+          // 获取用户信息
+          const userInfoData = await getUserInfo(address);
+          if (userInfoData) {
+            authManager.setUserInfo(userInfoData);
+          }
+          
+          // 检查是否为管理员
+          const adminCheckResult = await isAdmin(address);
+          const isAdminUser = adminCheckResult?.data?.isAdmin || false;
+          
+          // 更新地址和余额
+          authManager.setAddress(address);
+          const balanceInETH = formatBalance(balance?.value.toString() || '0');
+          authManager.setBalance(balanceInETH);
+        } catch (error) {
+          console.error('Error initializing user info:', error);
+        }
+      }
+    };
+    
+    initUserInfo();
+  }, [isConnected, address, balance]);
+
   // 监听余额变化
   useEffect(() => {
     if (balance && address) {
       const balanceInETH = formatBalance(balance.value.toString() || '0');
-      setAuthData({
-        balance: balanceInETH,
-      });
+      authManager.setBalance(balanceInETH);
     }
   }, [balance, address]);
 
@@ -80,12 +102,16 @@ const MainLayout: FC = () => {
     try {
       // 清理旧的连接状态
       await handleDisconnectWallet();
+      
       // 更新状态为新账户
-      setAuthData({
-        address: newAccount,
-        balance: formatBalance(balance?.value.toString() || '0'), // 新的余额将通过 useBalance 自动获取
-        chainID: chainId,
-      });
+      authManager.setAddress(newAccount);
+      authManager.setBalance(formatBalance(balance?.value.toString() || '0'));
+      
+      // 获取新账户的用户信息
+      const userInfoData = await getUserInfo(newAccount);
+      if (userInfoData) {
+        authManager.setUserInfo(userInfoData);
+      }
     } catch (error) {
       console.error('Error switching account:', error);
     }
@@ -96,14 +122,9 @@ const MainLayout: FC = () => {
     try {
       await disconnect();
       // 清理所有状态
-      setAuthData({
-        address: '',
-        balance: '',
-        chainID: -1,
-        name: '',
-        isAdmin: false,
-      });
-      // 可能需要清理其他状态...
+      authManager.setAddress('');
+      authManager.setBalance('0');
+      authManager.setUserInfo(null);
     } catch (error) {
       console.error('Error disconnecting wallet:', error);
     }
@@ -113,24 +134,23 @@ const MainLayout: FC = () => {
   const handleConnectWallet = async () => {
     if (!isConnected) {
       openConnectModal?.();
-    }else{
-      //  如果连接成功，setAuthData
-      setAuthData({
-        address: address,
-        balance: formatBalance(balance?.value.toString() || '0'),
-        chainID: chainId,
-        name: '',
-        isAdmin: false,
-      });
-      console.log(" 连接成功: " + JSON.stringify(authData));
+    } else {
+      // 如果连接成功，更新 authManager
+      authManager.setAddress(address || '');
+      authManager.setBalance(formatBalance(balance?.value.toString() || '0'));
+      
+      // 获取用户信息
+      const userInfoData = await getUserInfo(address || '');
+      if (userInfoData) {
+        authManager.setUserInfo(userInfoData);
+      }
+      
+      console.log("连接成功: " + JSON.stringify(authManager.userInfo));
     }
   };
 
-
- 
   const [current, setCurrent] = useState('home');
   const navigate = useNavigate();
-
 
   const { t, i18n } = useTranslation();
   const items: MenuItem[] = [
@@ -139,13 +159,11 @@ const MainLayout: FC = () => {
       key: HOME_PATH_NAME,
       icon: <HomeOutlined />,
     },
-
     {
       label: t('header.nav.suply'),
       key: SUPLY_PATH_NAME,
       icon: <AppstoreOutlined />,
     },
-
     {
       label: t('header.nav.mall'),
       key: SMALL_PATH_NAME,
@@ -156,9 +174,7 @@ const MainLayout: FC = () => {
       key: ABOUT_PATH_NAME,
       icon: <TeamOutlined />
     },
-
   ];
-
 
   const onClick: MenuProps['onClick'] = (e) => {
     console.log('click ', e);
@@ -171,7 +187,6 @@ const MainLayout: FC = () => {
     i18n.changeLanguage(value);
   };
 
-
   const walletStyle = {
     width: '250px',
     height: 'auto',
@@ -180,13 +195,12 @@ const MainLayout: FC = () => {
     marginBottom: '20px'
   };
 
-
-
   const handleMenuClick = (key: string) => {
     console.info("select key: " + key);
-    if (key == 'disconnect' && isConnected) {
+    if (key === 'disconnect' && isConnected) {
       console.info("disconnect");
       handleDisconnectWallet();
+      authManager.clear();
     } else {
       navigate(key);
     }
@@ -194,29 +208,25 @@ const MainLayout: FC = () => {
 
   const handleNetworkChange = async (value: string) => {
     console.info("切换网络： ", value);
-    const networkId = parseInt(value, 10); // 将字符串转换为数字
+    const networkId = parseInt(value, 10);
     try {
-      await switchChain({ chainId: networkId }); // 等待网络切换完成
-      await refetch(); // 手动调用 refetch 函数
+      await switchChain({ chainId: networkId });
+      await refetch();
     
       const balanceInETH = formatBalance(balance?.value.toString() || '0');
-      console.info("切换网络成功！！！+ 连接状态： " +isConnected + " 余额： " + balanceInETH);
-      await setAuthData({
-        address: address,
-        balance: balanceInETH,
-        chainID: networkId,
-        name: '',
-        isAdmin: false,
-      });
+      console.info("切换网络成功！！！+ 连接状态： " + isConnected + " 余额： " + balanceInETH);
+      
+      // 更新 authManager
+      authManager.setAddress(address || '');
+      authManager.setBalance(balanceInETH);
     } catch (error) {
       console.error('Error occurred during network switch or balance fetch:', error);
       message.error('切换网络或更新余额时出错，请重试');
     }
   };
 
-
   interface UserAvatarProps {
-    size?: number; // 可选的图标大小
+    size?: number;
   }
 
   const UserAvatar: React.FC<UserAvatarProps> = ({ size = 22 }) => {
@@ -225,7 +235,7 @@ const MainLayout: FC = () => {
         style={{
           color: 'white',
           backgroundColor: 'gray',
-          fontSize: `${size}px`, // 根据传入的大小调整字体大小
+          fontSize: `${size}px`,
           width: size,
           height: size,
         }}
@@ -234,10 +244,8 @@ const MainLayout: FC = () => {
     );
   };
 
-
-  //登录成功后，显示钱包相关信息
+  // 登录成功后，显示钱包相关信息
   const WalletInfo = () => {
-    const { Option } = Select;
     const [isCopy, setIsCopy] = useState(false);
 
     const handleCopy = async () => {
@@ -254,6 +262,7 @@ const MainLayout: FC = () => {
         message.error('复制失败，请重试');
       }
     };
+    
     const accountMenu = [
       {
         key: 'account',
@@ -261,7 +270,6 @@ const MainLayout: FC = () => {
         icon: <UserOutlined className='text-info' />,
         children: [],
       },
-
       {
         key: 'contract',
         title: <Typography onClick={() => handleMenuClick('/admin/profile/balance')}>合约管理</Typography>,
@@ -277,7 +285,6 @@ const MainLayout: FC = () => {
       {
         key: 'disconnect2',
         title: '',
-
       },
       {
         key: 'disconnect',
@@ -285,7 +292,6 @@ const MainLayout: FC = () => {
         icon: <LogoutOutlined className='text-danger' />,
         children: [],
       },
-
     ];
 
     return (
@@ -303,13 +309,12 @@ const MainLayout: FC = () => {
               <CopyOutlined className='text-defult' />
             </a>
           }
-
         </Space>
         <div style={{ textAlign: 'center' }}>
           <Row>
             <Col span={8}>
               <span className='text-danger' style={{ fontSize: '12px' }}>
-                {balance ? formatBalance(balance.value.toString()) : 0} ETH
+                {authManager.balance || '0'} ETH
               </span><br />
               <span style={{ fontSize: '10px', color: 'gray' }}>
                 余额
@@ -317,7 +322,7 @@ const MainLayout: FC = () => {
             </Col>
             <Col span={8}>
               <span className='text-danger' style={{ fontSize: '12px' }}>
-                {balance ? formatBalance(balance.value.toString()) : 0} ETH
+                {authManager.balance || '0'} ETH
               </span><br />
               <span style={{ fontSize: '10px', color: 'gray' }}>
                 质押
@@ -344,25 +349,20 @@ const MainLayout: FC = () => {
                 // Handle subMenuItem here if needed
               })) : undefined,
             }))}
-
           />
         </div>
-
       </Space>
     );
   };
 
-
   return (
-
     <Layout>
       <Header style={{ display: 'flex', backgroundColor: 'white', height: '15%' }}>
         <Row style={{ width: '100%', alignItems: 'center' }}>
           <Col style={{ textAlign: 'left', width: '30%' }} >
-          <span className="iconfont" style={{color:'#1296DB',fontSize:'34px'}}>&#xe610;</span>
+            <span className="iconfont" style={{color:'#1296DB',fontSize:'34px'}}>&#xe610;</span>
             <a style={{ marginLeft: '10px' }} href={HOME_PATH_NAME}>
-              <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}
-              </span> 
+              <span className={classnames(mainCss.logoStyle, mainCss.hcqFont, mainCss.hcqStyle1)}>{t('header.logo')}</span> 
             </a>
           </Col>
           <Col style={{ width: '40%' }}>
@@ -373,7 +373,6 @@ const MainLayout: FC = () => {
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
               <Select size={"middle"} defaultValue="简体中文" onChange={handleChange} options={languges} style={{ marginLeft: '10px' }} />
               {isConnected ? (
-
                 <Space style={{ marginLeft: '20px' }}>
                   <Select defaultValue={chains[0].name} options={chains.map((chain) => ({ label: chain.name, value: chain.id, prefixIcon: <img src={chainIcons[chain.id]} alt={chain.name} style={{ width: 20, height: 20 }} /> }))} onSelect={handleNetworkChange} />
                   <Dropdown
@@ -383,25 +382,20 @@ const MainLayout: FC = () => {
                     placement="bottom"
                   >
                     <Input readOnly style={{ width: '70%' }} prefix={<UserAvatar />} defaultValue={shortenAddress(address || '')} suffix={<DownOutlined />} />
-
                   </Dropdown>
                 </Space>
-
               ) : (
                 <div>
                   <Button size={"middle"} icon={<UserOutlined />} onClick={handleConnectWallet} style={{ marginLeft: '10px' }}>
                     {t('walletconnect')}
                   </Button>
-
                 </div>
-
               )}
             </div>
           </Col>
         </Row>
       </Header>
       <Content style={{alignItems:'center',justifyContent:'center'}}>
-        {/* 确保 Outlet 只有一个父元素包裹 */}
         <div>
           <Outlet />
         </div>
@@ -417,7 +411,6 @@ const MainLayout: FC = () => {
         <div>版权所有 &copy; 2025 RCC 平台</div>
       </Footer>
     </Layout>
-
   );
 };
 

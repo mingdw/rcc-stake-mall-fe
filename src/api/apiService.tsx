@@ -1,4 +1,3 @@
-import { useAuth } from '../context/AuthContext';
 import { authManager } from '../utils/authManager';
 import axiosInstance from './axiosInstance';
 import { message } from 'antd';
@@ -269,6 +268,24 @@ interface UserAddress {
 	updator: string;
 }
 
+interface UserInfoResponse {
+  id: number;
+	uniqueId: string;
+	userCode: string;
+	nickname: string;
+	avatar: string;
+	gender: number;
+	birthday: string;
+	email: string;
+	phone: string;
+	password: string;
+	status: number;
+	statusDesc: string;
+	type: number;
+	typeDesc: string;
+	isAdmin: boolean;
+}
+
 // 统一的错误处理函数
 const handleApiError = (error: any, customMessage?: string) => {
   if (error.response?.data?.message) {
@@ -329,11 +346,28 @@ export const isAdmin = async (address: string) => {
     if (response.status === 200 && response.data.code === 0) {
       return response.data;
     }
-    return null;
   } catch (error) {
     handleApiError(error, '检查管理员权限失败');
   }
+
 };
+
+// 获取用户信息
+export const getUserInfo = async (address: string) : Promise<UserInfoResponse | null> => {
+  try {
+    const response = await axiosInstance.get(`/v1/user/${address}`);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    handleApiError(error, '获取用户信息失败');
+    return null;
+  }
+};
+
+
+
 
 // 获取分类列表
 export const getCategoryList = async (): Promise<CategoryResponse[]> => {
@@ -491,6 +525,38 @@ export const setDefaultAddress = async (id: string) => {
   }
 };
 
+// 更新用户头像
+export const updateUserAvatar = async (formData: FormData) => {
+  try {
+    const response = await axiosInstance.post('/v1/user/avatar/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'x-address': getCurrentAddress()
+      }
+    });
+    
+    if (response.status === 200 && response.data.code === 0) {
+      return {
+        success: true,
+        data: {
+          avatarUrl: response.data.data.url
+        }
+      };
+    }
+    
+    return {
+      success: false,
+      message: response.data.message || '上传头像失败'
+    };
+  } catch (error) {
+    handleApiError(error, '上传头像失败');
+    return {
+      success: false,
+      message: '网络错误，请稍后重试'
+    };
+  }
+};
+
 // 导出接口类型
 export type {
   Attr,
@@ -509,7 +575,8 @@ export type {
   AddressResponse,
   UserAddressListRequest,
   UserAddressListResponse,
-  UserAddress
+  UserAddress,
+  UserInfoResponse
 };
 
 

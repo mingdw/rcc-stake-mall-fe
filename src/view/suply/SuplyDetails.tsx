@@ -1,18 +1,17 @@
 import React, { FC, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
 import { Button, Card, Col, Divider, Input, Modal, Progress, Row, Space, Tabs, TabsProps, Tooltip, Typography } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import styles from './SuplyDetails.module.scss'
 import ApyChartCompoment from "../../components/ApyChartCompoment";
 import { pingServer } from "../../api/apiService";
+import { authManager } from "../../utils/authManager";
 
 const SuplyDetails: FC = () => {
     const location = useLocation();
     const { data } = location.state || {}; // 获取传递的行数据
-    const { authData } = useAuth();
    
-    const [balance, setBalance] = useState(authData?.balance ? authData?.balance : '0'); // 使用状态管理 balance
+    const [balance, setBalance] = useState(authManager.balance ? authManager.balance : '0'); // 使用状态管理 balance
 
     const [selectedPeriod, setSelectedPeriod] = useState<'1m' | '6m' | '1y'>('1m');
     const balanceInfo = [
@@ -25,7 +24,7 @@ const SuplyDetails: FC = () => {
     const handleTabChange = (key: string) => {
         setSelectedTab(key);
         console.log(key);
-        console.log("authData: " + JSON.stringify(authData));
+        console.log("authData: " + JSON.stringify(authManager.userInfo));
         setBalance("0.1")
     };
 
@@ -77,8 +76,8 @@ const SuplyDetails: FC = () => {
 
     useEffect(() => {
         console.log("pool key: " + data.key);
-        console.log("authData: " + JSON.stringify(authData));
-    }, [data, authData])
+        console.log("authData: " + JSON.stringify(authManager.userInfo));
+    }, [data, authManager.userInfo])
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [stakeAmount, setStakeAmount] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -89,8 +88,8 @@ const SuplyDetails: FC = () => {
 
     // 计算 ETH 余额对应的 USD 价值
     const getBalanceInUSD = () => {
-        if (!authData?.balance) return '0.00';
-        const usdBalance = (Number(authData.balance) * ETH_TO_USD_RATE).toFixed(2);
+        if (!authManager.balance) return '0.00';
+        const usdBalance = (Number(authManager.balance) * ETH_TO_USD_RATE).toFixed(2);
         return usdBalance;
     };
 
@@ -122,7 +121,7 @@ const SuplyDetails: FC = () => {
         setStakeAmount(inputValue);
 
         // 检查输入值是否大于可用余额
-        if (inputValue && Number(inputValue) > Number(authData.balance) && Number(inputValue) > 0) {
+        if (inputValue && Number(inputValue) > Number(authManager.balance) && Number(inputValue) > 0) {
             setErrorMessage('输入金额不能超过可用余额');
         } else {
             setErrorMessage('');
@@ -141,7 +140,7 @@ const SuplyDetails: FC = () => {
                     {/* <PayCircleOutlined style={{color:'gray',fontSize:'36px'}}/> */}
                     <div>
                         <span className={styles.p1}>账户余额</span><br />
-                        <span className={styles.p2}>{authData.balance ? authData.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
+                        <span className={styles.p2}>{authManager.balance ? authManager.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
                     </div>
                 </Space>
             </div>
@@ -154,14 +153,14 @@ const SuplyDetails: FC = () => {
                         <Tooltip title="质押率是指已质押资产与目标质押资产的比率。">
                             <InfoCircleOutlined className={styles.titleIcon} />
                         </Tooltip><br />
-                        <span className={styles.p2}>{authData.balance ? authData.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
+                        <span className={styles.p2}>{authManager.balance ? authManager.balance : 0} {tabKey === 'tab1' ? 'ETH' : 'WETH'}</span><br />
                         <span className={styles.p1}>$ {getBalanceInUSD()}</span>
                     </Col>
                     <Col span={12} style={{ textAlign: 'right' }}>
                         <Button 
                             type="primary" 
                             style={{ marginTop: '20px' }} 
-                            disabled={!authData.balance || Number(authData.balance) <= 0} 
+                            disabled={!authManager.balance || Number(authManager.balance) <= 0} 
                             onClick={showModal}
                         >
                             质押
@@ -193,7 +192,7 @@ const SuplyDetails: FC = () => {
                                         suffix={
                                             <div style={{textAlign:'right',marginTop:'25px'}}>
                                                 <span className="iconfont" style={{ color: 'gray', fontSize: '18px',marginTop:'20px',marginRight:'10px' }}>&#xe67b;  ETH</span><br/>
-                                                <span style={{fontSize:'12px',color:'gray',marginTop:'55px'}}>钱包可用余额:{authData.balance} ETH</span>
+                                                <span style={{fontSize:'12px',color:'gray',marginTop:'55px'}}>钱包可用余额:{authManager.balance} ETH</span>
                                             </div>
                                         }
                                         value={stakeAmount}
@@ -242,7 +241,7 @@ const SuplyDetails: FC = () => {
                                 disabled={
                                     !stakeAmount || // 输入为空
                                     Number(stakeAmount) <= 0 || // 输入金额小于等于0
-                                    Number(stakeAmount) > Number(authData.balance) || // 输入金额大于可用余额
+                                    Number(stakeAmount) > Number(authManager.balance) || // 输入金额大于可用余额
                                     errorMessage !== '' // 存在错误信息
                                 }
                             >

@@ -1,54 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Layout } from 'antd';
+import { Layout, Spin, message } from 'antd';
 import { UserOutlined, DatabaseOutlined, MoneyCollectOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import styles from './AdminLayout.module.scss';
+import { authManager } from '../utils/authManager';
 
 const { Sider, Content } = Layout;
-
-const cardStyle = {
-    margin: '16px',
-    border:'1px solid #E1DBDB',
-    borderRadius:'5px',
-    backgroundColor:'#fff'
-};
-
-const titleStyle = {
-    height:'40px',
-    fontWeight: 'bold',
-    display: 'flex',
-    alignItems: 'center',
-    color:'#17A0BF',
-    backgroundColor:'#EEF2F4'
-};
-
-const contentStyle = {
-   backgroundColor:'#fff',
-};
-
-const itemStyle = {
-    padding: '5px 0',
-    cursor: 'pointer',
-    marginLeftLeft:'20px',
-    borderBottom: '0.5px solid #F4F5F9', 
-    color:'gray'
-};
-
-const hoverStyle = {
-    backgroundColor: '#f0f0f0',
-};
-
-const hoverLeve = {
-    backgroundColor: 'gray',
-};
-
-const hoverDown = {
-    color: 'blue',
-};
-
-const iconStyle = {
-    fontSize: '12px', 
-    marginRight: '8px' 
-}
 
 // 定义菜单项的 props 类型
 interface MenuItemProps {
@@ -90,11 +47,11 @@ const menuDatas = [
         ]
     },
     {
-        key: "boorrow",
-        title: "借贷管理",
+        key: "order",
+        title: "交易管理",
         links: [
-            { path: "/admin/boorrow", label: "概览" },
-            { path: "/lending/transactions", label: "交易记录" },
+            { path: "/admin/order", label: "概览" },
+            { path: "/admin/history", label: "历史记录" },
         ]
     },
     {
@@ -108,11 +65,43 @@ const menuDatas = [
 ]
 
 const AdminLayout: React.FC = () => {
-
     const location = useLocation();
     const navigate = useNavigate();
     const [selectedItem, setSelectedItem] = useState("个人信息");
+    const [loading, setLoading] = useState(true);
+    const [isAdminUser, setIsAdminUser] = useState(false);
     
+    // 初始化用户信息
+    useEffect(() => {
+        const initUserData = async () => {
+            setLoading(true);
+            try {
+                // 检查是否已有用户信息
+                if (!authManager.userInfo) {
+                    // 如果没有用户信息，初始化
+                    await authManager.init();
+                }
+                
+                // 获取用户信息并检查是否为管理员
+                const userInfo = authManager.userInfo;
+                if (userInfo) {
+                    // 检查用户是否为管理员
+                    setIsAdminUser(userInfo.isAdmin || false);
+                } else {
+                    message.error('无法获取用户信息，请重新登录');
+                    // 可以选择重定向到登录页面
+                    // navigate('/');
+                }
+            } catch (error) {
+                console.error("初始化用户数据失败:", error);
+                message.error('获取用户信息失败');
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        initUserData();
+    }, [navigate]);
     
     useEffect(() => {
         navigate("/admin/profile/info");
@@ -123,68 +112,78 @@ const AdminLayout: React.FC = () => {
             item.links.some(link => link.path === location.pathname)
         );
     
-        const currentLink = menuData?.links.find(link => link.path === location.pathname); // 找到对应的 link 对象
+        const currentLink = menuData?.links.find(link => link.path === location.pathname);
         if (currentLink) {
             setSelectedItem(currentLink.label);
         }
     }, [location]);
 
     // 菜单项组件
-const MenuItem: React.FC<MenuItemProps> = ({ to, children ,name}) => (
-    <div
-        style={itemStyle}
-        className="menu-item"
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
-   >
-        <Link onClick={() => setSelectedItem(name)} style={{marginLeft:'40px',fontSize:'12px',color:selectedItem === name?'#15C377':'gray'}} to={to} >{children}</Link>
-    </div>
-);
-// 卡片组件
-const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links }) => (
-    <div style={cardStyle}>
-        <div style={titleStyle}>
-            <span style={{marginLeft:'20px' }}> {icon} {title}</span>
+    const MenuItem: React.FC<MenuItemProps> = ({ to, children, name }) => (
+        <div className={styles.menuItem}>
+            <Link 
+                onClick={() => setSelectedItem(name)} 
+                className={`${styles.menuLink} ${selectedItem === name ? styles.menuLinkActive : styles.menuLinkInactive}`}
+                to={to}
+            >
+                {children}
+            </Link>
         </div>
-        <div style={contentStyle}>
-            {links.map((link, index) => (
-                <MenuItem key={index} to={link.path} name={link.label}>
-                    {link.label}
-                </MenuItem>
-            ))}
+    );
+    
+    // 卡片组件
+    const CardComponent: React.FC<CardComponentProps> = ({ icon, title, links }) => (
+        <div className={styles.card}>
+            <div className={styles.title}>
+                <span className={styles.titleText}>{icon} {title}</span>
+            </div>
+            <div className={styles.cardContent}>
+                {links.map((link, index) => (
+                    <MenuItem key={index} to={link.path} name={link.label}>
+                        {link.label}
+                    </MenuItem>
+                ))}
+            </div>
         </div>
-    </div>
-);
+    );
+
+    if (loading) {
+        return (
+            <div className={styles.loadingContainer}>
+                <Spin size="large" tip="加载中..." />
+            </div>
+        );
+    }
 
     return (
-        <Layout style={{ width: '65%', margin: '0 auto' ,backgroundColor:'yellow'}}>
-            <Sider width={250} style={{ background: 'rgb(245,245,245)' }}>
-            <CardComponent
-                    icon={<UserOutlined  />}
+        <Layout className={styles.layout}>
+            <Sider width={250} className={styles.left}>
+                <CardComponent
+                    icon={<UserOutlined />}
                     title={menuDatas.find(item => item.key === 'profile')?.title || "个人中心"}
                     links={menuDatas.find(item => item.key === 'profile')?.links || []}
                 />
                 <CardComponent
-                    icon={<DatabaseOutlined style={iconStyle} />}
+                    icon={<DatabaseOutlined className={styles.icon} />}
                     title={menuDatas.find(item => item.key === 'suply')?.title || "质押管理"}
                     links={menuDatas.find(item => item.key === 'suply')?.links || []}
-                  
                 />
                 <CardComponent
-                    icon={<MoneyCollectOutlined style={iconStyle} />}
-                    title={menuDatas.find(item => item.key === 'boorrow')?.title || "借贷管理"}
-                    links={menuDatas.find(item => item.key === 'boorrow')?.links || []} 
-                  
+                    icon={<MoneyCollectOutlined className={styles.icon} />}
+                    title={menuDatas.find(item => item.key === 'order')?.title || "交易管理"}
+                    links={menuDatas.find(item => item.key === 'order')?.links || []} 
                 />
-                <CardComponent
-                    icon={<FileTextOutlined style={iconStyle} />}
-                    title={menuDatas.find(item => item.key === 'contract')?.title || "合约管理"}
-                    links={menuDatas.find(item => item.key === 'contract')?.links || []}
-                />
+                {isAdminUser && (
+                    <CardComponent
+                        icon={<FileTextOutlined className={styles.icon} />}
+                        title={menuDatas.find(item => item.key === 'contract')?.title || "合约管理"}
+                        links={menuDatas.find(item => item.key === 'contract')?.links || []}
+                    />
+                )}
             </Sider>
 
-            <Layout style={{ padding: '16px' }}>
-                <Content style={{ minHeight:'auto' ,width:'130%'}}>
+            <Layout className={styles.right}>
+                <Content className={styles.content}>
                     <Outlet /> {/* 渲染匹配的子路由组件 */}
                 </Content>
             </Layout>

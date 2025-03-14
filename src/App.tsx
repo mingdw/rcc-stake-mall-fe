@@ -15,8 +15,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config } from './config/wagmi'
 import '@rainbow-me/rainbowkit/styles.css'
 import { Route } from 'react-router-dom'
-import OrderConfirm from './view/mall/OrderConfirm'
-import OrderSuccess from './view/mall/OrderSuccess'
+import OrderConfirm from './view/mall/OrderConfirm.js'
+import OrderSuccess from './view/mall/OrderSuccess.js'
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient()

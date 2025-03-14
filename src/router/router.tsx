@@ -98,50 +98,49 @@ const router = createBrowserRouter([
             {
                 path: '/admin',
                 element: (
-                    <PrivateRoute>
+                    
                         <AdminLayout/>
-                    </PrivateRoute>
+                   
                 ),
                 children:[
                     {
                         path: '/admin/profile/info',
                         element: (
-                            <PrivateRoute>
+                           
                                 <ProfileInfo />
-                            </PrivateRoute>
+                          
                         )
                     },
                     {
                         path: '/admin/profile/balance',
                         element: (
-                            <PrivateRoute>
+                           
                                 <ProfileBalance />
-                            </PrivateRoute>
+                          
                         )
                     },  
                     {
                         path: '/admin/profile/security',
                         element: (
-                            <PrivateRoute>
+                            
                                 <SecuritySettings/>
-                            </PrivateRoute>
+                           
                         )
                     },
                    
                     {
                         path: '/admin/profile/history',
                         element: (
-                            <PrivateRoute>
+                            
                                 <TransactionList/>
-                            </PrivateRoute>
+                           
                         )
                     },
                     {
                         path: '/admin/profile/notifications',
                         element: (
-                            <PrivateRoute>
+                           
                                 <NotificationSettings/>
-                            </PrivateRoute>
                         )
                     },
                     

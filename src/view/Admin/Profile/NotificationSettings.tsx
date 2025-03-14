@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { BellOutlined } from '@ant-design/icons';
-import AdminContentCard from '../AdminContentCard';
 import { Checkbox, Button, message } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import AdminContentCard from '../AdminContentCard';
 
 interface NotificationSettingsState {
     accountActivity: boolean;
