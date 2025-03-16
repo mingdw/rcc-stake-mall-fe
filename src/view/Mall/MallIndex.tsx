@@ -705,14 +705,10 @@ useEffect(() => {
     searchText 
   }) => {
     // 从 categoryProducts 中查找对应分类的 productCount
-    const categoryProductCount = useMemo(() => {
-      if (category.code === 'search' || category.code === '') {
-        return total; // 搜索结果或全部商品使用传入的 total
-      }
-      
-      const categoryData = categoryProducts.find(cat => cat.categoryCode === category.code);
-      return categoryData?.productCount || total; // 如果找不到，回退到传入的 total
-    }, [category.code, categoryProducts, total]);
+    const categoryData = categoryProducts.find(cat => 
+      cat.categoryCode === category.code
+    );
+    const totalProductCount = categoryData?.productCount || total;
 
     return (
       <div className={stylesCss.categoryTitle}>
@@ -725,9 +721,9 @@ useEffect(() => {
               </span>
             )}
           </span>
-          <span className={stylesCss.subTitle}>共 {categoryProductCount} 件商品</span>
+          <span className={stylesCss.subTitle}>共 {totalProductCount} 件商品</span>
         </div>
-        {onViewMore && categoryProductCount > MAX_ITEMS_PER_CATEGORY && (
+        {onViewMore && totalProductCount > MAX_ITEMS_PER_CATEGORY && (
           <Button 
             type="link" 
             onClick={onViewMore}
@@ -768,14 +764,11 @@ useEffect(() => {
         <>
           {categories
             .filter(category => {
-              // 检查该分类下是否有商品
               const categoryProducts = groupedProducts[category.code];
               return categoryProducts && categoryProducts.length > 0;
             })
             .map(category => {
-              // 获取当前分类的商品
               const categoryProducts = groupedProducts[category.code] || [];
-              // 获取实际显示的商品数量（最多显示8个）
               const displayProducts = categoryProducts.slice(0, MAX_ITEMS_PER_CATEGORY);
               
               return (
@@ -786,7 +779,7 @@ useEffect(() => {
                   title={
                     <CategoryCardTitle
                       category={category}
-                      total={categoryProducts.length} // 使用分类下的商品数量作为备选
+                      total={categoryProducts.length}
                       onViewMore={() => handleViewMore(category.code)}
                     />
                   }
@@ -804,7 +797,15 @@ useEffect(() => {
         </>
       );
     } else {
+      // 单个分类视图
       const currentCategory = getCurrentCategory();
+      // 从 categoryProducts 中获取当前分类的商品总数
+      const categoryData = categoryProducts.find(cat => 
+        cat.categoryCode === currentCategory?.code
+      );
+      const totalProductCount = categoryData?.productCount || 0;
+      const displayProducts = filteredTagProducts.slice(0, MAX_ITEMS_PER_CATEGORY);
+      
       return (
         <Card
           className={stylesCss.categoryCard}
@@ -815,11 +816,33 @@ useEffect(() => {
                 name: currentCategory?.name || '商品列表',
                 icon: currentCategory?.icon
               }}
-              total={filteredTagProducts.length} // 使用筛选后的商品数量作为备选
+              total={totalProductCount}
+              onViewMore={
+                totalProductCount > MAX_ITEMS_PER_CATEGORY 
+                  ? () => handleViewMore(currentCategory?.code || '')
+                  : undefined
+              }
             />
           }
         >
-          {renderProductContent(filteredTagProducts)}
+          <Row gutter={[16, 16]}>
+            {displayProducts.map((product, index) => (
+              <Col span={24 / ITEMS_PER_ROW} key={`${product.id}-${index}`}>
+                {renderProductCard(product, index)}
+              </Col>
+            ))}
+          </Row>
+          {totalProductCount > MAX_ITEMS_PER_CATEGORY && (
+            <div className={stylesCss.viewMoreWrapper}>
+              <Button 
+                type="link" 
+                onClick={() => handleViewMore(currentCategory?.code || '')}
+                className={stylesCss.moreButton}
+              >
+                查看更多 <RightOutlined />
+              </Button>
+            </div>
+          )}
         </Card>
       );
     }
