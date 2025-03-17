@@ -1,0 +1,11 @@
+.properties {
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+
+    :global {
+        .ant-form-item {
+            margin-bottom: 24px;
+        }
+    }
+} 

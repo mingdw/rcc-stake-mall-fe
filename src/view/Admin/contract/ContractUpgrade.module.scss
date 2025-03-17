@@ -1,0 +1,20 @@
+.contractUpgrade {
+    .warning {
+        margin-bottom: 24px;
+    }
+
+    .upgradeCard {
+        background: #fff;
+        border-radius: 8px;
+
+        :global {
+            .ant-form-item {
+                margin-bottom: 24px;
+            }
+
+            .ant-upload-list {
+                margin-top: 12px;
+            }
+        }
+    }
+} 

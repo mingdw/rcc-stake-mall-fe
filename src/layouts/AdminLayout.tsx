@@ -26,43 +26,55 @@ interface CardComponentProps {
     links: LinkItem[];    // 链接项的数组
 }
 
-const menuDatas = [
+// 将菜单数据移到组件外部
+const ALL_MENU_DATA = [
     {
         key: "profile",
         title: "个人中心",
+        icon: <UserOutlined />,
         links: [
             { path: "/admin/profile/info", label: "个人信息" },
-            { path: "/admin/profile/balance", label: "账户余额" },
             { path: "/admin/profile/security", label: "安全设置" },
-            { path: "/admin/profile/history", label: "交易历史" },
             { path: "/admin/profile/notifications", label: "通知设置" },
         ]
     },
     {
-        key: "suply",
-        title: "质押管理",
+        key: "assets",
+        title: "我的资产",
+        icon: <DatabaseOutlined />,
         links: [
-            { path: "/admin/suply", label: "概览" },
-            { path: "/admin/history", label: "历史记录" },
+            { path: "/admin/assets/balance", label: "账户余额" },
+            { path: "/admin/assets/staking", label: "质押管理" },
+            { path: "/admin/assets/tradelist", label: "交易记录" },
         ]
     },
     {
         key: "order",
         title: "交易管理",
+        icon: <MoneyCollectOutlined />,
         links: [
-            { path: "/admin/order", label: "概览" },
-            { path: "/admin/history", label: "历史记录" },
+            { path: "/admin/order/address", label: "收货地址管理"},
+            { path: "/admin/order/pending", label: "待付款" },
+            { path: "/admin/order/list", label: "订单列表" },
+            { path: "/admin/order/aftersale", label: "退款/售后" },
         ]
     },
     {
         key: "contract",
         title: "合约管理",
+        icon: <FileTextOutlined />,
+        adminOnly: true, // 标记该菜单仅管理员可见
         links: [
-            { path: "/admin/contract", label: "合约管理"},
-            { path: "/admin/contract/templates", label: "授权审核" },
+            { path: "/admin/contract/role-management", label: "权限管理"},
+            { path: "/admin/contract/staking-pools", label: "质押池管理"},
+            { path: "/admin/contract/properties", label: "参数设置" },
+            { path: "/admin/contract/emergency-control", label: "紧急控制"},
+            { path: "/admin/contract/user-management", label: "用户管理"},
+            { path: "/admin/contract/contract-upgrade", label: "合约升级"},
+            { path: "/admin/contract/account-monitoring", label: "财务监控"},
         ]
     }
-]
+];
 
 const AdminLayout: React.FC = () => {
     const location = useLocation();
@@ -70,27 +82,30 @@ const AdminLayout: React.FC = () => {
     const [selectedItem, setSelectedItem] = useState("个人信息");
     const [loading, setLoading] = useState(true);
     const [isAdminUser, setIsAdminUser] = useState(false);
+    const [menuData, setMenuData] = useState(ALL_MENU_DATA);
     
     // 初始化用户信息
     useEffect(() => {
         const initUserData = async () => {
             setLoading(true);
             try {
-                // 检查是否已有用户信息
                 if (!authManager.userInfo) {
-                    // 如果没有用户信息，初始化
                     await authManager.init();
                 }
                 
-                // 获取用户信息并检查是否为管理员
                 const userInfo = authManager.userInfo;
                 if (userInfo) {
-                    // 检查用户是否为管理员
-                    setIsAdminUser(userInfo.isAdmin || false);
+                    const isAdmin = userInfo.isAdmin || false;
+                    setIsAdminUser(isAdmin);
+                    
+                    // 根据用户角色过滤菜单
+                    const filteredMenu = ALL_MENU_DATA.filter(menu => 
+                        !menu.adminOnly || (menu.adminOnly && isAdmin)
+                    );
+                    setMenuData(filteredMenu);
                 } else {
                     message.error('无法获取用户信息，请重新登录');
-                    // 可以选择重定向到登录页面
-                    // navigate('/');
+                    navigate('/login');
                 }
             } catch (error) {
                 console.error("初始化用户数据失败:", error);
@@ -108,15 +123,15 @@ const AdminLayout: React.FC = () => {
     }, [navigate]);
 
     useEffect(() => {
-        const menuData = menuDatas.find(item => 
+        const menu = menuData.find(item => 
             item.links.some(link => link.path === location.pathname)
         );
     
-        const currentLink = menuData?.links.find(link => link.path === location.pathname);
+        const currentLink = menu?.links.find(link => link.path === location.pathname);
         if (currentLink) {
             setSelectedItem(currentLink.label);
         }
-    }, [location]);
+    }, [location, menuData]);
 
     // 菜单项组件
     const MenuItem: React.FC<MenuItemProps> = ({ to, children, name }) => (
@@ -158,33 +173,19 @@ const AdminLayout: React.FC = () => {
     return (
         <Layout className={styles.layout}>
             <Sider width={250} className={styles.left}>
-                <CardComponent
-                    icon={<UserOutlined />}
-                    title={menuDatas.find(item => item.key === 'profile')?.title || "个人中心"}
-                    links={menuDatas.find(item => item.key === 'profile')?.links || []}
-                />
-                <CardComponent
-                    icon={<DatabaseOutlined className={styles.icon} />}
-                    title={menuDatas.find(item => item.key === 'suply')?.title || "质押管理"}
-                    links={menuDatas.find(item => item.key === 'suply')?.links || []}
-                />
-                <CardComponent
-                    icon={<MoneyCollectOutlined className={styles.icon} />}
-                    title={menuDatas.find(item => item.key === 'order')?.title || "交易管理"}
-                    links={menuDatas.find(item => item.key === 'order')?.links || []} 
-                />
-                {isAdminUser && (
+                {menuData.map((menu) => (
                     <CardComponent
-                        icon={<FileTextOutlined className={styles.icon} />}
-                        title={menuDatas.find(item => item.key === 'contract')?.title || "合约管理"}
-                        links={menuDatas.find(item => item.key === 'contract')?.links || []}
+                        key={menu.key}
+                        icon={menu.icon}
+                        title={menu.title}
+                        links={menu.links}
                     />
-                )}
+                ))}
             </Sider>
 
             <Layout className={styles.right}>
                 <Content className={styles.content}>
-                    <Outlet /> {/* 渲染匹配的子路由组件 */}
+                    <Outlet />
                 </Content>
             </Layout>
         </Layout>

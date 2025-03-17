@@ -1,0 +1,31 @@
+.stakingPools {
+    .statistics {
+        margin-bottom: 24px;
+
+        :global {
+            .ant-card {
+                border-radius: 8px;
+            }
+
+            .ant-statistic-title {
+                color: #8c8c8c;
+            }
+
+            .ant-statistic-content {
+                color: #262626;
+            }
+        }
+    }
+
+    .poolTable {
+        background: #fff;
+        border-radius: 8px;
+        padding: 24px;
+
+        :global {
+            .ant-table-wrapper {
+                margin-top: 16px;
+            }
+        }
+    }
+} 

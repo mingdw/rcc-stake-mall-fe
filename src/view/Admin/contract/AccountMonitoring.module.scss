@@ -1,0 +1,27 @@
+.accountMonitoring {
+    .statistics {
+        margin-bottom: 24px;
+
+        :global {
+            .ant-card {
+                border-radius: 8px;
+            }
+        }
+    }
+
+    .transactionTable {
+        background: #fff;
+        border-radius: 8px;
+        padding: 24px;
+
+        :global {
+            .ant-table-wrapper {
+                margin-top: 24px;
+            }
+        }
+    }
+
+    .alert {
+        margin-bottom: 24px;
+    }
+} 

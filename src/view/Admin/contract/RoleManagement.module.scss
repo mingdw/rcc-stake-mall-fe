@@ -1,0 +1,25 @@
+.roleManagement {
+    .header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    :global {
+        .ant-table-wrapper {
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .ant-table-pagination {
+            margin: 16px 0;
+        }
+    }
+
+    .modalFooter {
+        margin-top: 24px;
+        text-align: right;
+        margin-bottom: 0;
+    }
+} 

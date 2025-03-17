@@ -1,0 +1,20 @@
+.userManagement {
+    .header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    :global {
+        .ant-table-wrapper {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .ant-table-pagination {
+            margin: 16px 0;
+        }
+    }
+} 

@@ -1,0 +1,162 @@
+.addressManagerContainer {
+  padding: 16px;
+  
+  .cardHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .addressCard {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    
+    :global(.ant-card-head) {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 16px 24px;
+    }
+    
+    :global(.ant-card-body) {
+      padding: 24px;
+    }
+  }
+  
+  .loadingContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+  
+  .noAddressContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  }
+  
+  .addressGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    
+    .addressItem {
+      position: relative;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.3s;
+      cursor: pointer;
+      
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+      }
+      
+      &.selected {
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+      }
+      
+      &[data-default="true"] {
+        .defaultTag {
+          position: absolute;
+          top: 0;
+          right: 0;
+          background-color: #1890ff;
+          color: white;
+          padding: 2px 8px;
+          font-size: 12px;
+          border-radius: 0 8px 0 8px;
+        }
+      }
+      
+      .addressContent {
+        display: flex;
+        justify-content: space-between;
+        
+        .addressInfo {
+          flex: 1;
+          
+          .addressLine {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            
+            .name {
+              font-weight: 500;
+            }
+            
+            .phone {
+              color: #666;
+              
+              &:after {
+                content: '|';
+                margin-left: 8px;
+                color: #ddd;
+              }
+            }
+            
+            .addressDetail {
+              color: rgba(0, 0, 0, 0.65);
+              flex: 1;
+            }
+          }
+        }
+        
+        .addressActions {
+          display: flex;
+          align-items: center;
+          margin-left: 16px;
+          
+          :global(.ant-btn-link) {
+            padding: 4px 8px;
+            height: auto;
+          }
+          
+          :global(.ant-divider-vertical) {
+            height: 16px;
+            margin: 0 4px;
+          }
+        }
+      }
+    }
+  }
+  
+  .addressDetails {
+    padding: 16px 0;
+    
+    .detailRow {
+      display: flex;
+      margin-bottom: 16px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .detailLabel {
+        width: 120px;
+        color: rgba(0, 0, 0, 0.65);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .detailValue {
+        flex: 1;
+        word-break: break-word;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .defaultTag {
+        margin-left: 8px;
+      }
+    }
+  }
+} 

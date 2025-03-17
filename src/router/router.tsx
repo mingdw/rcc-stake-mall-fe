@@ -11,7 +11,6 @@ import About from "../view/about/AboutIndex";
 import TransactionList from "../view/transaction/TransactionList";
 import NotFount from "../view/403";
 import NotificationSettings from "../view/admin/profile/NotificationSettings";
-import ProfileBalance from "../view/admin/profile/ProfileBalance";
 import ProfileInfo from "../view/admin/profile/ProfileInfo";
 import SecuritySettings from "../view/admin/profile/SecuritySettings";
 import NotConnected from "../view/403";
@@ -21,6 +20,19 @@ import Budding from "../view/budding";
 import ProductDetail from "../view/mall/ProductDetail";
 import OrderConfirm from "../view/mall/OrderConfirm";
 import OrderSuccess from "../view/mall/OrderSuccess";
+import RoleManagement from "../view/admin/contract/RoleManagement";
+import StakingPools from "../view/admin/contract/StakingPools";
+import Properties from "../view/admin/contract/Properties";
+import EmergencyControl from "../view/admin/contract/EmergencyControl";
+import UserManagement from "../view/admin/contract/UserManagement";
+import ContractUpgrade from "../view/admin/contract/ContractUpgrade";
+import AccountMonitoring from "../view/admin/contract/AccountMonitoring";
+import Balance from "../view/admin/asserts/Balance";
+import Staking from "../view/admin/asserts/Staking";
+import TradeList from "../view/admin/asserts/TradeList";
+import AddressManager from "../view/admin/order/AddressManager";
+import OrderPending from "../view/admin/order/OrderPending";
+import AfterSale from "../view/admin/order/AfterSale";
 
 
 
@@ -97,53 +109,79 @@ const router = createBrowserRouter([
            
             {
                 path: '/admin',
-                element: (
-                    
-                        <AdminLayout/>
-                   
-                ),
+                element: <AdminLayout/>,
                 children:[
                     {
                         path: '/admin/profile/info',
-                        element: (
-                           
-                                <ProfileInfo />
-                          
-                        )
+                        element: <ProfileInfo />
                     },
-                    {
-                        path: '/admin/profile/balance',
-                        element: (
-                           
-                                <ProfileBalance />
-                          
-                        )
-                    },  
                     {
                         path: '/admin/profile/security',
-                        element: (
-                            
-                                <SecuritySettings/>
-                           
-                        )
-                    },
-                   
-                    {
-                        path: '/admin/profile/history',
-                        element: (
-                            
-                                <TransactionList/>
-                           
-                        )
+                        element: <SecuritySettings/>
                     },
                     {
                         path: '/admin/profile/notifications',
-                        element: (
-                           
-                                <NotificationSettings/>
-                        )
+                        element: <NotificationSettings/>
                     },
                     
+                    {
+                        path: '/admin/assets/balance',
+                        element: <Balance />
+                    },
+                    {
+                        path: '/admin/assets/staking',
+                        element: <Staking/>
+                    },
+                    {
+                        path: '/admin/assets/tradelist',
+                        element: <TradeList/>
+                    },
+                    
+                    {
+                        path: '/admin/order/address',
+                        element: <AddressManager/>
+                    },
+                    {
+                        path: '/admin/order/pending',
+                        element: <OrderPending/>
+                    },
+                    {
+                        path: '/admin/order/list',
+                        element: <TransactionList/>
+                    },
+                    {
+                        path: '/admin/order/aftersale',
+                        element: <AfterSale />
+                    },
+                    
+                    {
+                        path: '/admin/contract/role-management',
+                        element: <RoleManagement />
+                    },
+                    {
+                        path: '/admin/contract/staking-pools',
+                        element: <StakingPools />
+                    },
+                    {
+                        path: '/admin/contract/properties',
+                        element: <Properties />
+                    },
+                    {
+                        path: '/admin/contract/emergency-control',
+                        element: <EmergencyControl />
+                    },
+                    {
+                        path: '/admin/contract/user-management',
+                        element: <UserManagement />
+                    },
+                    {
+                        path: '/admin/contract/contract-upgrade',
+                        element: <ContractUpgrade />
+                    },
+                    {
+                        path: '/admin/contract/account-monitoring',
+                        element: <AccountMonitoring />
+                    }
                 ]
             },
            

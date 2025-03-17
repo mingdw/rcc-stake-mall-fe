@@ -1,0 +1,458 @@
+.balanceContainer {
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+}
+
+.balanceOverview {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.balanceItem {
+    padding: 24px;
+    background: linear-gradient(135deg, #f6f9ff 0%, #f0f5ff 100%);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h3 {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 12px;
+        font-weight: normal;
+    }
+    
+    p {
+        font-size: 24px;
+        color: #1a1a1a;
+        margin: 0;
+        font-weight: 500;
+    }
+}
+
+.section {
+    margin-top: 32px;
+    
+    h3 {
+        font-size: 18px;
+        color: #262626;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+}
+
+.tokenList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.tokenItem {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .tokenIcon {
+        width: 40px;
+        height: 40px;
+        margin-right: 16px;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+    }
+
+    .tokenInfo {
+        flex: 1;
+        margin-right: 16px;
+    }
+
+    .tokenAmount {
+        font-size: 18px;
+        color: #262626;
+        font-weight: 500;
+    }
+
+    .tokenValue {
+        font-size: 14px;
+        color: #8c8c8c;
+        margin-top: 4px;
+    }
+
+    .exchangeButton {
+        padding: 4px 8px;
+        min-width: 60px;
+        height: auto;
+        
+        .anticon {
+            font-size: 14px;
+        }
+    }
+}
+
+.stakingList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.stakingItem {
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    .stakingHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f0f0;
+
+        h4 {
+            font-size: 16px;
+            color: #262626;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .apy {
+            color: #52c41a;
+            font-weight: 500;
+            background: #f6ffed;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+    }
+
+    .rewardInfo {
+        background: #f6ffed;
+        border: 1px solid #b7eb8f;
+        padding: 12px;
+        border-radius: 6px;
+        margin-top: 12px;
+
+        .rewardAmount {
+            color: #52c41a;
+            font-weight: 500;
+        }
+    }
+}
+
+.stakingDetails {
+    .stakingDetail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        span:first-child {
+            color: #8c8c8c;
+        }
+
+        .detailValue {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            color: #262626;
+
+            .amount {
+                font-weight: 500;
+                font-size: 16px;
+            }
+
+            .unit {
+                color: #8c8c8c;
+                font-size: 14px;
+            }
+        }
+    }
+}
+
+.actions {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.exchangeButton {
+    height: 40px;
+    padding: 0 24px;
+    font-size: 15px;
+}
+
+.exchangeForm {
+    padding: 24px 0 8px;
+
+    .tokenOption {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .balance {
+            margin-left: auto;
+            color: #8c8c8c;
+        }
+    }
+
+    .exchangeRate {
+        margin: 16px 0;
+        padding: 12px;
+        background: #f5f5f5;
+        border-radius: 8px;
+        text-align: center;
+        color: #666;
+    }
+
+    .exchangeEstimate {
+        text-align: right;
+        color: #1677ff;
+        font-weight: 500;
+        margin-top: 16px;
+    }
+}
+
+.stakeForm {
+    padding: 20px 0;
+
+    .estimatedRewards {
+        background: #f5f5f5;
+        padding: 16px;
+        border-radius: 8px;
+        text-align: center;
+
+        h4 {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        p {
+            color: #52c41a;
+            font-size: 20px;
+            margin: 0;
+        }
+    }
+}
+
+.stakingActions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+
+    button {
+        flex: 1;
+    }
+}
+
+.rccSection {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+
+    .rccBalance {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+
+        .rccIcon {
+            width: 64px;
+            height: 64px;
+            background: #fff1f0;
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: 40px;
+                height: 40px;
+                object-fit: contain;
+            }
+        }
+
+        .rccInfo {
+            flex: 1;
+
+            .rccStatsRow {
+                display: flex;
+                gap: 120px;
+                align-items: center;
+
+                .rccStatItem {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                    position: relative;
+
+                    &:not(:last-child)::after {
+                        content: '';
+                        position: absolute;
+                        right: -60px;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        height: 28px;
+                        width: 1px;
+                        background-color: #f0f0f0;
+                    }
+
+                    .statLabel {
+                        font-size: 14px;
+                        color: #8c8c8c;
+                    }
+
+                    .statValueWrapper {
+                        display: flex;
+                        align-items: baseline;
+                        gap: 4px;
+
+                        .statValue {
+                            font-size: 28px;
+                            color: #cf1322;
+                            font-weight: 600;
+                        }
+
+                        .unit {
+                            font-size: 16px;
+                            color: #cf1322;
+                            font-weight: normal;
+                            margin-right: 4px;
+                        }
+
+                        .statUsdValue {
+                            font-size: 14px;
+                            color: #8c8c8c;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h3 {
+        margin: 0;
+    }
+}
+
+// 在途收益区域样式
+.pendingRewardsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pendingRewardCard {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+  
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.pendingRewardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pendingRewardSource {
+  font-weight: 500;
+  color: #333;
+}
+
+.pendingRewardAmount {
+  font-size: 16px;
+  color: #cf1322;
+  font-weight: 500;
+}
+
+.pendingRewardUsd {
+  font-size: 14px;
+  color: #888;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.pendingRewardTime {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.daysRemaining {
+  color: #1890ff;
+  margin-left: 4px;
+}
+
+.pendingTotal {
+  font-size: 14px;
+  color: #666;
+}
+
+.pendingTotalValue {
+  font-weight: 500;
+  color: #cf1322;
+  font-size: 16px;
+}
+
+.emptyPendingRewards {
+  padding: 24px;
+  text-align: center;
+  color: #888;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+// 分隔线样式
+.balanceContainer {
+  .ant-divider {
+    margin: 24px 0;
+  }
+}    

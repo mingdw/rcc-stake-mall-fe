@@ -9,7 +9,9 @@ class AuthManager {
   private _balance: string = '0';
   
 
-  private constructor() {}
+  private constructor() {
+    this.init();
+  }
   
 
   static getInstance(): AuthManager {
