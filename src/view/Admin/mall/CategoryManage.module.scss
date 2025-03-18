@@ -1,0 +1,191 @@
+// 商品分类管理样式
+.categoryManage {
+  background-color: #fff;
+  
+  // 整体布局
+  .container {
+    display: flex;
+    height: calc(100vh - 180px);
+    gap: 16px;
+  }
+  
+  // 左侧分类树
+  .categoryTree {
+    width: 320px;
+    transition: all 0.3s;
+    
+    .treeContainer {
+      height: calc(100vh - 250px);
+      overflow: auto;
+      padding-right: 8px;
+      
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+    
+    .treeNodeContent {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 4px 0;
+      
+      .nodeTitle {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .nodeActions {
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      
+      &:hover .nodeActions {
+        opacity: 1;
+      }
+    }
+  }
+  
+  // 右侧详情
+  .detailPanel {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    
+    .basicInfo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+      
+      .infoItem {
+        display: flex;
+        align-items: center;
+        
+        .label {
+          font-weight: 500;
+          margin-right: 8px;
+          color: rgba(0, 0, 0, 0.65);
+          min-width: 80px;
+        }
+        
+        .value {
+          color: rgba(0, 0, 0, 0.85);
+        }
+      }
+      
+      .fullWidth {
+        grid-column: 1 / -1;
+      }
+      
+      .iconPreview {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        margin-left: 8px;
+        border: 1px solid #f0f0f0;
+        border-radius: 4px;
+      }
+    }
+    
+    .emptyState {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(0, 0, 0, 0.45);
+      
+      .emptyIcon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        color: rgba(0, 0, 0, 0.25);
+      }
+      
+      .emptyText {
+        font-size: 16px;
+      }
+    }
+  }
+  
+  // 表格样式
+  .tableWrapper {
+    .tableHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      
+      .title {
+        font-size: 16px;
+        font-weight: 500;
+        margin: 0;
+      }
+    }
+    
+    .nestedTable {
+      margin-top: 8px;
+      
+      :global(.ant-table-small) {
+        border: 1px solid #f0f0f0;
+        border-radius: 4px;
+      }
+    }
+  }
+  
+  // 表单样式
+  .formItem {
+    margin-bottom: 24px;
+    
+    &.inline {
+      display: flex;
+      gap: 16px;
+      
+      > * {
+        flex: 1;
+      }
+    }
+  }
+  
+  // 状态标签
+  .statusTag {
+    &.active {
+      color: #52c41a;
+      background: #f6ffed;
+      border-color: #b7eb8f;
+    }
+    
+    &.inactive {
+      color: #ff4d4f;
+      background: #fff2f0;
+      border-color: #ffccc7;
+    }
+  }
+  
+  // 动画效果
+  .fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

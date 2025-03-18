@@ -8,7 +8,6 @@ import Suply from "../view/suply/SuplyIndex";
 import SuplyDetails from "../view/suply/SuplyDetails";
 import Home from "../view/home/HomeIndex";
 import About from "../view/about/AboutIndex";
-import TransactionList from "../view/transaction/TransactionList";
 import NotFount from "../view/403";
 import NotificationSettings from "../view/admin/profile/NotificationSettings";
 import ProfileInfo from "../view/admin/profile/ProfileInfo";
@@ -33,6 +32,12 @@ import TradeList from "../view/admin/asserts/TradeList";
 import AddressManager from "../view/admin/order/AddressManager";
 import OrderPending from "../view/admin/order/OrderPending";
 import AfterSale from "../view/admin/order/AfterSale";
+import TransactionList from "../view/admin/order/TransactionList";
+import CategoryManage from "../view/admin/mall/CategoryManage";
+import ProductsManage from "../view/admin/mall/ProductsManage";
+import OrdersManage from "../view/admin/mall/OrdersManage";
+import CommentsManage from "../view/admin/mall/CommentsManage";
+import AttributesManage from "../view/admin/mall/AttributesManage";
 
 
 
@@ -153,10 +158,30 @@ const router = createBrowserRouter([
                         path: '/admin/order/aftersale',
                         element: <AfterSale />
                     },
+                    {
+                        path: '/admin/mall/categories',
+                        element: <CategoryManage />
+                    },
+                    {
+                        path: '/admin/mall/attributes',
+                        element: <AttributesManage />
+                    },
                     
                     {
+                        path: '/admin/mall/products',
+                        element: <ProductsManage />
+                    },
+                    {
+                        path: '/admin/mall/orders',
+                        element: <OrdersManage />
+                    },
+                    {
+                        path: '/admin/mall/comments',
+                        element: <CommentsManage />
+                    },
+                    {
                         path: '/admin/contract/role-management',
-                        element: <RoleManagement />
+                        element: <RoleManagement/>
                     },
                     {
                         path: '/admin/contract/staking-pools',

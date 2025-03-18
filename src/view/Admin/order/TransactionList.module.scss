@@ -1,0 +1,91 @@
+.transactionListContainer {
+  padding: 16px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.headerCard {
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.statsRow {
+  margin-bottom: 16px;
+}
+
+.statCard {
+  height: 100%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+}
+
+.filterCard {
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.tableCard {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.statistic {
+  padding: 8px 0;
+}
+
+.statisticTitle {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.statisticValue {
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+}
+
+.statisticPrefix {
+  margin-right: 8px;
+}
+
+.rowCancelled {
+  background-color: rgba(255, 77, 79, 0.05);
+}
+
+.rowProcessing {
+  background-color: rgba(24, 144, 255, 0.05);
+}
+
+.rowShipped {
+  background-color: rgba(0, 191, 165, 0.05);
+}
+
+.orderTabs {
+  margin-bottom: 16px;
+
+  :global {
+    .ant-tabs-nav {
+      margin-bottom: 16px;
+    }
+  }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .statsRow > div {
+    margin-bottom: 16px;
+  }
+  
+  .filterCard {
+    .ant-row > div {
+      margin-bottom: 16px;
+    }
+  }
+}

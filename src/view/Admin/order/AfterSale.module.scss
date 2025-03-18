@@ -1,0 +1,226 @@
+.afterSaleContainer {
+  padding: 16px;
+}
+
+.headerCard {
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.statsRow {
+  margin-bottom: 24px;
+}
+
+.statCard {
+  height: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .statCardContent {
+    display: flex;
+    align-items: center;
+  }
+  
+  .statCardIconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    
+    &.blue {
+      background-color: rgba(24, 144, 255, 0.1);
+      color: #1890ff;
+    }
+    
+    &.orange {
+      background-color: rgba(250, 173, 20, 0.1);
+      color: #faad14;
+    }
+    
+    &.purple {
+      background-color: rgba(114, 46, 209, 0.1);
+      color: #722ed1;
+    }
+    
+    &.green {
+      background-color: rgba(82, 196, 26, 0.1);
+      color: #52c41a;
+    }
+  }
+  
+  .statCardIcon {
+    font-size: 28px;
+  }
+  
+  .statCardInfo {
+    flex: 1;
+  }
+  
+  .statCardValue {
+    font-size: 28px;
+    font-weight: 600;
+    color: #262626;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  
+  .statCardTitle {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+  }
+  
+  :global(.ant-badge-status-dot) {
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+  }
+}
+
+.filterCard {
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.tableCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.afterSaleTabs {
+  margin-bottom: 16px;
+  
+  :global(.ant-tabs-tab) {
+    padding: 12px 16px;
+    transition: all 0.3s;
+    
+    &:hover {
+      color: #1890ff;
+    }
+  }
+  
+  :global(.ant-tabs-tab-active) {
+    font-weight: 500;
+  }
+}
+
+.customerInfo {
+  display: flex;
+  align-items: center;
+}
+
+.customerAvatar {
+  margin-right: 8px;
+}
+
+// 行样式
+.rowPending {
+  background-color: #fffbe6;
+}
+
+.rowRejected {
+  background-color: #fff1f0;
+}
+
+.rowCompleted {
+  background-color: #f6ffed;
+}
+
+// 详情页样式
+.detailHeader {
+  margin-bottom: 24px;
+}
+
+.detailSection {
+  margin-bottom: 24px;
+}
+
+.productImage {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.timelineContainer {
+  margin-top: 16px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.imageGallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.imageItem {
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.statusBadge {
+  margin-right: 8px;
+}
+
+.actionButton {
+  margin-right: 8px;
+}
+
+.divider {
+  margin: 16px 0;
+}
+
+.replyForm {
+  margin-top: 16px;
+}
+
+.trackingForm {
+  margin-top: 16px;
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .statsRow {
+    .statCard {
+      margin-bottom: 16px;
+    }
+  }
+  
+  .filterCard {
+    .ant-col {
+      margin-bottom: 16px;
+    }
+  }
+}

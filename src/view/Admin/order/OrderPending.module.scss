@@ -1,69 +1,160 @@
 .orderPendingContainer {
-  padding: 20px;
+  width: 100%;
   
-  .cardTitle {
+  .summaryContainer {
+    margin-bottom: 20px;
+    
+    .summaryCard {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      
+      :global(.ant-statistic-title) {
+        font-size: 14px;
+        color: #666;
+      }
+      
+      :global(.ant-statistic-content) {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+      }
+    }
+  }
+  
+  .toolbarContainer {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    font-size: 18px;
-    font-weight: 500;
+    margin-bottom: 20px;
     
-    .titleIcon {
-      margin-right: 8px;
-      font-size: 20px;
+    .searchContainer {
+      flex: 1;
+      max-width: 300px;
+      
+      .searchInput {
+        border-radius: 20px;
+      }
+    }
+    
+    .actionsContainer {
+      display: flex;
+      align-items: center;
+      
+      .refreshButton, .filterButton {
+        margin-left: 8px;
+        border-radius: 4px;
+      }
+      
+      .helpIcon {
+        margin-left: 12px;
+        color: #1890ff;
+        font-size: 16px;
+        cursor: pointer;
+      }
     }
   }
   
-  .balanceInfo {
-    font-size: 14px;
+  .tableContainer {
+    margin-bottom: 20px;
     
-    .balanceAmount {
-      font-weight: 600;
-      color: #1890ff;
-      margin-left: 4px;
+    .loadingContainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 300px;
+    }
+    
+    .emptyContainer {
+      padding: 40px 0;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .orderTable {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      
+      :global(.ant-table-thead > tr > th) {
+        background-color: #f7f7f7;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      :global(.ant-table-tbody > tr.ant-table-row:hover > td) {
+        background-color: #f0f7ff;
+      }
+      
+      :global(.ant-table-pagination.ant-pagination) {
+        margin: 16px 0;
+      }
+      
+      .tableRow {
+        transition: all 0.3s;
+        
+        &:hover {
+          background-color: #f0f7ff;
+        }
+      }
+      
+      .summaryRow {
+        background-color: #f7f7f7;
+        font-weight: 600;
+        
+        .tableSummary {
+          padding: 12px 8px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          
+          .summaryLabel {
+            margin-right: 8px;
+          }
+          
+          .summaryAmount {
+            color: #ff4d4f;
+            font-size: 16px;
+          }
+        }
+      }
     }
   }
   
-  .orderCard {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    
-    :global(.ant-card-head) {
-      border-bottom: 1px solid #f0f0f0;
-      padding: 0 24px;
-    }
+  .orderId {
+    font-weight: 600;
+    color: #1890ff;
   }
   
-  .loadingContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 300px;
-  }
-  
-  .emptyContainer {
-    padding: 60px 0;
-  }
-  
-  .orderTable {
-    :global(.ant-table-thead > tr > th) {
-      background-color: #f7f7f7;
+  .dateTimeWrapper {
+    .dateDisplay {
       font-weight: 500;
+      color: #333;
+    }
+    
+    .timeDisplay {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
     }
   }
   
   .productInfo {
     .productItem {
       display: flex;
-      align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #eee;
       
       &:last-child {
         margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
       }
       
       .productImage {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         object-fit: cover;
         border-radius: 4px;
         margin-right: 12px;
@@ -73,18 +164,28 @@
         flex: 1;
         
         .productName {
-          font-weight: 500;
+          font-size: 14px;
           margin-bottom: 4px;
           color: #333;
+          line-height: 1.4;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
         
         .productPrice {
-          color: #666;
           display: flex;
           justify-content: space-between;
+          align-items: center;
+          color: #666;
           
           .productQuantity {
             color: #999;
+            background-color: #f5f5f5;
+            padding: 0 6px;
+            border-radius: 10px;
+            font-size: 12px;
           }
         }
       }
@@ -94,88 +195,262 @@
   .totalAmount {
     font-weight: 600;
     color: #ff4d4f;
-    font-size: 16px;
   }
   
   .actionButtons {
-    display: flex;
-    gap: 8px;
-    
-    button {
-      border-radius: 4px;
-      min-width: auto;
-      padding: 0 12px;
-    }
-    
     .payButton, .cancelButton {
-      font-size: 13px;
+      border-radius: 4px;
     }
-  }
-  
-  .paymentModalContent {
-    padding: 10px 0;
     
-    .paymentInfo {
-      background-color: #f9f9f9;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+    .payButton {
+      background-color: #1890ff;
       
-      .paymentRow {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        
-        &:last-child {
-          margin-bottom: 0;
-        }
-        
-        .paymentLabel {
-          color: #666;
-        }
-        
-        .paymentAmount {
-          font-weight: 600;
-          color: #ff4d4f;
-        }
-        
-        .balanceAmount {
-          font-weight: 600;
-          color: #1890ff;
-        }
+      &:hover {
+        background-color: #40a9ff;
       }
     }
     
-    .insufficientBalance {
-      color: #ff4d4f;
-      text-align: center;
-      padding: 10px;
-      background-color: #fff1f0;
-      border: 1px solid #ffccc7;
-      border-radius: 4px;
+    .cancelButton {
+      &:hover {
+        color: #ff4d4f;
+        border-color: #ff4d4f;
+      }
     }
   }
   
   .countdownWrapper {
     display: flex;
     align-items: center;
-    margin-top: 5px;
     
     .clockIcon {
-      color: #faad14;
+      color: #1890ff;
       margin-right: 4px;
-      font-size: 12px;
+    }
+    
+    .urgentClockIcon {
+      color: #ff4d4f;
+      margin-right: 4px;
+      animation: blink 1s infinite;
     }
     
     .countdown {
-      color: #666;
       font-size: 12px;
+      color: #1890ff;
     }
     
     .urgentCountdown {
-      color: #ff4d4f;
       font-size: 12px;
-      font-weight: 500;
+      color: #ff4d4f;
+      font-weight: 600;
+    }
+  }
+  
+  .statusTag {
+    margin-left: 8px;
+  }
+  
+  .paymentModal {
+    .paymentModalTitle {
+      display: flex;
+      align-items: center;
+      
+      .paymentIcon {
+        margin-right: 8px;
+        color: #1890ff;
+      }
+    }
+    
+    .paymentModalContent {
+      .paymentOrderInfo {
+        background-color: #f7f7f7;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        
+        .paymentRow {
+          display: flex;
+          margin-bottom: 12px;
+          
+          .paymentLabel {
+            width: 80px;
+            color: #666;
+          }
+        }
+        
+        .paymentProductList {
+          margin: 16px 0;
+          
+          .paymentProductItem {
+            display: flex;
+            margin-bottom: 12px;
+            
+            .paymentProductImage {
+              width: 50px;
+              height: 50px;
+              object-fit: cover;
+              border-radius: 4px;
+              margin-right: 12px;
+            }
+            
+            .paymentProductDetails {
+              flex: 1;
+              
+              .paymentProductName {
+                font-size: 14px;
+                margin-bottom: 4px;
+              }
+              
+              .paymentProductPrice {
+                display: flex;
+                justify-content: space-between;
+                
+                .paymentProductQuantity {
+                  color: #999;
+                }
+              }
+            }
+          }
+        }
+        
+        .paymentTotalRow {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px dashed #ddd;
+          
+          .paymentLabel {
+            font-weight: 600;
+          }
+          
+          .paymentAmount {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ff4d4f;
+          }
+        }
+        
+        .paymentCountdown {
+          margin-top: 12px;
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
+      
+      .paymentMethods {
+        margin-bottom: 24px;
+        
+        .paymentMethodTitle {
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 16px;
+        }
+        
+        .paymentMethodOptions {
+          .paymentMethodCard {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            
+            &:hover {
+              border-color: #e6f7ff;
+            }
+            
+            &.active {
+              border-color: #1890ff;
+              background-color: #e6f7ff;
+            }
+            
+            .paymentMethodIcon {
+              margin-bottom: 8px;
+              
+              img {
+                height: 36px;
+              }
+            }
+            
+            .paymentMethodName {
+              font-size: 14px;
+              color: #333;
+            }
+          }
+        }
+      }
+      
+      .paymentActions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        
+        .cancelPaymentButton {
+          min-width: 100px;
+        }
+        
+        .confirmPaymentButton {
+          min-width: 100px;
+        }
+      }
+    }
+  }
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .orderPendingContainer {
+    .toolbarContainer {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .searchContainer {
+        max-width: 100%;
+        width: 100%;
+        margin-bottom: 12px;
+      }
+      
+      .actionsContainer {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+    
+    .tableContainer {
+      .orderTable {
+        :global(.ant-table-content) {
+          overflow-x: auto;
+        }
+      }
+    }
+    
+    .paymentModal {
+      .paymentModalContent {
+        .paymentMethods {
+          .paymentMethodOptions {
+            display: flex;
+            flex-direction: column;
+            
+            .paymentMethodCard {
+              margin-bottom: 12px;
+            }
+          }
+        }
+        
+        .paymentActions {
+          flex-direction: column;
+          
+          button {
+            width: 100%;
+            margin-bottom: 8px;
+          }
+        }
+      }
     }
   }
 }

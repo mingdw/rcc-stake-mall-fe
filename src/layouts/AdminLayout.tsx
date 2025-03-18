@@ -60,6 +60,19 @@ const ALL_MENU_DATA = [
         ]
     },
     {
+        key: "mall",
+        title: "商城管理",
+        icon: <FileTextOutlined />,
+        links: [
+            { path: "/admin/mall/categories", label: "目录分类" },
+            { path: "/admin/mall/attributes", label: "属性组管理" },
+            { path: "/admin/mall/products", label: "商品管理" },
+            { path: "/admin/mall/orders", label: "订单管理" },
+            { path: "/admin/mall/comments", label: "评价管理" }
+        ]
+    },
+
+    {
         key: "contract",
         title: "合约管理",
         icon: <FileTextOutlined />,

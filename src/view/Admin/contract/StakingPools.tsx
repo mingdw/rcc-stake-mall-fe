@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Tag, Tooltip, Card, Statistic, Row, Col } from 'antd';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { DatabaseOutlined } from '@ant-design/icons';
 import AdminContentCard from '../AdminContentCard';
 import styles from './StakingPools.module.scss';

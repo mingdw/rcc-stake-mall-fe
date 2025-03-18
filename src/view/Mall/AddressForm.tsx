@@ -4,6 +4,7 @@ import { UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import styles from './AddressForm.module.scss';
 import type { Address, ListAddressRequest, UserAddress } from '../../api/apiService';
 import { addOrUpdateUserAddress, getAddressList } from '../../api/apiService';
+import { authManager } from '../../utils/authManager';
 
 const { Option } = Select;
 
@@ -187,8 +188,8 @@ const AddressForm: React.FC<AddressFormProps> = ({
 
       const submitData: UserAddress = {
         id: initialValues?.id || 0,
-        userId: initialValues?.userId || -1,
-        userCode: values.userCode || '0x324234',
+        userId: initialValues?.userId || authManager.userInfo?.id || -1,
+        userCode: values.userCode || authManager.userInfo?.userCode || '',
         reciverPhone: values.reciverPhone,
         reciverName: values.reciverName,
         provinceCode: values.provinceCode,
