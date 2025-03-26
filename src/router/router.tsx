@@ -20,7 +20,7 @@ import ProductDetail from "../view/mall/ProductDetail";
 import OrderConfirm from "../view/mall/OrderConfirm";
 import OrderSuccess from "../view/mall/OrderSuccess";
 import RoleManagement from "../view/admin/contract/RoleManagement";
-import StakingPools from "../view/admin/contract/StakingPools";
+import StakingPoolManage from "../view/admin/contract/StakingPoolManage";
 import Properties from "../view/admin/contract/Properties";
 import EmergencyControl from "../view/admin/contract/EmergencyControl";
 import UserManagement from "../view/admin/contract/UserManagement";
@@ -185,7 +185,7 @@ const router = createBrowserRouter([
                     },
                     {
                         path: '/admin/contract/staking-pools',
-                        element: <StakingPools />
+                        element: <StakingPoolManage />
                     },
                     {
                         path: '/admin/contract/properties',

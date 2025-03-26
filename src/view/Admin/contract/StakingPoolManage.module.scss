@@ -1,0 +1,73 @@
+.searchContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .searchForm {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.statsCard {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  .statItem {
+    flex: 1;
+    min-width: 150px;
+    padding: 16px;
+    text-align: center;
+    
+    .statTitle {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.45);
+      margin-bottom: 8px;
+    }
+    
+    .statValue {
+      font-size: 24px;
+      font-weight: 500;
+      color: #1890ff;
+    }
+  }
+}
+
+.capacityBar {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+  
+  .capacityFill {
+    height: 100%;
+    background-color: #1890ff;
+  }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .searchContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .searchForm {
+      margin-bottom: 16px;
+      width: 100%;
+    }
+  }
+  
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+} 

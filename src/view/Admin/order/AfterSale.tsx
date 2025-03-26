@@ -25,8 +25,7 @@ import {
   Steps,
   Timeline,
   Avatar,
-  Image,
-  Statistic
+  Image
 } from 'antd';
 import moment from 'moment';
 import {
@@ -270,7 +269,7 @@ const AfterSale: React.FC = () => {
     
     const config = typeConfig[type];
     return (
-      <Tag icon={config.icon} color={config.color}>
+      <Tag icon={config.icon} color={config.color} style={{ whiteSpace: 'nowrap' }}>
         {config.text}
       </Tag>
     );
@@ -289,7 +288,7 @@ const AfterSale: React.FC = () => {
     
     const config = statusConfig[status];
     return (
-      <Tag icon={config.icon} color={config.color}>
+      <Tag icon={config.icon} color={config.color} style={{ whiteSpace: 'nowrap' }}>
         {config.text}
       </Tag>
     );
@@ -492,6 +491,7 @@ const AfterSale: React.FC = () => {
         { text: '维修', value: 'repair' },
       ],
       onFilter: (value, record) => record.type === value,
+      width: 120,
     },
     {
       title: '退款金额',
@@ -505,12 +505,14 @@ const AfterSale: React.FC = () => {
       dataIndex: 'reason',
       key: 'reason',
       ellipsis: true,
+      width: 150,
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       render: (status) => getStatusTag(status),
+      width: 100,
     },
     {
       title: '操作',
@@ -637,62 +639,34 @@ const AfterSale: React.FC = () => {
       <Row gutter={24} className={styles.statsRow}>
         <Col xs={24} sm={12} md={6}>
           <Card bordered={false} className={styles.statCard}>
-            <div className={styles.statCardContent}>
-              <div className={`${styles.statCardIconWrapper} ${styles.blue}`}>
-                <SolutionOutlined className={styles.statCardIcon} />
-              </div>
-              <div className={styles.statCardInfo}>
-                <div className={styles.statCardValue}>{stats.total}</div>
-                <div className={styles.statCardTitle}>
-                  <Badge status="processing" />总申请数
-                </div>
-              </div>
-            </div>
+            <Statistic title="总申请数" value={stats.total} prefix={<Badge status="processing" />} />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card bordered={false} className={styles.statCard}>
-            <div className={styles.statCardContent}>
-              <div className={`${styles.statCardIconWrapper} ${styles.orange}`}>
-                <ExclamationCircleOutlined className={styles.statCardIcon} />
-              </div>
-              <div className={styles.statCardInfo}>
-                <div className={styles.statCardValue}>{stats.pendingCount}</div>
-                <div className={styles.statCardTitle}>
-                  <Badge status="warning" />待处理
-                </div>
-              </div>
-            </div>
+            <Statistic 
+              title="待处理" 
+              value={stats.pendingCount} 
+              prefix={<Badge status="warning" />} 
+            />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card bordered={false} className={styles.statCard}>
-            <div className={styles.statCardContent}>
-              <div className={`${styles.statCardIconWrapper} ${styles.purple}`}>
-                <SyncOutlined className={styles.statCardIcon} />
-              </div>
-              <div className={styles.statCardInfo}>
-                <div className={styles.statCardValue}>{stats.processingCount}</div>
-                <div className={styles.statCardTitle}>
-                  <Badge status="processing" />处理中
-                </div>
-              </div>
-            </div>
+            <Statistic 
+              title="处理中" 
+              value={stats.processingCount} 
+              prefix={<Badge status="processing" />} 
+            />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card bordered={false} className={styles.statCard}>
-            <div className={styles.statCardContent}>
-              <div className={`${styles.statCardIconWrapper} ${styles.green}`}>
-                <DollarOutlined className={styles.statCardIcon} />
-              </div>
-              <div className={styles.statCardInfo}>
-                <div className={styles.statCardValue}>¥{stats.totalAmount.toFixed(2)}</div>
-                <div className={styles.statCardTitle}>
-                  <Badge status="success" />已完成退款
-                </div>
-              </div>
-            </div>
+            <Statistic 
+              title="已完成退款" 
+              value={`¥${stats.totalAmount.toFixed(2)}`} 
+              prefix={<Badge status="success" />} 
+            />
           </Card>
         </Col>
       </Row>
@@ -800,6 +774,7 @@ const AfterSale: React.FC = () => {
             if (record.status === 'completed') return styles.rowCompleted;
             return '';
           }}
+          scroll={{ x: 1200 }}
         />
       </Card>
 
@@ -860,6 +835,25 @@ const AfterSale: React.FC = () => {
       </Modal>
       
       {/* ... 其他模态框 ... */}
+    </div>
+  );
+};
+
+// 统计组件
+interface StatisticProps {
+  title: string;
+  value: string | number;
+  prefix?: React.ReactNode;
+}
+
+const Statistic: React.FC<StatisticProps> = ({ title, value, prefix }) => {
+  return (
+    <div className={styles.statistic}>
+      <div className={styles.statisticTitle}>{title}</div>
+      <div className={styles.statisticValue}>
+        {prefix && <span className={styles.statisticPrefix}>{prefix}</span>}
+        {value}
+      </div>
     </div>
   );
 };

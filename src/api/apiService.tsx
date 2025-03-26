@@ -1,6 +1,7 @@
 import { authManager } from '../utils/authManager';
 import axiosInstance from './axiosInstance';
 import { message } from 'antd';
+import { mockStakingPools } from './mockDatas';
 
 // 基础属性接口
 interface Attr {
@@ -554,6 +555,85 @@ export const updateUserAvatar = async (formData: FormData) => {
       success: false,
       message: '网络错误，请稍后重试'
     };
+  }
+};
+
+// 质押池管理相关API
+export const getStakingPools = async () => {
+  try {
+    // 模拟API调用，返回模拟数据
+    return Promise.resolve(mockStakingPools);
+    // 实际API调用应该是：
+    // const response = await axiosInstance.get('/staking-pools');
+    // return response.data;
+  } catch (error) {
+    console.error('获取质押池列表失败:', error);
+    throw error;
+  }
+};
+
+export const getStakingPoolById = async (id: string) => {
+  try {
+    // 模拟API调用，从模拟数据中查找指定id的质押池
+    const pool = mockStakingPools.find(pool => pool.id === id);
+    if (pool) {
+      return Promise.resolve(pool);
+    }
+    throw new Error('质押池不存在');
+    // 实际API调用应该是：
+    // const response = await axiosInstance.get(`/staking-pools/${id}`);
+    // return response.data;
+  } catch (error) {
+    console.error(`获取质押池详情失败, id: ${id}:`, error);
+    throw error;
+  }
+};
+
+export const createStakingPool = async (poolData: any) => {
+  try {
+    // 模拟API调用，创建新质押池
+    const newId = Date.now().toString();
+    const newPool = { 
+      ...poolData,
+      id: newId 
+    };
+    return Promise.resolve(newPool);
+    // 实际API调用应该是：
+    // const response = await axiosInstance.post('/staking-pools', poolData);
+    // return response.data;
+  } catch (error) {
+    console.error('创建质押池失败:', error);
+    throw error;
+  }
+};
+
+export const updateStakingPool = async (id: string, poolData: any) => {
+  try {
+    // 模拟API调用，更新质押池
+    const updatedPool = { 
+      ...poolData,
+      id 
+    };
+    return Promise.resolve(updatedPool);
+    // 实际API调用应该是：
+    // const response = await axiosInstance.put(`/staking-pools/${id}`, poolData);
+    // return response.data;
+  } catch (error) {
+    console.error(`更新质押池失败, id: ${id}:`, error);
+    throw error;
+  }
+};
+
+export const deleteStakingPool = async (id: string) => {
+  try {
+    // 模拟API调用，删除质押池
+    return Promise.resolve({ success: true, message: '删除成功' });
+    // 实际API调用应该是：
+    // const response = await axiosInstance.delete(`/staking-pools/${id}`);
+    // return response.data;
+  } catch (error) {
+    console.error(`删除质押池失败, id: ${id}:`, error);
+    throw error;
   }
 };
 

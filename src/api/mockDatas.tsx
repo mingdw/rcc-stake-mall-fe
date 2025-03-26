@@ -1628,3 +1628,75 @@ export const products: Product[] = [
     }
   ];
   
+// 质押池管理模拟数据
+export const mockStakingPools = [
+  {
+    id: '1',
+    name: 'ETH 2.0 质押池',
+    symbol: 'ETH',
+    apr: 5.8,
+    minStakeAmount: 0.1,
+    maxStakeAmount: 32,
+    lockPeriod: 30,
+    totalStaked: 1024,
+    remainingCapacity: 976,
+    maxCapacity: 2000,
+    status: 'active',
+    description: 'ETH 2.0质押池，参与ETH网络验证并获得奖励',
+    riskLevel: 'low',
+    createdAt: '2023-05-01T00:00:00Z',
+    updatedAt: '2023-06-15T00:00:00Z'
+  },
+  {
+    id: '2',
+    name: 'BTC 收益池',
+    symbol: 'BTC',
+    apr: 3.2,
+    minStakeAmount: 0.01,
+    maxStakeAmount: 1,
+    lockPeriod: 60,
+    totalStaked: 15,
+    remainingCapacity: 35,
+    maxCapacity: 50,
+    status: 'active',
+    description: 'BTC收益池，通过DeFi策略为BTC持有者提供被动收入',
+    riskLevel: 'medium',
+    createdAt: '2023-06-10T00:00:00Z',
+    updatedAt: '2023-06-15T00:00:00Z'
+  },
+  {
+    id: '3',
+    name: 'DOT 验证者池',
+    symbol: 'DOT',
+    apr: 12.5,
+    minStakeAmount: 50,
+    maxStakeAmount: 1000,
+    lockPeriod: 14,
+    totalStaked: 25000,
+    remainingCapacity: 75000,
+    maxCapacity: 100000,
+    status: 'paused',
+    description: 'Polkadot验证者池，参与网络共识并获得奖励',
+    riskLevel: 'medium',
+    createdAt: '2023-04-15T00:00:00Z',
+    updatedAt: '2023-06-01T00:00:00Z'
+  },
+  {
+    id: '4',
+    name: '高收益LP池',
+    symbol: 'LP',
+    apr: 20.5,
+    minStakeAmount: 100,
+    maxStakeAmount: 10000,
+    lockPeriod: 90,
+    totalStaked: 250000,
+    remainingCapacity: 0,
+    maxCapacity: 250000,
+    status: 'completed',
+    description: '高收益流动性提供者池，参与DEX流动性挖矿',
+    riskLevel: 'high',
+    createdAt: '2023-03-01T00:00:00Z',
+    updatedAt: '2023-05-30T00:00:00Z'
+  }
+];
+  

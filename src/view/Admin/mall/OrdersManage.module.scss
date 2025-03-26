@@ -1,0 +1,192 @@
+.ordersManageContainer {
+  padding: 16px;
+}
+
+.headerCard {
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.statsRow {
+  margin-bottom: 24px;
+}
+
+.statCard {
+  height: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 统计卡片样式
+.statistic {
+  .statisticTitle {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.45);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .statisticValue {
+    font-size: 24px;
+    font-weight: 600;
+    color: #262626;
+    display: flex;
+    align-items: center;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  
+  .statisticPrefix {
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+  }
+  
+  :global(.ant-badge-status-dot) {
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+  }
+}
+
+.filterCard {
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.tableCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+.orderTabs {
+  margin-bottom: 16px;
+  
+  :global(.ant-tabs-tab) {
+    padding: 12px 16px;
+    transition: all 0.3s;
+    
+    &:hover {
+      color: #1890ff;
+    }
+  }
+  
+  :global(.ant-tabs-tab-active) {
+    font-weight: 500;
+  }
+}
+
+// 客户信息
+.customerInfo {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.customerAvatar {
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.contactButton {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.customerInfo:hover .contactButton {
+  opacity: 1;
+}
+
+// 商品信息
+.itemsInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.itemsCount {
+  font-size: 14px;
+}
+
+.itemTooltip {
+  display: flex;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.itemDetails {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+// 金额样式
+.amount {
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+// 物流信息
+.trackingNumber {
+  font-family: monospace;
+  margin-bottom: 4px;
+}
+
+// 行样式
+.rowPending {
+  background-color: #fffbe6;
+}
+
+.rowCancelled {
+  background-color: #fff1f0;
+}
+
+.rowDelivered {
+  background-color: #f6ffed;
+}
+
+.rowShipped {
+  background-color: #e6f7ff;
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+  .statsRow {
+    .statCard {
+      margin-bottom: 16px;
+    }
+  }
+  
+  .filterCard {
+    .ant-col {
+      margin-bottom: 16px;
+    }
+  }
+  
+  .contactButton {
+    opacity: 1;
+  }
+}

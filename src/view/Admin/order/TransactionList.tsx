@@ -147,7 +147,7 @@ const TransactionList: React.FC = () => {
     
     const config = statusConfig[status];
     return (
-      <Tag icon={config.icon} color={config.color}>
+      <Tag icon={config.icon} color={config.color} style={{ whiteSpace: 'nowrap' }}>
         {config.text}
       </Tag>
     );
@@ -237,6 +237,7 @@ const TransactionList: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => getStatusTag(status),
+      width: 100,
     },
     {
       title: '物流信息',
@@ -481,6 +482,7 @@ const TransactionList: React.FC = () => {
             if (record.status === 'shipped') return styles.rowShipped;
             return '';
           }}
+          scroll={{ x: 1100 }}
         />
       </Card>
     </div>
