@@ -49,7 +49,7 @@
 
 
 ### 商城首页
-![商城首页](/public/mall_01.png)
+![商城首页](/public/mall_1.png)
 
 ### 后台管理
 ![后台管理-1](/public/admin_01.png)
