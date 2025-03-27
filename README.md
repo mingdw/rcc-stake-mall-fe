@@ -48,7 +48,7 @@ Here are some screenshots of the application:
 ![Login](/public/logo_in.png)
 
 ### Mall Homepage
-![商城首页](/public/mall_01.png)
+![Mall Homepage](/public/mall_01.png)
 
 ### Admin Management
 ![后台管理-1](/public/admin_01.png)
