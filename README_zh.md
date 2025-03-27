@@ -35,18 +35,32 @@
 
 ### 首页
 ![首页-1](/public/home_1.png)
+![首页-2](/public/home_2.png)
+![首页-3](/public/home_3.png)
+![首页-4](/public/home_4.png)
 
-### 商品市场
-![商品市场](/public/images/marketplace.png)
+### 登录
+![登录](/public/logo_in.png)
 
-### 质押页面
-![质押界面](/public/images/staking.png)
 
-### 商品详情
-![商品详情](/public/images/product-detail.png)
+### 商城
+![商品市场](/public/mall_01.png)
+
+### 后台管理
+![后台管理-1](/public/admin_01.png)
+![后台管理-2](/public/admin_02.png)
+
+### 账户余额
+![账户余额](/public/账户余额.png)
 
 ### 订单管理
-![订单管理](/public/images/order.png)
+![订单管理](/public/订单管理.png)
+
+### 交易记录
+![交易记录](/public/交易记录.png)
+
+### 质押管理
+![质押管理](/public/质押管理.png)
 
 ## 技术栈
 
