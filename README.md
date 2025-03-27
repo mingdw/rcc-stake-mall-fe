@@ -6,6 +6,19 @@
 
 A blockchain-based token staking mall system where users can stake tokens to earn rewards and exchange them for virtual goods in the marketplace, providing convenient, fast, and secure transactions.
 
+## Table of Contents
+
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Build for Production](#build-for-production)
+- [Project Structure](#project-structure)
+- [Backend Repository](#backend-repository)
+- [License](#license)
+
 ## Features
 
 - Token staking and rewards management
@@ -15,6 +28,25 @@ A blockchain-based token staking mall system where users can stake tokens to ear
 - Order management system
 - Admin dashboard
 - Multi-language support (Chinese/English)
+
+## Screenshots
+
+Here are some screenshots of the application:
+
+### Dashboard
+![Dashboard](/public/images/dashboard.png)
+
+### Marketplace
+![Marketplace](/public/images/marketplace.png)
+
+### Staking Page
+![Staking Interface](/public/images/staking.png)
+
+### Product Detail
+![Product Detail](/public/images/product-detail.png)
+
+### Order Management
+![Order Management](/public/images/order.png)
 
 ## Tech Stack
 
@@ -58,29 +90,3 @@ npm run build
 ## Project Structure
 
 ```
-rcc-stake-mall-fe
-├── src/
-│   ├── api/              # API services and endpoints
-│   ├── assets/           # Static assets (images, styles, etc.)
-│   ├── components/       # Reusable UI components
-│   ├── config/           # Application configuration
-│   ├── context/          # React context providers
-│   ├── hooks/            # Custom React hooks
-│   ├── layouts/          # Page layout components
-│   ├── locales/          # i18n translation files
-│   ├── utils/            # Utility functions
-│   ├── view/             # Page components
-│   ├── App.tsx           # Main application component
-│   └── main.tsx          # Application entry point
-├── public/               # Public static assets
-└── ...configuration files
-```
-
-## Backend Repository
-
-The backend code for this project is available at: 
-https://github.com/mingdw/rcc_stack_backed.git
-
-## License
-
-[MIT](LICENSE)
