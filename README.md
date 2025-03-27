@@ -6,6 +6,8 @@
 
 A blockchain-based token staking mall system where users can stake tokens to earn rewards and exchange them for virtual goods in the marketplace, providing convenient, fast, and secure transactions.
 
+> **Note**: This project is currently under development. Some features are still being implemented. Continuous updates are planned for the future. Your star on this repository is a great encouragement for our ongoing efforts. Welcome to join us in building this project together!
+
 ## Table of Contents
 
 - [Features](#features)
@@ -16,7 +18,7 @@ A blockchain-based token staking mall system where users can stake tokens to ear
   - [Installation](#installation)
   - [Build for Production](#build-for-production)
 - [Project Structure](#project-structure)
-- [Backend Repository](#backend-repository)
+- [Related Repositories](#related-repositories)
 - [License](#license)
 
 ## Features
@@ -33,20 +35,39 @@ A blockchain-based token staking mall system where users can stake tokens to ear
 
 Here are some screenshots of the application:
 
-### Dashboard
-![Dashboard](/public/images/dashboard.png)
+### Home Page
+![Home-1](/public/home_1.png)
 
-### Marketplace
-![Marketplace](/public/images/marketplace.png)
+![Home-2](/public/home_2.png)
 
-### Staking Page
-![Staking Interface](/public/images/staking.png)
+![Home-3](/public/home_3.png)
 
-### Product Detail
-![Product Detail](/public/images/product-detail.png)
+![Home-4](/public/home_4.png)
+
+### Login
+![Login](/public/logo_in.png)
+
+### Mall Homepage
+![Mall Homepage](/public/mall_01.png)
+
+### Admin Management
+![Admin-1](/public/admin_01.png)
+
+![Admin-2](/public/admin_02.png)
+
+### Account Balance
+![Account Balance](/public/账户余额.png)
 
 ### Order Management
-![Order Management](/public/images/order.png)
+![Order Management](/public/订单管理.png)
+
+### Transaction Records
+![Transaction Records](/public/交易记录.png)
+
+### Staking Management
+![Staking Management](/public/质押管理.png)
+
+These are just some of the project screenshots.
 
 ## Tech Stack
 
