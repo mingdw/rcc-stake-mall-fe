@@ -35,19 +35,23 @@
 
 ### 首页
 ![首页-1](/public/home_1.png)
+
 ![首页-2](/public/home_2.png)
+
 ![首页-3](/public/home_3.png)
+
 ![首页-4](/public/home_4.png)
 
 ### 登录
 ![登录](/public/logo_in.png)
 
 
-### 商城
-![商品市场](/public/mall_01.png)
+### 商城首页
+![商场首页](/public/mall_01.png)
 
 ### 后台管理
 ![后台管理-1](/public/admin_01.png)
+
 ![后台管理-2](/public/admin_02.png)
 
 ### 账户余额
@@ -61,6 +65,8 @@
 
 ### 质押管理
 ![质押管理](/public/质押管理.png)
+
+这只是部分项目截图
 
 ## 技术栈
 
