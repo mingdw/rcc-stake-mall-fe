@@ -67,7 +67,7 @@ Here are some screenshots of the application:
 ### Staking Management
 ![质押管理](/public/质押管理.png)
 
-这只是部分项目截图
+This is some of project pictures！！！
 
 ## Tech Stack
 
