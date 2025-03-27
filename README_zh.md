@@ -33,8 +33,8 @@
 
 以下是应用程序的部分截图：
 
-### 仪表盘
-![仪表盘](/public/images/dashboard.png)
+### 首页
+![首页-1](/public/home_1.png)
 
 ### 商品市场
 ![商品市场](/public/images/marketplace.png)
