@@ -18,12 +18,10 @@ i18next.init({
 });
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
   <I18nextProvider i18n={i18next}>
   <Providers>
       <App />
     </Providers>
-   
-  </I18nextProvider>,
-  </StrictMode>,
+  </I18nextProvider>
+
 )

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCartOutlined, FireOutlined } from '@ant-design/icons';
 import styles from './ProductCard.module.scss';
 import { Product } from '../api/apiService';
+import defaultProductImage from '../assets/images/rcc-logo.png';
+
 
 interface ProductCardProps {
   product: Product;
@@ -11,23 +13,20 @@ interface ProductCardProps {
   onClick?: (e: React.MouseEvent) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ 
+const ProductCard: React.FC<ProductCardProps> = ({
   product,
   showExchangeButton = false,
   onClick
 }) => {
   const navigate = useNavigate();
 
-  // 添加默认图片
-  const defaultImage = '../../../public/vite.svg'; // 替换为你的默认图片路径
-
 
   // 处理基础属性值，最多显示4个
   const renderBasicAttrValues = () => {
     if (!product.attributes?.basicAttrs) return [];
-    
+
     try {
-      const basicAttrs = typeof product.attributes.basicAttrs === 'string' 
+      const basicAttrs = typeof product.attributes.basicAttrs === 'string'
         ? JSON.parse(product.attributes.basicAttrs)
         : product.attributes.basicAttrs;
       const attrValues = Object.values(basicAttrs);
@@ -45,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const getBestPrice = () => {
     if (product.skuList && product.skuList.length > 0) {
       // 找出销量最高的SKU
-      const bestSellingSku = product.skuList.reduce((prev, current) => 
+      const bestSellingSku = product.skuList.reduce((prev, current) =>
         (prev.saleCount > current.saleCount) ? prev : current
       );
       return bestSellingSku.price;
@@ -57,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   // 获取原始价格
   const getOriginalPrice = () => {
     if (product.skuList && product.skuList.length > 0) {
-      const bestSellingSku = product.skuList.reduce((prev, current) => 
+      const bestSellingSku = product.skuList.reduce((prev, current) =>
         (prev.saleCount > current.saleCount) ? prev : current
       );
       return bestSellingSku.price > product.price ? bestSellingSku.price : product.price;
@@ -83,14 +82,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
       onClick={handleClick}
       cover={
         <div className={styles.imageWrapper}>
+
           <Image
-            src={product.images?.[0]}
-            alt={product.name}
-            fallback={defaultImage}
+            src={defaultProductImage}
+            alt='默认图片'
+            className={styles.mainImage}
             preview={false}
-            className={styles.productImage}
+          />
+          <img
+            src={product?.images?.[0] || defaultProductImage}
+            alt={product.name || '商品图片'}
             onError={(e) => {
-              console.error('Image load failed:', e);
+              e.currentTarget.src = defaultProductImage;
+              e.currentTarget.onerror = null; // 防止循环错误
+              console.error("加载图片失败:", product?.images?.[0]);
             }}
           />
           {product.totalSales > 100 && (
@@ -101,8 +106,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       }
       actions={showExchangeButton ? [
-        <Button 
-          type="primary" 
+        <Button
+          type="primary"
           className={styles.exchangeButton}
           disabled={product.totalStock === 0}
           onClick={(e) => {
@@ -150,8 +155,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </Tag>
           ))}
           {hasMoreAttrs && (
-            <Tooltip 
-              title={Object.values(typeof product.attributes.basicAttrs === 'string' 
+            <Tooltip
+              title={Object.values(typeof product.attributes.basicAttrs === 'string'
                 ? JSON.parse(product.attributes.basicAttrs)
                 : product.attributes.basicAttrs)
                 .slice(4)

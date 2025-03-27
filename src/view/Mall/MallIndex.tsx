@@ -16,6 +16,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Key } from 'antd/es/table/interface';
 import { message } from 'antd';
 import ProductCard from '../../components/ProductCard';
+import Image from 'antd/es/image';
 const { Search } = Input;
 
 // 添加所有需要的类型定义
@@ -62,6 +63,17 @@ function debounce<T extends (...args: any[]) => any>(
   };
 }
 
+// 在其他接口附近添加这个类型定义
+type MenuItem = {
+  key: string;
+  icon?: React.ReactNode;
+  label: React.ReactNode;
+  title?: string;
+  children?: MenuItem[];
+  onClick?: () => void;
+  onTitleClick?: (info: {key: string}) => void;
+};
+
 const MallIndex: React.FC = () => {
   const [showAllCategories, setShowAllCategories] = useState(true); // 默认为 true
   const [selectedScenes, setSelectedScenes] = useState<string[]>([]);
@@ -91,45 +103,14 @@ const MallIndex: React.FC = () => {
       try {
         setLoading(true);
         
-        // 并行获取分类和商品数据
-        const [categoryData, productData] = await Promise.all([
-          getCategoryList(),
-          getProductList({
-            categoryCodes: '',
-            productName: '',
-            page: 1,
-            pageSize: 8 // 获取所有商品
-          })
-        ]);
-
+        // 只获取分类数据，不重复获取商品
+        const categoryData = await getCategoryList();
+        
         // 处理分类数据
         const categoriesArray = Array.isArray(categoryData) ? categoryData : [];
         setCategories(categoriesArray);
         setCachedCategories(categoriesArray);
-
-        // 处理商品数据
-        if (productData?.categories) {
-          const allProducts = productData.categories
-            .filter(cat => cat.products !== null)
-            .flatMap(cat => cat.products || []);
-
-          // 按一级分类组织商品数据
-          const productsByCategory = allProducts.reduce((acc, product) => {
-            const category1Code = product.category1Code || '';
-            if (!acc[category1Code]) {
-              acc[category1Code] = [];
-            }
-            acc[category1Code].push(product);
-            return acc;
-          }, {} as { [key: string]: Product[] });
-
-          setProducts(allProducts);
-          setTotal(productData.total || 0);
-          setCachedProducts({
-            '': allProducts, // 所有商品
-            ...productsByCategory // 按一级分类缓存的商品
-          });
-        }
+        
       } catch (err) {
         console.error('Failed to fetch initial data:', err);
         message.error('获取数据失败');
@@ -179,6 +160,7 @@ const MallIndex: React.FC = () => {
       };
 
       const data = await getProductList(requestParams);
+      console.log('API返回数据:', data); // 调试用，可以看到实际返回结构
       
       if (data.categories && Array.isArray(data.categories)) {
         const allProducts = data.categories
@@ -186,10 +168,17 @@ const MallIndex: React.FC = () => {
           .flatMap((cat: CategoryProduct) => cat.products || []);
         
         setProducts(allProducts);
-        // 保存原始的 categories 数据，包含 productCount
         setCategoryProducts(data.categories);
-        // 更新 total 为 API 返回的总数
-        setTotal(data.total || 0);
+        
+        // 修改为从categories中获取productCount
+        if (selectedCategory) {
+          const categoryData = data.categories.find(cat => cat.categoryCode === selectedCategory);
+          setTotal(categoryData?.productCount || 0);
+        } else {
+          // 对于全局搜索，使用所有分类的productCount总和或使用返回的total
+          const totalCount = data.categories.reduce((sum, cat) => sum + (cat.productCount || 0), 0);
+          setTotal(totalCount || 0);
+        }
       } else {
         setProducts([]);
         setCategoryProducts([]);
@@ -647,10 +636,11 @@ useEffect(() => {
     setActiveKey(categoryCode);
     setCurrentPage(1);
     
+    // 获取更多产品，确保分页显示
     fetchProducts({
       categoryCodes: categoryCode,
       page: 1,
-      pageSize: PAGE_SIZE
+      pageSize: PAGE_SIZE * 3  // 获取更多数据，至少确保超过一页
     });
   };
 
@@ -675,12 +665,8 @@ useEffect(() => {
     setSelectedScenes([]);
     setSelectedStyles([]);
 
-    // 获取选中分类的商品
-    fetchProducts({
-      categoryCodes: isAllProducts ? '' : key,
-      page: 1,
-      pageSize: PAGE_SIZE
-    });
+    // 移除此处直接调用，仅依靠useEffect中的调用
+    // fetchProducts({ ... }); 
   };
 
   // 处理返回全部商品
@@ -804,7 +790,6 @@ useEffect(() => {
         cat.categoryCode === currentCategory?.code
       );
       const totalProductCount = categoryData?.productCount || 0;
-      const displayProducts = filteredTagProducts.slice(0, MAX_ITEMS_PER_CATEGORY);
       
       return (
         <Card
@@ -817,65 +802,36 @@ useEffect(() => {
                 icon: currentCategory?.icon
               }}
               total={totalProductCount}
-              onViewMore={
-                totalProductCount > MAX_ITEMS_PER_CATEGORY 
-                  ? () => handleViewMore(currentCategory?.code || '')
-                  : undefined
-              }
             />
           }
         >
-          <Row gutter={[16, 16]}>
-            {displayProducts.map((product, index) => (
-              <Col span={24 / ITEMS_PER_ROW} key={`${product.id}-${index}`}>
-                {renderProductCard(product, index)}
-              </Col>
-            ))}
-          </Row>
-          {totalProductCount > MAX_ITEMS_PER_CATEGORY && (
-            <div className={stylesCss.viewMoreWrapper}>
-              <Button 
-                type="link" 
-                onClick={() => handleViewMore(currentCategory?.code || '')}
-                className={stylesCss.moreButton}
-              >
-                查看更多 <RightOutlined />
-              </Button>
-            </div>
-          )}
+          {!showSearchResults ? renderProductContent(products) : renderProductContent(filteredTagProducts)}
         </Card>
       );
     }
   };
 
   // 修改 renderProductContent 函数，使用筛选后的商品数量
-  const renderProductContent = (productsToRender = filteredTagProducts) => {
+  const renderProductContent = (productsToRender = products) => {
     if (productsToRender.length > 0) {
-      // 计算当前页应显示的商品
-      const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const endIndex = startIndex + PAGE_SIZE;
-      const currentPageProducts = productsToRender.slice(startIndex, endIndex);
-      
       return (
         <>
           <Row gutter={[16, 16]}>
-            {currentPageProducts.map((product, index) => (
+            {productsToRender.map((product, index) => (
               <Col span={24 / ITEMS_PER_ROW} key={`${product.id}-${index}`}>
                 {renderProductCard(product, index)}
               </Col>
             ))}
           </Row>
-          {productsToRender.length > PAGE_SIZE && (
-            <div className={stylesCss.pagination}>
-              <Pagination
-                current={currentPage}
-                total={productsToRender.length} // 使用筛选后的商品数量
-                pageSize={PAGE_SIZE}
-                onChange={handlePageChange}
-                showTotal={(total) => `共 ${total} 条`}
-              />
-            </div>
-          )}
+          <div className={stylesCss.pagination}>
+            <Pagination
+              current={currentPage}
+              total={total} // 直接使用state中存储的总数
+              pageSize={PAGE_SIZE}
+              onChange={handlePageChange}
+              showTotal={(total) => `共 ${total} 条`}
+            />
+          </div>
         </>
       );
     } else {
@@ -1038,6 +994,52 @@ useEffect(() => {
     return key; // 如果找不到对应的一级分类，返回原key
   };
 
+  // 添加这个函数来生成菜单项
+  const generateMenuItems = useCallback((): MenuItem[] => {
+    const items: MenuItem[] = [
+      {
+        key: 'all',
+        icon: <BarsOutlined />,
+        label: '全部商品',
+      }
+    ];
+
+    // 添加分类项
+    (categories || []).forEach(category => {
+      const categoryItem: MenuItem = {
+        key: category.code,
+        icon: category.icon,
+        label: category.name,
+        onTitleClick: ({key}) => handleMenuClick({key}),
+        children: []
+      };
+
+      // 添加子分类项
+      category.children?.forEach(subCategory => {
+        const subCategoryItem: MenuItem = {
+          key: subCategory.code,
+          label: subCategory.name,
+          onTitleClick: ({key}) => handleMenuClick({key}),
+          children: []
+        };
+
+        // 添加三级项
+        subCategory.children?.forEach(item => {
+          subCategoryItem.children?.push({
+            key: item.code,
+            label: item.name
+          });
+        });
+
+        categoryItem.children?.push(subCategoryItem);
+      });
+
+      items.push(categoryItem);
+    });
+
+    return items;
+  }, [categories, handleMenuClick]);
+
   return (
     <Layout>
       <Header className={stylesCss.header}>
@@ -1049,33 +1051,8 @@ useEffect(() => {
               selectedKeys={[activeKey]}
               onClick={handleMenuClick}
               selectable={true}
-            >
-              <Menu.Item key="all" icon={<BarsOutlined />}>
-                全部商品
-              </Menu.Item>
-              {(categories || []).map(category => (
-                <Menu.SubMenu 
-                  key={category.code} 
-                  icon={category.icon} 
-                  title={category.name}
-                  onTitleClick={({ key }) => handleMenuClick({ key })} // 添加一级菜单标题点击处理
-               >
-                  {category.children?.map(subCategory => (
-                    <Menu.SubMenu 
-                      key={subCategory.code} 
-                      title={subCategory.name}
-                      onTitleClick={({ key }) => handleMenuClick({ key })} // 添加二级菜单标题点击处理
-                    >
-                      {subCategory.children?.map(item => (
-                        <Menu.Item key={item.code}>
-                          {item.name}
-                        </Menu.Item>
-                      ))}
-                    </Menu.SubMenu>
-                  ))}
-                </Menu.SubMenu>
-              ))}
-            </Menu>
+              items={generateMenuItems()} // 使用 items 属性代替子元素
+            />
           </Col>
           <Col span={6}>
             <div className={stylesCss.searchWrapper}>
