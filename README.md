@@ -6,7 +6,7 @@
 
 A blockchain-based token staking mall system where users can stake tokens to earn rewards and exchange them for virtual goods in the marketplace, providing convenient, fast, and secure transactions.
 
-> **Note**: This project is currently under development. Some features are still being implemented. Continuous updates are planned for the future. Your star on this repository is a great encouragement for our ongoing efforts. Welcome to join us in building this project together!
+<font color=red> > **Note**: This project is currently under development. Some features are still being implemented. Continuous updates are planned for the future. Your star on this repository is a great encouragement for our ongoing efforts. Welcome to join us in building this project together! </font>
 
 ## Table of Contents
 
