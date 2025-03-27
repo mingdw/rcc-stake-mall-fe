@@ -110,3 +110,33 @@ npm run build
 ## 项目结构
 
 ```
+rcc-stake-mall-fe
+├── src/
+│   ├── api/              # API 服务和端点
+│   ├── assets/           # 静态资源 (图片, 样式等)
+│   ├── components/       # 可复用 UI 组件
+│   ├── config/           # 应用配置
+│   ├── context/          # React 上下文提供者
+│   ├── hooks/            # 自定义 React 钩子
+│   ├── layouts/          # 页面布局组件
+│   ├── locales/          # i18n 翻译文件
+│   ├── utils/            # 工具函数
+│   ├── view/             # 页面组件
+│   ├── App.tsx           # 主应用组件
+│   └── main.tsx          # 应用入口点
+├── public/               # 公共静态资源
+└── ...配置文件
+```
+
+## 后端仓库
+
+项目后端代码地址：https://github.com/mingdw/rcc_stack_backed.git
+
+## 合约仓库
+
+合约代码地址：https://github.com/mingdw/rcc_stack_contact.git
+
+## 开源协议
+
+[MIT](LICENSE)
+
