@@ -128,13 +128,11 @@ rcc-stake-mall-fe
 └── ...配置文件
 ```
 
-## 后端仓库
+## 关联仓库地址
 
 项目后端代码地址：https://github.com/mingdw/rcc_stack_backed.git
-
-## 合约仓库
-
 合约代码地址：https://github.com/mingdw/rcc_stack_contact.git
+
 
 ## 开源协议
 
