@@ -6,7 +6,7 @@
 
 基于区块链技术的代币质押商城系统，用户可以通过质押代币来获取奖励，并且通过代币可以兑换商场里面的虚拟商品，交易方便快捷，安全可靠。
 
-> ⚠️ **注意**：本项目目前正在开发中，部分功能尚未完善，后期持续更新中，敬请期待。开源不易，您的小小的一颗星是对我不断地鼓励，欢迎大家一起建设。</font>
+> ⚠️ **注意**：本项目目前正在开发中，部分功能尚未完善，后期持续更新中，敬请期待。开源不易，您的小小的一颗星是对我不断地鼓励，欢迎大家一起建设。
 
 ## 目录
 
@@ -109,25 +109,25 @@ npm run dev
 npm run build
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 rcc-stake-mall-fe
 ├── src/
-│   ├── api/              # API 服务和端点
-│   ├── assets/           # 静态资源 (图片, 样式等)
-│   ├── components/       # 可复用 UI 组件
-│   ├── config/           # 应用配置
-│   ├── context/          # React 上下文提供者
-│   ├── hooks/            # 自定义 React 钩子
-│   ├── layouts/          # 页面布局组件
-│   ├── locales/          # i18n 翻译文件
-│   ├── utils/            # 工具函数
-│   ├── view/             # 页面组件
-│   ├── App.tsx           # 主应用组件
-│   └── main.tsx          # 应用入口点
-├── public/               # 公共静态资源
-└── ...配置文件
+│   ├── api/              # API services and endpoints
+│   ├── assets/           # Static assets (images, styles, etc.)
+│   ├── components/       # Reusable UI components
+│   ├── config/           # Application configuration
+│   ├── context/          # React context providers
+│   ├── hooks/            # Custom React hooks
+│   ├── layouts/          # Page layout components
+│   ├── locales/          # i18n translation files
+│   ├── utils/            # Utility functions
+│   ├── view/             # Page components
+│   ├── App.tsx           # Main application component
+│   └── main.tsx          # Application entry point
+├── public/               # Public static assets
+└── ...configuration files
 ```
 
 ## 关联仓库地址

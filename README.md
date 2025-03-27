@@ -6,7 +6,7 @@
 
 A blockchain-based token staking mall system where users can stake tokens to earn rewards and exchange them for virtual goods in the marketplace, providing convenient, fast, and secure transactions.
 
-> ⚠️ **Note**: This project is currently under development. Some features are still being implemented. Continuous updates are planned for the future. Your star on this repository is a great encouragement for our ongoing efforts. Welcome to join us in building this project together! 
+> <font color=red>**Note**: This project is currently under development. Some features are still being implemented. Continuous updates are planned for the future. Your star on this repository is a great encouragement for our ongoing efforts. Welcome to join us in building this project together!</font>
 
 ## Table of Contents
 
@@ -48,26 +48,26 @@ Here are some screenshots of the application:
 ![Login](/public/logo_in.png)
 
 ### Mall Homepage
-![Mall Homepage](/public/mall_01.png)
+![商城首页](/public/mall_01.png)
 
 ### Admin Management
-![Admin-1](/public/admin_01.png)
+![后台管理-1](/public/admin_01.png)
 
-![Admin-2](/public/admin_02.png)
+![后台管理-2](/public/admin_02.png)
 
 ### Account Balance
-![Account Balance](/public/账户余额.png)
+![账户余额](/public/账户余额.png)
 
 ### Order Management
-![Order Management](/public/订单管理.png)
+![订单管理](/public/订单管理.png)
 
 ### Transaction Records
-![Transaction Records](/public/交易记录.png)
+![交易记录](/public/交易记录.png)
 
 ### Staking Management
-![Staking Management](/public/质押管理.png)
+![质押管理](/public/质押管理.png)
 
-These are just some of the project screenshots.
+这只是部分项目截图
 
 ## Tech Stack
 
@@ -111,3 +111,30 @@ npm run build
 ## Project Structure
 
 ```
+rcc-stake-mall-fe
+├── src/
+│   ├── api/              # API services and endpoints
+│   ├── assets/           # Static assets (images, styles, etc.)
+│   ├── components/       # Reusable UI components
+│   ├── config/           # Application configuration
+│   ├── context/          # React context providers
+│   ├── hooks/            # Custom React hooks
+│   ├── layouts/          # Page layout components
+│   ├── locales/          # i18n translation files
+│   ├── utils/            # Utility functions
+│   ├── view/             # Page components
+│   ├── App.tsx           # Main application component
+│   └── main.tsx         # Application entry point
+├── public/               # Public static assets
+└── ...configuration files
+```
+
+## Related Repositories
+
+Backend repository: https://github.com/mingdw/rcc_stack_backed.git
+
+Smart contract repository: https://github.com/mingdw/rcc_stack_contact.git
+
+## License
+
+[MIT](LICENSE)
