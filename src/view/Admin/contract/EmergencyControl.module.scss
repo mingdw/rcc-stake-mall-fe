@@ -1,0 +1,178 @@
+.emergencyControl {
+    padding: 24px;
+    background: #fff;
+    border-radius: 8px;
+    
+    .pageAlert {
+        margin-bottom: 24px;
+    }
+    
+    .controlGrid {
+        margin-bottom: 24px;
+    }
+    
+    .controlCard {
+        height: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        overflow: hidden;
+        
+        &.active {
+            border-top: 4px solid #52c41a;
+            
+            .cardTitle {
+                color: #52c41a;
+            }
+        }
+        
+        &.paused {
+            border-top: 4px solid #ff4d4f;
+            
+            .cardTitle {
+                color: #ff4d4f;
+            }
+        }
+        
+        &.danger {
+            border-top: 4px solid #ff4d4f;
+            
+            .cardTitle {
+                color: #ff4d4f;
+            }
+        }
+        
+        &.upgrade {
+            border-top: 4px solid #1890ff;
+            
+            .cardTitle {
+                color: #1890ff;
+            }
+        }
+        
+        .cardTitle {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            
+            span {
+                margin-left: 8px;
+            }
+        }
+        
+        .cardContent {
+            display: flex;
+            flex-direction: column;
+            height: 180px;
+            
+            .statusDisplay {
+                display: flex;
+                align-items: center;
+                margin-bottom: 12px;
+                
+                :global(.ant-typography) {
+                    &:first-child {
+                        margin-right: 8px;
+                    }
+                }
+            }
+            
+            .activeText {
+                color: #52c41a;
+            }
+            
+            .pausedText {
+                color: #ff4d4f;
+            }
+            
+            .dangerText {
+                color: #ff4d4f;
+                font-size: 16px;
+                margin-bottom: 8px;
+                display: block;
+            }
+            
+            .statusDescription {
+                margin-bottom: 16px;
+                flex: 1;
+            }
+            
+            .warningBox {
+                margin-bottom: 16px;
+                flex: 1;
+            }
+            
+            .actionButton {
+                align-self: flex-start;
+                min-width: 120px;
+            }
+        }
+    }
+    
+    .statusOverview {
+        margin-bottom: 24px;
+        
+        .statusSummaryCard {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            
+            .statusItem {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 0;
+                
+                &:not(:last-child) {
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+                }
+                
+                .statusLabel {
+                    display: flex;
+                    align-items: center;
+                    
+                    .statusIcon {
+                        margin-right: 8px;
+                        color: rgba(0, 0, 0, 0.45);
+                    }
+                }
+                
+                .activeText {
+                    color: #52c41a;
+                }
+            }
+        }
+    }
+    
+    .confirmContent {
+        .warningAlert {
+            margin-bottom: 16px;
+        }
+        
+        .confirmInput {
+            margin-top: 12px;
+        }
+    }
+    
+    .upgradeForm {
+        margin-top: 16px;
+        
+        .upgradeInput {
+            margin-top: 8px;
+        }
+    }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+    .emergencyControl {
+        .controlCard {
+            .cardContent {
+                height: auto;
+                
+                .actionButton {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

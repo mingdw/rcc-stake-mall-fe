@@ -3,9 +3,145 @@
     background: #fff;
     border-radius: 8px;
 
-    :global {
-        .ant-form-item {
-            margin-bottom: 24px;
+    .blockInfo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        margin-bottom: 24px;
+        
+        .currentBlock {
+            flex: 0 0 200px;
+            padding: 24px;
+            background: linear-gradient(135deg, #1890ff, #1668dc);
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+            
+            .blockTitle {
+                font-size: 14px;
+                margin-bottom: 8px;
+                opacity: 0.8;
+            }
+            
+            .blockNumber {
+                font-size: 32px;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+        }
+        
+        .statusCards {
+            flex: 1;
+            display: flex;
+            gap: 16px;
+            
+            .statusCard {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                padding: 16px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                transition: all 0.3s ease;
+                
+                &.active {
+                    border-left: 4px solid #52c41a;
+                    
+                    .statusIcon {
+                        background-color: rgba(82, 196, 26, 0.1);
+                        color: #52c41a;
+                    }
+                    
+                    .statusValue {
+                        color: #52c41a;
+                    }
+                }
+                
+                &.paused {
+                    border-left: 4px solid #ff4d4f;
+                    
+                    .statusIcon {
+                        background-color: rgba(255, 77, 79, 0.1);
+                        color: #ff4d4f;
+                    }
+                    
+                    .statusValue {
+                        color: #ff4d4f;
+                    }
+                }
+                
+                .statusIcon {
+                    width: 48px;
+                    height: 48px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 12px;
+                    font-size: 24px;
+                    margin-right: 16px;
+                }
+                
+                .statusInfo {
+                    flex: 1;
+                    
+                    .statusTitle {
+                        font-size: 14px;
+                        color: rgba(0, 0, 0, 0.45);
+                        margin-bottom: 4px;
+                    }
+                    
+                    .statusValue {
+                        font-size: 18px;
+                        font-weight: 500;
+                    }
+                }
+                
+                .statusButton {
+                    margin-left: 16px;
+                }
+            }
+        }
+    }
+    
+    .settingsForm {
+        :global {
+            .ant-form-item {
+                margin-bottom: 24px;
+            }
+        }
+        
+        .infoIcon {
+            margin-left: 8px;
+            color: rgba(0, 0, 0, 0.45);
+        }
+        
+        .formActions {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 24px;
+            gap: 16px;
+            
+            .submitButton {
+                min-width: 120px;
+            }
+        }
+    }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+    .properties {
+        .blockInfo {
+            flex-direction: column;
+            
+            .currentBlock {
+                flex: 1;
+                width: 100%;
+            }
+            
+            .statusCards {
+                flex-direction: column;
+            }
         }
     }
 } 

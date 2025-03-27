@@ -22,7 +22,12 @@ import {
   DeleteOutlined, 
   QuestionCircleOutlined,
   ExclamationCircleOutlined,
-  WalletOutlined
+  WalletOutlined,
+  BarChartOutlined,
+  RiseOutlined,
+  FallOutlined,
+  FieldTimeOutlined,
+  DatabaseOutlined
 } from '@ant-design/icons';
 import AdminContentCard from '../AdminContentCard';
 import { 
@@ -470,28 +475,58 @@ const StakingPoolManage: React.FC = () => {
       </div>
       
       <Card className={styles.statsCard}>
-        <div className={styles.statItem}>
-          <div className={styles.statTitle}>总质押池数量</div>
-          <div className={styles.statValue}>{stakingPools.length}</div>
-        </div>
-        <div className={styles.statItem}>
-          <div className={styles.statTitle}>活跃质押池</div>
-          <div className={styles.statValue}>
-            {stakingPools.filter(pool => pool.status === 'active').length}
+        <div className={styles.statsRow}>
+          <div className={styles.statItem}>
+            <div className={styles.statIcon}>
+              <BarChartOutlined />
+            </div>
+            <div className={styles.statContent}>
+              <div className={styles.statTitle}>总质押池数量</div>
+              <div className={styles.statValue}>
+                {stakingPools.length}
+              </div>
+            </div>
           </div>
-        </div>
-        <div className={styles.statItem}>
-          <div className={styles.statTitle}>平均年化收益率</div>
-          <div className={styles.statValue}>
-            {stakingPools.length > 0 
-              ? (stakingPools.reduce((sum, pool) => sum + pool.apr, 0) / stakingPools.length).toFixed(2) 
-              : 0}%
+          
+          <div className={styles.statItem}>
+            <div className={styles.statIcon}>
+              <DatabaseOutlined />
+            </div>
+            <div className={styles.statContent}>
+              <div className={styles.statTitle}>活跃质押池</div>
+              <div className={styles.statValue}>
+                {stakingPools.filter(pool => pool.status === 'active').length}
+              </div>
+            </div>
           </div>
-        </div>
-        <div className={styles.statItem}>
-          <div className={styles.statTitle}>总质押量</div>
-          <div className={styles.statValue}>
-            {stakingPools.reduce((sum, pool) => sum + pool.totalStaked, 0).toLocaleString()}
+          
+          <div className={styles.statItem}>
+            <div className={styles.statIcon}>
+              <RiseOutlined />
+            </div>
+            <div className={styles.statContent}>
+              <div className={styles.statTitle}>平均年化收益率</div>
+              <div className={styles.statValue}>
+                {stakingPools.length > 0 
+                  ? (stakingPools.reduce((sum, pool) => sum + pool.apr, 0) / stakingPools.length).toFixed(2) 
+                  : 0}%
+              </div>
+            </div>
+          </div>
+          
+          <div className={styles.statItem}>
+            <div className={styles.statIcon}>
+              <FieldTimeOutlined />
+            </div>
+            <div className={styles.statContent}>
+              <div className={styles.statTitle}>总质押量</div>
+              <div className={styles.statValue}>
+                {stakingPools.reduce((sum, pool) => sum + pool.totalStaked, 0).toLocaleString()}
+                <span className={styles.trendIcon + ' ' + styles.up}>
+                  <RiseOutlined />
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </Card>

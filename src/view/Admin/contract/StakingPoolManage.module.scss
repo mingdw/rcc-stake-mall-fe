@@ -16,28 +16,77 @@
   gap: 16px;
 }
 
+/* 统计卡片样式优化 */
 .statsCard {
   margin-bottom: 24px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  border-radius: 8px;
+  overflow: hidden;
 
+  .statsRow {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -4px;
+  }
+  
   .statItem {
     flex: 1;
-    min-width: 150px;
-    padding: 16px;
-    text-align: center;
+    min-width: 200px;
+    background-color: #fff;
+    margin: 4px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .statIcon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: rgba(24, 144, 255, 0.1);
+      color: #1890ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    
+    .statContent {
+      flex: 1;
+    }
     
     .statTitle {
       font-size: 14px;
       color: rgba(0, 0, 0, 0.45);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     
     .statValue {
       font-size: 24px;
       font-weight: 500;
       color: #1890ff;
+      line-height: 1.2;
+      
+      .trendIcon {
+        font-size: 14px;
+        margin-left: 6px;
+        
+        &.up {
+          color: #52c41a;
+        }
+        
+        &.down {
+          color: #ff4d4f;
+        }
+      }
     }
   }
 }
@@ -69,5 +118,19 @@
   
   .formGrid {
     grid-template-columns: 1fr;
+  }
+  
+  .statsCard {
+    .statItem {
+      min-width: calc(50% - 8px);
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .statsCard {
+    .statItem {
+      min-width: 100%;
+    }
   }
 } 
