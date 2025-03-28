@@ -300,6 +300,6 @@ const EmergencyControl: React.FC = () => {
             </Modal>
         </AdminContentCard>
     );
-};
+}; 
 
 export default EmergencyControl;

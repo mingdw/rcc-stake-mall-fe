@@ -34,7 +34,7 @@ import OrderPending from "../view/admin/order/OrderPending";
 import AfterSale from "../view/admin/order/AfterSale";
 import TransactionList from "../view/admin/order/TransactionList";
 import CategoryManage from "../view/admin/mall/CategoryManage";
-import ProductsManage from "../view/admin/mall/ProductsManage";
+import ProductsManage from "../view/admin/mall/products";
 import OrdersManage from "../view/admin/mall/OrdersManage";
 import CommentsManage from "../view/admin/mall/CommentsManage";
 import AttributesManage from "../view/admin/mall/AttributesManage";

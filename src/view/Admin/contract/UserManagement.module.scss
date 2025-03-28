@@ -6,6 +6,211 @@
         align-items: center;
     }
 
+    .statsRow {
+        margin-bottom: 24px;
+
+        .statsCard {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+
+            &:hover {
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+                transform: translateY(-2px);
+            }
+
+            .statTitle {
+                display: flex;
+                align-items: center;
+                color: rgba(0, 0, 0, 0.45);
+                margin-bottom: 8px;
+
+                .statIcon {
+                    margin-right: 8px;
+                    font-size: 16px;
+                    color: #1890ff;
+                }
+            }
+
+            .statValue {
+                font-weight: 600;
+                
+                :global {
+                    .ant-statistic-content-value {
+                        font-size: 24px;
+                        color: #1890ff;
+                    }
+                }
+            }
+        }
+    }
+
+    .searchContainer {
+        flex: 1;
+        max-width: 400px;
+
+        .searchInput {
+            border-radius: 8px;
+            height: 40px;
+        }
+    }
+
+    .userTable {
+        border-radius: 12px;
+        overflow: hidden;
+        
+        :global {
+            .ant-table-thead > tr > th {
+                background-color: #f5f8ff;
+                font-weight: 600;
+            }
+            
+            .ant-table-row:hover {
+                background-color: #f5f8ff;
+            }
+        }
+
+        .addressText {
+            color: #1890ff;
+            font-family: monospace;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        .actionButtons {
+            button {
+                padding: 0 8px;
+            }
+        }
+    }
+
+    .paginationWrapper {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    // 用户详情样式
+    .userDetailDrawer {
+        :global {
+            .ant-drawer-header {
+                background-color: #1890ff;
+                color: white;
+                border-radius: 0;
+                
+                .ant-drawer-title {
+                    color: white;
+                    font-weight: 600;
+                }
+                
+                .ant-drawer-close {
+                    color: white;
+                }
+            }
+        }
+
+        .userDetailContent {
+            .userHeader {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 24px;
+
+                .userInfo {
+                    display: flex;
+                    align-items: center;
+
+                    .userAvatar {
+                        width: 60px;
+                        height: 60px;
+                        background-color: #f5f8ff;
+                        border-radius: 50%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-right: 16px;
+                        color: #1890ff;
+                        font-size: 28px;
+                    }
+
+                    .userAddress {
+                        .addressText {
+                            font-family: monospace;
+                            font-size: 16px;
+                            margin-bottom: 8px;
+                            color: #333;
+                            max-width: 300px;
+                        }
+
+                        .userRoles {
+                            display: flex;
+                            align-items: center;
+                            flex-wrap: wrap;
+                            gap: 8px;
+                        }
+                    }
+                }
+            }
+
+            .userStats {
+                margin-bottom: 24px;
+
+                .userStatCard {
+                    border-radius: 8px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                    
+                    :global {
+                        .ant-statistic-title {
+                            margin-bottom: 12px;
+                            font-size: 14px;
+                        }
+                        
+                        .ant-statistic-content {
+                            font-size: 24px;
+                            font-weight: 600;
+                        }
+                        
+                        .ant-statistic-content-prefix {
+                            margin-right: 8px;
+                        }
+                    }
+                }
+            }
+
+            .userTabs {
+                margin-top: 24px;
+                
+                :global {
+                    .ant-tabs-nav {
+                        margin-bottom: 16px;
+                    }
+                }
+
+                .activityCard {
+                    .activityItem {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        padding: 12px 0;
+                        
+                        &:not(:last-child) {
+                            border-bottom: 1px solid #f0f0f0;
+                        }
+
+                        .activityInfo {
+                            .activityAction {
+                                margin-bottom: 8px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     :global {
         .ant-table-wrapper {
             background: #fff;
@@ -15,6 +220,39 @@
 
         .ant-table-pagination {
             margin: 16px 0;
+        }
+    }
+}
+
+// 响应式调整
+@media (max-width: 768px) {
+    .userManagement {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            
+            .searchContainer {
+                margin-top: 16px;
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+        
+        .userDetailDrawer {
+            .userDetailContent {
+                .userHeader {
+                    flex-direction: column;
+                    
+                    .userActions {
+                        margin-top: 16px;
+                        width: 100%;
+                        
+                        button {
+                            width: 100%;
+                        }
+                    }
+                }
+            }
         }
     }
 } 

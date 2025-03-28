@@ -1,0 +1,247 @@
+/* 商品管理页面样式 */
+.searchContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .searchForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    .searchForm {
+      margin-bottom: 16px;
+      width: 100%;
+    }
+  }
+}
+
+/* 商品表单模态框 */
+.productFormModal {
+  :global(.ant-form-item) {
+    margin-bottom: 16px;
+  }
+  
+  :global(.ant-modal-content) {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  :global(.ant-modal-header) {
+    background: #f7f7f7;
+    border-bottom: 1px solid #eee;
+    padding: 16px 24px;
+  }
+  
+  :global(.ant-modal-title) {
+    font-weight: 500;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  :global(.ant-tabs-nav) {
+    margin-bottom: 0;
+  }
+  
+  :global(.ant-form-item-label > label) {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  :global(.ant-input),
+  :global(.ant-select-selector),
+  :global(.ant-input-number),
+  :global(.ant-input-number-input) {
+    border-radius: 4px;
+  }
+}
+
+/* 表单卡片 */
+.formCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 20px;
+  margin-bottom: 24px;
+  border: 1px solid #f0f0f0;
+}
+
+/* 分区标题 */
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1890ff;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 表单网格布局 */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 24px;
+  row-gap: 16px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 表单区域 */
+.formSection {
+  padding: 16px 0;
+}
+
+/* 价格输入框 */
+.priceInput {
+  :global(.ant-input-number-group-addon) {
+    color: #1890ff;
+    font-weight: bold;
+    background: #f0f7ff;
+  }
+}
+
+/* 库存输入框 */
+.stockInput {
+  :global(.ant-input-number-handler-wrap) {
+    background: #f7f7f7;
+  }
+}
+
+/* 状态开关 */
+.statusSwitch {
+  :global(.ant-switch-checked) {
+    background-color: #52c41a;
+  }
+}
+
+/* 描述文本框 */
+.descriptionInput {
+  border-radius: 4px;
+  resize: vertical;
+  
+  &:focus {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+}
+
+/* 图片上传区域 */
+.imagesUpload {
+  margin-bottom: 0 !important;
+}
+
+.uploadContainer {
+  .uploadButton {
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+    background-color: #fafafa;
+    transition: all 0.3s;
+    
+    &:hover {
+      border-color: #1890ff;
+      background-color: #f0f7ff;
+    }
+  }
+  
+  .uploadTip {
+    margin-top: 8px;
+    color: #999;
+    font-size: 12px;
+  }
+}
+
+/* 属性表单区域 */
+.attrFormSection {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* 属性行样式 */
+.attrRow {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 16px;
+
+  > div {
+    flex: 1;
+  }
+
+  button {
+    margin-top: 4px;
+  }
+}
+
+/* 属性组 */
+.attrGroup {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+
+  .groupTitle {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+}
+
+/* 生成规格组合区域 */
+.generateSpecSection {
+  margin: 16px 0 24px;
+}
+
+/* 规格标签 */
+.specTag {
+  display: inline-block;
+  margin-right: 8px;
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  background-color: #f0f5ff;
+  border-radius: 4px;
+  color: #1890ff;
+  font-size: 12px;
+}
+
+/* 规格组合表格 */
+.specCombinationsTable {
+  margin-top: 16px;
+
+  .batchActions {
+    margin-bottom: 16px;
+  }
+}
+
+/* 空规格占位 */
+.emptySpec {
+  text-align: center;
+  padding: 40px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  margin-top: 16px;
+  color: #aaa;
+}
+
+/* 空状态提示 */
+.emptyNotice {
+  text-align: center;
+  padding: 24px;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+  color: #888;
+  font-size: 14px;
+} 
