@@ -12,7 +12,7 @@ import { useAccount, useBalance, useChainId, useChains, useDisconnect, useSwitch
 import { formatBalance, shortenAddress } from '../utils/common';
 import { ABOUT_PATH_NAME, chainIcons, HOME_PATH_NAME, SMALL_PATH_NAME, SUPLY_PATH_NAME } from '../config/valiable';
 import { authManager } from '../utils/authManager';
-import { getUserInfo, isAdmin } from '../api/apiService';
+import { getUserInfo } from '../api/apiService';
 
 const { Header, Content, Footer } = Layout;
 
@@ -56,24 +56,15 @@ const MainLayout: FC = () => {
         try {
           // 获取用户信息
           const userInfoData = await getUserInfo(address);
-          if (userInfoData) {
-            authManager.setUserInfo(userInfoData);
+          if(userInfoData){
+            const balanceInETH = formatBalance(balance?.value.toString() || '0');
+            authManager.auth(address, userInfoData, balanceInETH, isConnected);
           }
-          
-          // 检查是否为管理员
-          const adminCheckResult = await isAdmin(address);
-          const isAdminUser = adminCheckResult?.data?.isAdmin || false;
-          
-          // 更新地址和余额
-          authManager.setAddress(address);
-          const balanceInETH = formatBalance(balance?.value.toString() || '0');
-          authManager.setBalance(balanceInETH);
         } catch (error) {
           console.error('Error initializing user info:', error);
         }
       }
     };
-    
     initUserInfo();
   }, [isConnected, address, balance]);
 

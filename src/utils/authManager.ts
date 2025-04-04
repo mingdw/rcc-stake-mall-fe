@@ -1,7 +1,6 @@
 import { useAccount } from "wagmi";
 import { getUserInfo, UserInfoResponse } from "../api/apiService";
 
-export const defaultAddress = '0x67003e9d9B26Ed30B8AfeA6da762279D7c83abC2';
 
 class AuthManager {
   private static instance: AuthManager;
@@ -68,14 +67,26 @@ class AuthManager {
     this._isConnected = false;
   }
 
+  auth(address: string, userInfo: UserInfoResponse | null, balance: string, isConnected: boolean) {
+    this._address = address;
+    this._userInfo = userInfo;
+    this._balance = balance;
+    this._isConnected = isConnected;
+  }
+
   async init() {
-    const userInfo = await getUserInfo(defaultAddress);
+    if (!this._address) {
+      return;
+    }
+    const userInfo = await getUserInfo(this._address);
     if (userInfo) {
       this._userInfo = userInfo;
-      this._balance = '123';
-      this._address = defaultAddress;
+      this._balance = '';
+      this._address = this._address;
     }
   }
+
+
 
 
 }

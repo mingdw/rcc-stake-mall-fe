@@ -94,12 +94,14 @@ const Home: React.FC = () => {
     const [stakeAmount, setStakeAmount] = useState(0);
     const [totalEarnings, setTotalEarnings] = useState(0);
     const [platformRate, setPlatformRate] = useState(0);
+    const [productCount, setProductCount] = useState(0);
 
     // 模拟数据
     const targetUserCount = 1500;
     const targetStakeAmount = 12444;
     const targetTotalEarnings = 28737;
     const targetPlatformRate = 5; // 5%~10% 可以根据需要调整
+    const targetProductCount = 1000;
 
     // 计数器效果
     useEffect(() => {
@@ -114,7 +116,7 @@ const Home: React.FC = () => {
             setUserCount(Math.floor(progress * targetUserCount));
             setStakeAmount(Math.floor(progress * targetStakeAmount));
             setTotalEarnings(Math.floor(progress * targetTotalEarnings));
-
+            setProductCount(Math.floor(progress * targetProductCount));
             if (progress < 1) {
                 requestAnimationFrame(updateCounts); // 继续更新
             }
@@ -150,22 +152,23 @@ const Home: React.FC = () => {
             </Carousel>
             <CardContentComponent id="chenji" title="我们的成绩" des="2018至今，平台完成的数据" bgColor="#fff">
                 <Row style={{ marginTop: '20px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
-                    <Col span={5} className={styles.dashCard}>
+                    <Col span={4} className={styles.dashCard}>
                         <p className={styles.p1}>{userCount}+</p>
                         <p className={styles.p2}>用户总数</p>
                     </Col>
-                    <Col span={5} className={styles.dashCard}>
-                        <p className={styles.p1}>${stakeAmount}</p>
-                        <p className={styles.p2}>质押资产总额</p>
+                    <Col span={4} className={styles.dashCard}>
+                        <p className={styles.p1}>{productCount}+</p>
+                        <p className={styles.p2}>商品数量</p>
                     </Col>
-                    <Col span={5} className={styles.dashCard}>
+                    <Col span={4} className={styles.dashCard}>
                         <p className={styles.p1}>${totalEarnings}</p>
                         <p className={styles.p2}>历史总收益</p>
                     </Col>
-                    <Col span={5} className={styles.dashCard}>
+                    <Col span={4} className={styles.dashCard}>
                         <p className={styles.p1}>{platformRate}%~10%</p>
                         <p className={styles.p2}>平台收益率</p>
                     </Col>
+                    
                 </Row>
             </CardContentComponent >
 

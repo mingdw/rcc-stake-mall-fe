@@ -63,9 +63,9 @@ const ALL_MENU_DATA = [
         key: "mall",
         title: "商城管理",
         icon: <FileTextOutlined />,
+        adminOnly: true, // 标记该菜单仅管理员可见
         links: [
             { path: "/admin/mall/categories", label: "目录分类" },
-            { path: "/admin/mall/attributes", label: "属性组管理" },
             { path: "/admin/mall/products", label: "商品管理" },
             { path: "/admin/mall/orders", label: "订单管理" },
             { path: "/admin/mall/comments", label: "评价管理" }
@@ -94,7 +94,6 @@ const AdminLayout: React.FC = () => {
     const navigate = useNavigate();
     const [selectedItem, setSelectedItem] = useState("个人信息");
     const [loading, setLoading] = useState(true);
-    const [isAdminUser, setIsAdminUser] = useState(false);
     const [menuData, setMenuData] = useState(ALL_MENU_DATA);
     
     // 初始化用户信息
@@ -102,23 +101,22 @@ const AdminLayout: React.FC = () => {
         const initUserData = async () => {
             setLoading(true);
             try {
-                if (!authManager.userInfo) {
-                    await authManager.init();
-                }
-                
                 const userInfo = authManager.userInfo;
                 if (userInfo) {
                     const isAdmin = userInfo.isAdmin || false;
-                    setIsAdminUser(isAdmin);
                     
-                    // 根据用户角色过滤菜单
-                    const filteredMenu = ALL_MENU_DATA.filter(menu => 
-                        !menu.adminOnly || (menu.adminOnly && isAdmin)
-                    );
-                    setMenuData(filteredMenu);
-                } else {
-                    message.error('无法获取用户信息，请重新登录');
-                    navigate('/login');
+                    if(isAdmin){
+                        // 根据用户角色过滤菜单
+                        const filteredMenu = ALL_MENU_DATA.filter(menu => 
+                            menu.adminOnly
+                        );
+                        setMenuData(filteredMenu);
+                    }else{
+                        setMenuData(ALL_MENU_DATA.filter(menu => !menu.adminOnly));
+                    }
+
+                }else{
+                    setMenuData(ALL_MENU_DATA.filter(menu => !menu.adminOnly));
                 }
             } catch (error) {
                 console.error("初始化用户数据失败:", error);

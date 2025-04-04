@@ -25,7 +25,7 @@ import {
   DownOutlined,
   AppstoreOutlined
 } from '@ant-design/icons';
-import { getCategoryList } from '../../../api/apiService';
+import { getCategoryList, addCategory, updateCategory, deleteCategory } from '../../../api/apiService';
 import type { CategoryResponse, AttrGroup, Attr } from '../../../api/apiService';
 import styles from './CategoryManage.module.scss';
 
@@ -127,23 +127,55 @@ const CategoryManage: React.FC = () => {
 
   // 删除分类
   const handleDeleteCategory = async (category: CategoryResponse) => {
-    // 这里需要实现删除分类的API调用
-    message.success(`删除分类 ${category.name} 成功`);
-    await fetchCategories();
+    try {
+      const success = await deleteCategory(category.id);
+      if (success) {
+        message.success(`删除分类 ${category.name} 成功`);
+        await fetchCategories();
+      }
+    } catch (error) {
+      console.error('删除分类失败:', error);
+    }
   };
 
   // 保存分类
   const handleSaveCategory = async () => {
     try {
       const values = await form.validateFields();
-      // 这里需要实现添加/编辑分类的API调用
+      let result;
+      
       if (modalType === 'add') {
-        message.success(`添加分类 ${values.name} 成功`);
+        result = await addCategory({
+          name: values.name,
+          code: values.code,
+          level: values.level,
+          sort: values.sort,
+          parentId: values.parentId,
+          icon: values.icon
+        });
+        if (result) {
+          message.success(`添加分类 ${values.name} 成功`);
+        }
       } else {
-        message.success(`更新分类 ${values.name} 成功`);
+        console.log("update id:"+values.id);
+        result = await updateCategory(values.id, {
+          id: values.id,
+          name: values.name,
+          code: values.code,
+          level: values.level,
+          sort: values.sort,
+          parentId: values.parentId,
+          icon: values.icon
+        });
+        if (result) {
+          message.success(`更新分类 ${values.name} 成功`);
+        }
       }
-      setModalVisible(false);
-      await fetchCategories();
+      
+      if (result) {
+        setModalVisible(false);
+        await fetchCategories();
+      }
     } catch (error) {
       console.error('表单验证失败:', error);
     }
@@ -170,7 +202,8 @@ const CategoryManage: React.FC = () => {
       code: attrGroup.code,
       status: attrGroup.status,
       type: attrGroup.type,
-      sort: attrGroup.sort
+      sort: attrGroup.sort,
+      description: attrGroup.description
     });
     setAttrGroupModalVisible(true);
   };
@@ -267,6 +300,12 @@ const CategoryManage: React.FC = () => {
       title: '排序',
       dataIndex: 'sort',
       key: 'sort'
+    },
+    {
+      title: '描述',
+      dataIndex: 'description',
+      key: 'description',
+      ellipsis: true,
     },
     {
       title: '操作',
@@ -721,6 +760,19 @@ const CategoryManage: React.FC = () => {
             className={styles.formItem}
           >
             <InputNumber min={0} style={{ width: '100%' }} placeholder="数字越小越靠前" />
+          </Form.Item>
+          
+          <Form.Item
+            name="description"
+            label="描述"
+            className={styles.formItem}
+          >
+            <Input.TextArea 
+              placeholder="请输入属性组描述" 
+              rows={4}
+              maxLength={200}
+              showCount
+            />
           </Form.Item>
         </Form>
       </Modal>

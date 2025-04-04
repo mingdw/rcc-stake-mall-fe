@@ -21,6 +21,7 @@ interface AttrGroup {
   status: number;
   type: number;
   sort: number;
+  description?: string;
   attrs: Attr[];
 }
 
@@ -340,18 +341,6 @@ export const pingServer = async () => {
   }
 };
 
-// 判断是否为管理员
-export const isAdmin = async (address: string) => {
-  try {
-    const response = await axiosInstance.get(`/isAdmin/${address}`);
-    if (response.status === 200 && response.data.code === 0) {
-      return response.data;
-    }
-  } catch (error) {
-    handleApiError(error, '检查管理员权限失败');
-  }
-
-};
 
 // 获取用户信息
 export const getUserInfo = async (address: string) : Promise<UserInfoResponse | null> => {
@@ -634,6 +623,59 @@ export const deleteStakingPool = async (id: string) => {
   } catch (error) {
     console.error(`删除质押池失败, id: ${id}:`, error);
     throw error;
+  }
+};
+
+// 目录分类相关接口
+interface CategoryRequest {
+  id?: number;
+  name: string;
+  code: string;
+  level: number;
+  sort: number;
+  parentId: number;
+  icon?: string;
+}
+
+// 添加分类
+export const addCategory = async (category: CategoryRequest): Promise<CategoryResponse | null> => {
+  try {
+    const response = await axiosInstance.put('/v1/categories/modify', category);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    handleApiError(error, '添加分类失败');
+    return null;
+  }
+};
+
+// 更新分类
+export const updateCategory = async (id: number, category: CategoryRequest): Promise<CategoryResponse | null> => {
+  try {
+    const response = await axiosInstance.put(`/v1/categories/modify`, category);
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    handleApiError(error, '更新分类失败');
+    return null;
+  }
+};
+
+// 删除分类
+export const deleteCategory = async (id: number): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.delete(`/v1/categories/delete/${id}`);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    handleApiError(error, '删除分类失败');
+    return false;
   }
 };
 

@@ -68,7 +68,22 @@ const ProfileInfo: React.FC = () => {
                             </div>
                         </div>
                         <div className={styles.userInfo}>
-                            <h2 className={styles.userName}>{userInfo?.nickname || '未设置昵称'}</h2>
+                            <div className={styles.userName}>
+                                {userInfo?.nickname || '未设置昵称'}
+                                <div className={styles.walletAddress}>
+                                    <span className={styles.addressValue}>
+                                        {shortenAddress(authManager.address) || '未连接钱包'}
+                                    </span>
+                                    {authManager.address && (
+                                        <Tooltip title={copied ? "已复制" : "复制地址"}>
+                                            {copied ? 
+                                                <CheckOutlined className={styles.copyIcon} style={{ color: '#52c41a' }} /> : 
+                                                <CopyOutlined className={styles.copyIcon} onClick={handleCopyAddress} />
+                                            }
+                                        </Tooltip>
+                                    )}
+                                </div>
+                            </div>
                             <span className={`${styles.userRole} ${userInfo?.isAdmin ? styles.adminRole : ''}`}>
                                 {userInfo?.isAdmin ? '管理员' : '普通用户'}
                             </span>
@@ -110,40 +125,6 @@ const ProfileInfo: React.FC = () => {
                             <div className={styles.infoItem}>
                                 <span className={styles.infoLabel}>手机号码：</span>
                                 <span className={styles.infoValue}>{userInfo?.phone || '未设置'}</span>
-                            </div>
-                        </div>
-
-                        <div className={styles.infoSection}>
-                            <h3 className={styles.sectionTitle}>钱包信息</h3>
-                            <div className={styles.walletInfo}>
-                                <div className={styles.walletAddress}>
-                                    <span className={styles.infoLabel}>钱包地址：</span>
-                                    <span className={styles.addressValue}>
-                                        {shortenAddress(authManager.address) || '未连接钱包'}
-                                    </span>
-                                    {authManager.address && (
-                                        <Tooltip title={copied ? "已复制" : "复制地址"}>
-                                            {copied ? 
-                                                <CheckOutlined className={styles.copyIcon} style={{ color: '#52c41a' }} /> : 
-                                                <CopyOutlined className={styles.copyIcon} onClick={handleCopyAddress} />
-                                            }
-                                        </Tooltip>
-                                    )}
-                                </div>
-                                <div className={styles.balanceInfo}>
-                                    <div className={styles.balanceItem}>
-                                        <div className={styles.balanceValue}>{authManager.balance || '0'} ETH</div>
-                                        <div className={styles.balanceLabel}>账户余额</div>
-                                    </div>
-                                    <div className={styles.balanceItem}>
-                                        <div className={styles.balanceValue}>0.00 ETH</div>
-                                        <div className={styles.balanceLabel}>质押金额</div>
-                                    </div>
-                                    <div className={styles.balanceItem}>
-                                        <div className={styles.balanceValue}>0.00 RCC</div>
-                                        <div className={styles.balanceLabel}>收益金额</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
 

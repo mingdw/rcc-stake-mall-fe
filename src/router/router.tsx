@@ -9,9 +9,6 @@ import SuplyDetails from "../view/suply/SuplyDetails";
 import Home from "../view/home/HomeIndex";
 import About from "../view/about/AboutIndex";
 import NotFount from "../view/403";
-import NotificationSettings from "../view/admin/profile/NotificationSettings";
-import ProfileInfo from "../view/admin/profile/ProfileInfo";
-import SecuritySettings from "../view/admin/profile/SecuritySettings";
 import NotConnected from "../view/403";
 import PrivateRoute from "../components/PrivateRoute";
 import Mall from "../view/mall/MallIndex";
@@ -37,7 +34,9 @@ import CategoryManage from "../view/admin/mall/CategoryManage";
 import ProductsManage from "../view/admin/mall/products";
 import OrdersManage from "../view/admin/mall/OrdersManage";
 import CommentsManage from "../view/admin/mall/CommentsManage";
-import AttributesManage from "../view/admin/mall/AttributesManage";
+import ProfileInfo from "../view/admin/profile/ProfileInfo";
+import SecuritySettings from "../view/admin/profile/SecuritySettings";
+import NotificationSettings from "../view/admin/profile/NotificationSettings";
 
 
 
@@ -114,98 +113,139 @@ const router = createBrowserRouter([
            
             {
                 path: '/admin',
-                element: <AdminLayout/>,
+                element: <PrivateRoute>
+                    <AdminLayout/>
+                </PrivateRoute>
+                ,
                 children:[
                     {
                         path: '/admin/profile/info',
-                        element: <ProfileInfo />
+                        element: <PrivateRoute>
+                            <ProfileInfo />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/profile/security',
-                        element: <SecuritySettings/>
+                        element: <PrivateRoute>
+                            <SecuritySettings/>
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/profile/notifications',
-                        element: <NotificationSettings/>
+                        element: <PrivateRoute>
+                            <NotificationSettings/>
+                        </PrivateRoute>
                     },
                     
                     {
                         path: '/admin/assets/balance',
-                        element: <Balance />
+                        element: <PrivateRoute>
+                            <Balance />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/assets/staking',
-                        element: <Staking/>
+                        element: <PrivateRoute>
+                            <Staking/>
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/assets/tradelist',
-                        element: <TradeList/>
+                        element: <PrivateRoute>
+                            <TradeList/>
+                        </PrivateRoute>
                     },
                     
                     {
                         path: '/admin/order/address',
-                        element: <AddressManager/>
+                        element: <PrivateRoute>
+                            <AddressManager/>
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/order/pending',
-                        element: <OrderPending/>
+                        element: <PrivateRoute>
+                            <OrderPending/>
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/order/list',
-                        element: <TransactionList/>
+                        element: <PrivateRoute>
+                            <TransactionList/>
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/order/aftersale',
-                        element: <AfterSale />
+                        element: <PrivateRoute>
+                            <AfterSale />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/mall/categories',
-                        element: <CategoryManage />
-                    },
-                    {
-                        path: '/admin/mall/attributes',
-                        element: <AttributesManage />
+                        element: <PrivateRoute>
+                            <CategoryManage />
+                        </PrivateRoute>
                     },
                     
                     {
                         path: '/admin/mall/products',
-                        element: <ProductsManage />
+                        element: <PrivateRoute>
+                            <ProductsManage />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/mall/orders',
-                        element: <OrdersManage />
+                        element: <PrivateRoute>
+                            <OrdersManage />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/mall/comments',
-                        element: <CommentsManage />
+                        element: <PrivateRoute>
+                            <CommentsManage />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/role-management',
-                        element: <RoleManagement/>
+                        element: <PrivateRoute>
+                            <RoleManagement/>
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/staking-pools',
-                        element: <StakingPoolManage />
+                        element: <PrivateRoute>
+                            <StakingPoolManage />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/properties',
-                        element: <Properties />
+                        element: <PrivateRoute>
+                            <Properties />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/emergency-control',
-                        element: <EmergencyControl />
+                        element: <PrivateRoute>
+                            <EmergencyControl />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/user-management',
-                        element: <UserManagement />
+                        element: <PrivateRoute>
+                            <UserManagement />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/contract-upgrade',
-                        element: <ContractUpgrade />
+                        element: <PrivateRoute>
+                            <ContractUpgrade />
+                        </PrivateRoute>
                     },
                     {
                         path: '/admin/contract/account-monitoring',
-                        element: <AccountMonitoring />
+                        element: <PrivateRoute>
+                            <AccountMonitoring />
+                        </PrivateRoute>
                     }
                 ]
             },

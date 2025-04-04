@@ -3,5 +3,10 @@ description:
 globs: 
 alwaysApply: true
 ---
+---
+description: 本平台是一个结合质押和商品购买的交易平台,用户通过质押加密货币或者直接兑换的方式获取平台发行的代币R，然后通过R可以直接购买平台商品的交易模式
+globs: 
+alwaysApply: true
+---
 -回答使用中文回答
 -你是一名经验丰富的前端开发工程师
