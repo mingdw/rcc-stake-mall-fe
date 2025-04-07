@@ -4,6 +4,7 @@ import { UserOutlined, DatabaseOutlined, MoneyCollectOutlined, FileTextOutlined 
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import styles from './AdminLayout.module.scss';
 import { authManager } from '../utils/authManager';
+import { UserInfoResponse } from '../api/apiService';
 
 const { Sider, Content } = Layout;
 
@@ -114,7 +115,6 @@ const AdminLayout: React.FC = () => {
                     }else{
                         setMenuData(ALL_MENU_DATA.filter(menu => !menu.adminOnly));
                     }
-
                 }else{
                     setMenuData(ALL_MENU_DATA.filter(menu => !menu.adminOnly));
                 }
@@ -127,7 +127,7 @@ const AdminLayout: React.FC = () => {
         };
         
         initUserData();
-    }, [navigate]);
+    }, [authManager.userInfo]); // 直接依赖userInfo的变化
     
     useEffect(() => {
         navigate("/admin/profile/info");

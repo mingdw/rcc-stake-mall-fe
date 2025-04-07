@@ -8,6 +8,7 @@ class AuthManager {
   private _userInfo: UserInfoResponse | null = null; 
   private _balance: string = '0';
   private _isConnected: boolean = false;
+  private listeners: ((userInfo: UserInfoResponse | null) => void)[] = [];
   
 
   private constructor() {
@@ -50,6 +51,7 @@ class AuthManager {
 
   setUserInfo(userInfo: UserInfoResponse | null) {
     this._userInfo = userInfo;
+    this.notifyListeners();
   }
 
   get balance(): string {
@@ -86,8 +88,16 @@ class AuthManager {
     }
   }
 
+  addListener(listener: (userInfo: UserInfoResponse | null) => void) {
+    this.listeners.push(listener);
+  }
 
+  removeListener(listener: (userInfo: UserInfoResponse | null) => void) {
+    this.listeners = this.listeners.filter(l => l !== listener);
+  }
 
-
+  private notifyListeners() {
+    this.listeners.forEach(listener => listener(this._userInfo));
+  }
 }
 export const authManager = AuthManager.getInstance(); 

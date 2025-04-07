@@ -136,6 +136,24 @@
       }
     }
     
+    :global(.ant-table-wrapper) {
+      max-height: calc(100vh - 300px);
+      overflow-y: auto;
+      
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+    
     .nestedTable {
       margin-top: 8px;
       
@@ -186,6 +204,36 @@
     }
     to {
       opacity: 1;
+    }
+  }
+}
+
+.attrGroupTable {
+  :global {
+    .ant-table-thead > tr > th {
+      text-align: left;
+    }
+    .ant-table-tbody > tr > td {
+      text-align: left;
+    }
+  }
+}
+
+.attrTable {
+  :global {
+    .ant-table-thead > tr > th {
+      text-align: left;
+      
+      &:nth-child(2) { // 名称列
+        text-align: center;
+      }
+    }
+    .ant-table-tbody > tr > td {
+      text-align: left;
+      
+      &:nth-child(2) { // 名称列
+        text-align: center;
+      }
     }
   }
 }

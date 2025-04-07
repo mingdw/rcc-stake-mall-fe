@@ -25,9 +25,21 @@ import {
   DownOutlined,
   AppstoreOutlined
 } from '@ant-design/icons';
-import { getCategoryList, addCategory, updateCategory, deleteCategory } from '../../../api/apiService';
+import { 
+  getCategoryList, 
+  addCategory, 
+  updateCategory, 
+  deleteCategory,
+  modifyCategoryGroup,
+  deleteCategoryGroup,
+  modifyCategoryGroupAttr,
+  deleteCategoryGroupAttr,
+  CategoryGroupModifyRequest,
+  CategoryGroupAttrModifyRequest
+} from '../../../api/apiService';
 import type { CategoryResponse, AttrGroup, Attr } from '../../../api/apiService';
 import styles from './CategoryManage.module.scss';
+import type { AlignType } from 'rc-table/lib/interface';
 
 const { TabPane } = Tabs;
 
@@ -47,6 +59,7 @@ const CategoryManage: React.FC = () => {
   const [attrModalVisible, setAttrModalVisible] = useState<boolean>(false);
   const [selectedAttrGroup, setSelectedAttrGroup] = useState<AttrGroup | null>(null);
   const [activeTab, setActiveTab] = useState<string>('basic');
+  const [expandedRowKeys, setExpandedRowKeys] = useState<number[]>([]);
 
   // 获取分类数据
   const fetchCategories = async () => {
@@ -212,10 +225,36 @@ const CategoryManage: React.FC = () => {
   const handleSaveAttrGroup = async () => {
     try {
       const values = await attrGroupForm.validateFields();
-      // 这里需要实现添加/编辑属性组的API调用
-      message.success(`保存属性组 ${values.name} 成功`);
-      setAttrGroupModalVisible(false);
-      await fetchCategories();
+      if (!selectedCategory) {
+        message.error('未选择分类');
+        return;
+      }
+
+      const request: CategoryGroupModifyRequest = {
+        id: values.id,
+        categoryId: selectedCategory.id,
+        categoryCode: selectedCategory.code,
+        name: values.name,
+        code: values.code,
+        type: values.type,
+        status: values.status,
+        sort: values.sort,
+        description: values.description
+      };
+
+      const success = await modifyCategoryGroup(request);
+      if (success) {
+        message.success(`保存属性组 ${values.name} 成功`);
+        setAttrGroupModalVisible(false);
+        await fetchCategories();
+        const updatedCategories = await getCategoryList();
+        const updatedCategory = updatedCategories.find(cat => cat.id === selectedCategory.id);
+        if (updatedCategory) {
+          setSelectedCategory(updatedCategory);
+        }
+      } else {
+        message.error('保存属性组失败');
+      }
     } catch (error) {
       console.error('表单验证失败:', error);
     }
@@ -246,13 +285,90 @@ const CategoryManage: React.FC = () => {
   const handleSaveAttr = async () => {
     try {
       const values = await attrForm.validateFields();
-      // 这里需要实现添加/编辑属性的API调用
-      message.success(`保存属性 ${values.name} 成功`);
-      setAttrModalVisible(false);
-      await fetchCategories();
+      if (!selectedAttrGroup) {
+        message.error('未选择属性组');
+        return;
+      }
+
+      const request: CategoryGroupAttrModifyRequest = {
+        id: values.id,
+        attrGroupId: selectedAttrGroup.id,
+        attrGroupCode: selectedAttrGroup.code,
+        attrCode: values.code,
+        attrName: values.name,
+        attrType: values.type,
+        status: values.status,
+        sort: values.sort,
+        description: values.description
+      };
+
+      const success = await modifyCategoryGroupAttr(request);
+      if (success) {
+        message.success(`保存属性 ${values.name} 成功`);
+        setAttrModalVisible(false);
+        await fetchCategories();
+        const updatedCategories = await getCategoryList();
+        const updatedCategory = updatedCategories.find(cat => cat.id === selectedCategory?.id);
+        if (updatedCategory) {
+          setSelectedCategory(updatedCategory);
+        }
+      } else {
+        message.error('保存属性失败');
+      }
     } catch (error) {
       console.error('表单验证失败:', error);
     }
+  };
+
+  // 删除属性组
+  const handleDeleteAttrGroup = async (attrGroup: AttrGroup) => {
+    try {
+      const success = await deleteCategoryGroup(attrGroup.id);
+      if (success) {
+        message.success(`删除属性组 ${attrGroup.name} 成功`);
+        await fetchCategories();
+        const updatedCategories = await getCategoryList();
+        const updatedCategory = updatedCategories.find(cat => cat.id === selectedCategory?.id);
+        if (updatedCategory) {
+          setSelectedCategory(updatedCategory);
+        }
+      } else {
+        message.error('删除属性组失败');
+      }
+    } catch (error) {
+      console.error('删除属性组失败:', error);
+    }
+  };
+
+  // 删除属性
+  const handleDeleteAttr = async (attr: Attr) => {
+    try {
+      const success = await deleteCategoryGroupAttr(attr.id);
+      if (success) {
+        message.success(`删除属性 ${attr.name} 成功`);
+        await fetchCategories();
+        const updatedCategories = await getCategoryList();
+        const updatedCategory = updatedCategories.find(cat => cat.id === selectedCategory?.id);
+        if (updatedCategory) {
+          setSelectedCategory(updatedCategory);
+        }
+      } else {
+        message.error('删除属性失败');
+      }
+    } catch (error) {
+      console.error('删除属性失败:', error);
+    }
+  };
+
+  // 处理展开/折叠
+  const handleExpand = (id: number) => {
+    setExpandedRowKeys(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(key => key !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
   };
 
   // 属性组表格列
@@ -261,22 +377,28 @@ const CategoryManage: React.FC = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 80
+      width: 0,
+      hidden: true,
+      align: 'left' as AlignType,
+      sorter: (a: AttrGroup, b: AttrGroup) => a.id - b.id
     },
     {
       title: '名称',
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      align: 'left' as AlignType
     },
     {
       title: '编码',
       dataIndex: 'code',
-      key: 'code'
+      key: 'code',
+      align: 'left' as AlignType
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      align: 'left' as AlignType,
       render: (status: number) => (
         <span className={status === 1 ? `${styles.statusTag} ${styles.active}` : `${styles.statusTag} ${styles.inactive}`}>
           {status === 1 ? '启用' : '禁用'}
@@ -287,6 +409,7 @@ const CategoryManage: React.FC = () => {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
+      align: 'left' as AlignType,
       render: (type: number) => {
         const typeMap = {
           1: '基本属性',
@@ -299,24 +422,30 @@ const CategoryManage: React.FC = () => {
     {
       title: '排序',
       dataIndex: 'sort',
-      key: 'sort'
+      key: 'sort',
+      align: 'left' as AlignType,
+      sorter: (a: AttrGroup, b: AttrGroup) => a.sort - b.sort,
+      defaultSortOrder: 'ascend' as const
     },
     {
       title: '描述',
       dataIndex: 'description',
       key: 'description',
+      align: 'left' as AlignType,
       ellipsis: true,
     },
     {
       title: '操作',
       key: 'action',
+      width: 250,
+      align: 'left' as AlignType,
       render: (_: any, record: AttrGroup) => (
         <Space size="small">
-          <Tooltip title="编辑">
+          <Tooltip title="展开/折叠属性">
             <Button 
               type="text" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEditAttrGroup(record)} 
+              icon={expandedRowKeys.includes(record.id) ? <UpOutlined /> : <DownOutlined />} 
+              onClick={() => handleExpand(record.id)}
             />
           </Tooltip>
           <Tooltip title="添加属性">
@@ -326,14 +455,17 @@ const CategoryManage: React.FC = () => {
               onClick={() => handleAddAttr(record)} 
             />
           </Tooltip>
+          <Tooltip title="编辑">
+            <Button 
+              type="text" 
+              icon={<EditOutlined />} 
+              onClick={() => handleEditAttrGroup(record)} 
+            />
+          </Tooltip>
           <Tooltip title="删除">
             <Popconfirm
               title="确定要删除这个属性组吗?"
-              onConfirm={() => {
-                // 实现删除属性组的API调用
-                message.success(`删除属性组 ${record.name} 成功`);
-                fetchCategories();
-              }}
+              onConfirm={() => handleDeleteAttrGroup(record)}
               okText="确定"
               cancelText="取消"
             >
@@ -351,22 +483,28 @@ const CategoryManage: React.FC = () => {
       title: 'ID',
       dataIndex: 'id',
       key: 'id',
-      width: 80
+      width: 0,
+      hidden: true,
+      align: 'left' as AlignType,
+      sorter: (a: Attr, b: Attr) => a.id - b.id
     },
     {
       title: '名称',
       dataIndex: 'name',
-      key: 'name'
+      key: 'name',
+      align: 'center' as AlignType
     },
     {
       title: '编码',
       dataIndex: 'code',
-      key: 'code'
+      key: 'code',
+      align: 'left' as AlignType
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      align: 'left' as AlignType,
       render: (status: number) => (
         <span className={status === 1 ? `${styles.statusTag} ${styles.active}` : `${styles.statusTag} ${styles.inactive}`}>
           {status === 1 ? '启用' : '禁用'}
@@ -377,6 +515,7 @@ const CategoryManage: React.FC = () => {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
+      align: 'left' as AlignType,
       render: (type: number) => {
         const typeMap = {
           1: '输入框',
@@ -390,35 +529,129 @@ const CategoryManage: React.FC = () => {
     {
       title: '排序',
       dataIndex: 'sort',
-      key: 'sort'
+      key: 'sort',
+      align: 'left' as AlignType,
+      sorter: (a: Attr, b: Attr) => a.sort - b.sort,
+      defaultSortOrder: 'ascend' as const
     },
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: Attr, index: number) => (
-        <Space size="small">
-          <Tooltip title="编辑">
-            <Button 
-              type="text" 
-              icon={<EditOutlined />} 
-              onClick={() => handleEditAttr(record, selectedAttrGroup!)} 
-            />
-          </Tooltip>
-          <Tooltip title="删除">
-            <Popconfirm
-              title="确定要删除这个属性吗?"
-              onConfirm={() => {
-                // 实现删除属性的API调用
-                message.success(`删除属性 ${record.name} 成功`);
-                fetchCategories();
-              }}
-              okText="确定"
-              cancelText="取消"
-            >
-              <Button type="text" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </Tooltip>
-        </Space>
+      width: 150,
+      align: 'left' as AlignType,
+      render: (_: any, record: Attr) => {
+        // 找到当前属性所属的属性组
+        const currentAttrGroup = selectedCategory?.attrGroups?.find(group => 
+          group.attrs?.some(attr => attr.id === record.id)
+        );
+        
+        return (
+          <Space size="small">
+            <Tooltip title="编辑">
+              <Button 
+                type="text" 
+                icon={<EditOutlined />} 
+                onClick={() => handleEditAttr(record, currentAttrGroup!)} 
+              />
+            </Tooltip>
+            <Tooltip title="删除">
+              <Popconfirm
+                title="确定要删除这个属性吗?"
+                onConfirm={() => handleDeleteAttr(record)}
+                okText="确定"
+                cancelText="取消"
+              >
+                <Button type="text" danger icon={<DeleteOutlined />} />
+              </Popconfirm>
+            </Tooltip>
+          </Space>
+        );
+      }
+    }
+  ];
+
+  const tabItems = [
+    {
+      key: 'basic',
+      label: '基本信息',
+      children: (
+        <div className={styles.basicInfo}>
+          <div className={styles.infoItem}>
+            <span className={styles.label}>ID:</span>
+            <span className={styles.value}>{selectedCategory?.id}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.label}>名称:</span>
+            <span className={styles.value}>{selectedCategory?.name}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.label}>编码:</span>
+            <span className={styles.value}>{selectedCategory?.code}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.label}>层级:</span>
+            <span className={styles.value}>{selectedCategory?.level}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.label}>排序:</span>
+            <span className={styles.value}>{selectedCategory?.sort}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.label}>父级ID:</span>
+            <span className={styles.value}>{selectedCategory?.parentId}</span>
+          </div>
+          {selectedCategory?.icon && (
+            <div className={`${styles.infoItem} ${styles.fullWidth}`}>
+              <span className={styles.label}>图标:</span>
+              <img 
+                src={selectedCategory.icon} 
+                alt="分类图标" 
+                className={styles.iconPreview}
+              />
+            </div>
+          )}
+        </div>
+      )
+    },
+    {
+      key: 'attrGroups',
+      label: '属性组管理',
+      children: (
+        <div className={styles.tableWrapper}>
+          <Table 
+            columns={attrGroupColumns}
+            dataSource={selectedCategory?.attrGroups || []}
+            rowKey="id"
+            className={styles.attrGroupTable}
+            expandable={{
+              expandedRowRender: (record) => (
+                <div className={styles.nestedTable}>
+                  <div className={styles.tableHeader}>
+                    <h4 className={styles.title}>属性列表</h4>
+                  </div>
+                  <Table 
+                    columns={attrColumns}
+                    dataSource={record.attrs || []}
+                    rowKey="id"
+                    size="small"
+                    pagination={false}
+                    className={styles.attrTable}
+                  />
+                </div>
+              ),
+              expandIcon: () => null,
+              expandRowByClick: false,
+              expandedRowKeys: expandedRowKeys,
+              onExpand: (expanded, record) => {
+                if (expanded) {
+                  setExpandedRowKeys(prev => [...prev, record.id]);
+                } else {
+                  setExpandedRowKeys(prev => prev.filter(key => key !== record.id));
+                }
+              }
+            }}
+          />
+        </div>
       )
     }
   ];
@@ -529,6 +762,7 @@ const CategoryManage: React.FC = () => {
               <Tabs 
                 activeKey={activeTab} 
                 onChange={setActiveTab}
+                items={tabItems}
                 tabBarExtraContent={
                   activeTab === 'attrGroups' ? (
                     <Button 
@@ -541,88 +775,13 @@ const CategoryManage: React.FC = () => {
                     </Button>
                   ) : null
                 }
-              >
-                <TabPane tab="基本信息" key="basic">
-                  <div className={styles.basicInfo}>
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>ID:</span>
-                      <span className={styles.value}>{selectedCategory.id}</span>
-                    </div>
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>名称:</span>
-                      <span className={styles.value}>{selectedCategory.name}</span>
-                    </div>
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>编码:</span>
-                      <span className={styles.value}>{selectedCategory.code}</span>
-                    </div>
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>层级:</span>
-                      <span className={styles.value}>{selectedCategory.level}</span>
-                    </div>
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>排序:</span>
-                      <span className={styles.value}>{selectedCategory.sort}</span>
-                    </div>
-                    <div className={styles.infoItem}>
-                      <span className={styles.label}>父级ID:</span>
-                      <span className={styles.value}>{selectedCategory.parentId}</span>
-                    </div>
-                    {selectedCategory.icon && (
-                      <div className={`${styles.infoItem} ${styles.fullWidth}`}>
-                        <span className={styles.label}>图标:</span>
-                        <img 
-                          src={selectedCategory.icon} 
-                          alt="分类图标" 
-                          className={styles.iconPreview}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </TabPane>
-                <TabPane 
-                  tab="属性组管理" 
-                  key="attrGroups"
-                >
-                  <div className={styles.tableWrapper}>
-                    <Table 
-                      columns={attrGroupColumns}
-                      dataSource={selectedCategory.attrGroups || []}
-                      rowKey="id"
-                      expandable={{
-                        expandedRowRender: (record) => (
-                          <div className={styles.nestedTable}>
-                            <div className={styles.tableHeader}>
-                              <h4 className={styles.title}>属性列表</h4>
-                              <Button 
-                                type="primary" 
-                                size="small"
-                                icon={<PlusOutlined />}
-                                onClick={() => handleAddAttr(record)}
-                              >
-                                添加属性
-                              </Button>
-                            </div>
-                            <Table 
-                              columns={attrColumns}
-                              dataSource={record.attrs || []}
-                              rowKey="id"
-                              size="small"
-                              pagination={false}
-                            />
-                          </div>
-                        ),
-                      }}
-                    />
-                  </div>
-                </TabPane>
-              </Tabs>
+              />
             </div>
           ) : (
-            <div className={styles.emptyState}>
-              <AppstoreOutlined className={styles.emptyIcon} />
-              <span className={styles.emptyText}>请从左侧选择一个分类查看详情</span>
-            </div>
+            <Empty 
+              image={Empty.PRESENTED_IMAGE_SIMPLE} 
+              description="请从左侧选择一个分类查看详情" 
+            />
           )}
         </Card>
       </div>
@@ -791,6 +950,17 @@ const CategoryManage: React.FC = () => {
         >
           <Form.Item name="id" label="ID" hidden>
             <Input />
+          </Form.Item>
+          
+          <Form.Item
+            label="所属属性组"
+            className={styles.formItem}
+          >
+            <Input 
+              value={selectedAttrGroup?.name} 
+              disabled 
+              placeholder="属性组名称" 
+            />
           </Form.Item>
           
           <Form.Item

@@ -679,6 +679,88 @@ export const deleteCategory = async (id: number): Promise<boolean> => {
   }
 };
 
+// 属性组修改请求接口
+interface CategoryGroupModifyRequest {
+  id?: number;
+  categoryId: number;
+  categoryCode: string;
+  name: string;
+  code: string;
+  type: number;
+  status: number;
+  sort: number;
+  description?: string;
+}
+
+// 修改属性组
+export const modifyCategoryGroup = async (request: CategoryGroupModifyRequest): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.put('/v1/categories/group/modify', request);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    handleApiError(error, '修改属性组失败');
+    return false;
+  }
+};
+
+// 删除属性组
+export const deleteCategoryGroup = async (id: number): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.delete(`/v1/categories/group/delete/${id}`);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    handleApiError(error, '删除属性组失败');
+    return false;
+  }
+};
+
+// 属性修改请求接口
+interface CategoryGroupAttrModifyRequest {
+  id?: number;
+  attrGroupId: number;
+  attrGroupCode: string;
+  attrCode: string;
+  attrName: string;
+  attrType: number;
+  sort: number;
+  status: number;
+  description?: string;
+}
+
+// 修改属性
+export const modifyCategoryGroupAttr = async (request: CategoryGroupAttrModifyRequest): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.put('/v1/categories/group/attr/modify', request);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    handleApiError(error, '修改属性失败');
+    return false;
+  }
+};
+
+// 删除属性
+export const deleteCategoryGroupAttr = async (id: number): Promise<boolean> => {
+  try {
+    const response = await axiosInstance.delete(`/v1/categories/group/attr/delete/${id}`);
+    if (response.status === 200 && response.data.code === 0) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    handleApiError(error, '删除属性失败');
+    return false;
+  }
+};
+
 // 导出接口类型
 export type {
   Attr,
@@ -698,7 +780,9 @@ export type {
   UserAddressListRequest,
   UserAddressListResponse,
   UserAddress,
-  UserInfoResponse
+  UserInfoResponse,
+  CategoryGroupModifyRequest,
+  CategoryGroupAttrModifyRequest
 };
 
 
