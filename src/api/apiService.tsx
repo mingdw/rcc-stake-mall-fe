@@ -127,6 +127,19 @@ interface ProductSku {
   updator: string;
 }
 
+// 图片上传接口响应类型
+interface ImageUploadResponse {
+  content_type: string;
+  file_name: string;
+  hash: string;
+  id: number;
+  key: string;
+  original_name: string;
+  size: number;
+  status: number;
+  url: string;
+}
+
 // 商品评价接口
 interface ProductReview {
   id: number;
@@ -759,6 +772,34 @@ export const deleteCategoryGroupAttr = async (id: number): Promise<boolean> => {
     handleApiError(error, '删除属性失败');
     return false;
   }
+};
+
+/**
+ * 上传图片
+ * @param file 要上传的文件
+ * @returns 上传结果，包含图片URL
+ */
+export const uploadImage = async (file: File) => {
+  try {
+    console.log('uploadImage API 被调用，文件:', file.name); // 添加调试日志
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await axiosInstance.post('/v1/upload/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    console.log('uploadImage API 响应:', response.data); // 添加调试日志
+    if (response.status === 200 && response.data.code === 0) {
+      return response.data.data;
+    }
+  } catch (error) {
+    console.error('上传图片失败:', error);
+    throw error;
+  }
+  return null;
 };
 
 // 导出接口类型

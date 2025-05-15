@@ -6,12 +6,19 @@ import { getProductList, getCategoryList } from '../../../../api/apiService';
 import type { Product, CategoryResponse, ProductListRequest, AttrGroup } from '../../../../api/apiService';
 import type { UploadFile } from 'antd/es/upload/interface';
 import type { ColumnsType } from 'antd/es/table';
-import { SpecCombination } from './types';
 import { findCategoryById, findCategoryName, generateSpecCombinations, processProductImages, extractImageUrls, parseProductAttributes } from './utils';
 import styles from './ProductsManage.module.scss';
 import ProductForm from './ProductForm';
 
 const { TreeNode } = TreeSelect;
+
+type SpecCombination = {
+  id: string;
+  specs: Record<string, string>;
+  price: number;
+  stock: number;
+  skuCode: string;
+};
 
 const ProductsManage: React.FC = () => {
   // 状态定义
@@ -204,10 +211,27 @@ const ProductsManage: React.FC = () => {
         categoryId: product.category3Id ? product.category3Id.toString() : undefined,
       };
       
-      // 设置基础属性初始值
-      Object.entries(basicAttrsData).forEach(([attrId, attrValue]: [string, any]) => {
-        initialValues[`basicAttr_${attrId}`] = attrValue.value;
-      });
+      // 设置基础属性初始值 - 需要修改逻辑
+      // 因为基础属性现在是按属性组分类的，所以需要找到每个属性对应的属性组
+      if (product.category3Id) {
+        const category = findCategoryById(categories, product.category3Id);
+        if (category && category.attrGroups) {
+          const baseAttrGroups = category.attrGroups.filter(group => group.type === 1);
+          
+          // 对于每个属性组，找到已选择的属性值
+          baseAttrGroups.forEach(group => {
+            // 遍历该组下的所有属性
+            for (const attr of group.attrs) {
+              // 检查是否为已选属性
+              if (basicAttrsData[attr.id]) {
+                // 将属性名称设置为该属性组的选中值
+                initialValues[`basicAttr_${group.id}`] = attr.name;
+                break; // 找到该组的选中值后退出循环
+              }
+            }
+          });
+        }
+      }
       
       // 设置销售属性初始值
       const saleAttrsArray = Object.entries(saleAttrsData).map(([key, value]) => ({
@@ -224,7 +248,17 @@ const ProductsManage: React.FC = () => {
       initialValues.specAttrs = specAttrsArray.length > 0 ? specAttrsArray : [{ key: '', values: [] }];
       
       // 设置规格属性状态
-      setSpecAttrs(specAttrsData);
+      if (specAttrsArray.length > 0) {
+        const specAttrsMapData: Record<string, string[]> = {};
+        specAttrsArray.forEach(item => {
+          if (item.key && item.values && item.values.length > 0) {
+            specAttrsMapData[item.key] = item.values;
+          }
+        });
+        setSpecAttrs(specAttrsMapData);
+      } else {
+        setSpecAttrs({});
+      }
       
       // 设置SKU列表
       if (product.skuList && product.skuList.length > 0) {
@@ -242,8 +276,11 @@ const ProductsManage: React.FC = () => {
       if (product.category3Id) {
         setSelectedCategory(product.category3Id.toString());
         const category = findCategoryById(categories, product.category3Id);
+        
         if (category && category.attrGroups) {
-          setAttrGroups(category.attrGroups);
+          // 筛选出类型为基础属性的属性组
+          const baseAttrGroups = category.attrGroups.filter(group => group.type === 1);
+          setAttrGroups(baseAttrGroups);
         }
       }
       
@@ -278,14 +315,20 @@ const ProductsManage: React.FC = () => {
       
       // 处理基础属性
       const basicAttrsData = attrGroups.reduce((acc, group) => {
-        group.attrs.forEach((attr: any) => {
-          if (values[`basicAttr_${attr.id}`]) {
-            acc[attr.id] = {
-              name: attr.name,
-              value: values[`basicAttr_${attr.id}`]
+        const selectedAttrName = values[`basicAttr_${group.id}`];
+        
+        if (selectedAttrName) {
+          // 找到选中的属性
+          const selectedAttr = group.attrs.find(attr => attr.name === selectedAttrName);
+          
+          if (selectedAttr) {
+            // 将属性ID作为键，属性信息作为值
+            acc[selectedAttr.id] = {
+              name: selectedAttr.name,
+              value: selectedAttr.name
             };
           }
-        });
+        }
         return acc;
       }, {} as Record<string, { name: string; value: string }>);
       
@@ -341,14 +384,41 @@ const ProductsManage: React.FC = () => {
     }
   };
 
-  // 处理规格组合生成
-  const handleGenerateSpecCombinations = () => {
+  // 修改处理规格组合生成函数
+  const handleGenerateSpecCombinations = (specAttrsMap: Record<string, string[]> = {}, defaultPrice: number = 0) => {
+    // 检查是否有规格属性
+    if (Object.keys(specAttrsMap).length === 0) {
+      // 尝试从表单中获取
+      const specAttrsValues = form.getFieldValue('specAttrs');
+      if (specAttrsValues && specAttrsValues.length > 0) {
+        specAttrsValues.forEach((item: any) => {
+          if (item.key && item.values && item.values.length > 0) {
+            specAttrsMap[item.key] = item.values;
+          }
+        });
+      }
+      
+      // 如果仍然没有，使用已有的状态
+      if (Object.keys(specAttrsMap).length === 0) {
+        specAttrsMap = specAttrs;
+      }
+    }
+
+    // 使用工具函数生成组合
     const combinations = generateSpecCombinations(
-      specAttrs, 
+      specAttrsMap, 
       specCombinations, 
-      currentProduct?.realPrice || 0
+      defaultPrice || currentProduct?.realPrice || 0
     );
+    
     setSpecCombinations(combinations);
+    
+    // 如果生成了组合，显示成功消息
+    if (combinations.length > 0) {
+      message.success(`已生成 ${combinations.length} 个规格组合`);
+    } else {
+      message.warning('未能生成规格组合，请检查规格设置');
+    }
   };
 
   // 渲染分类树
@@ -393,16 +463,74 @@ const ProductsManage: React.FC = () => {
     setSelectedCategory(value);
     const numValue = parseInt(value, 10);
     const category = findCategoryById(categories, numValue);
-    if (category && category.attrGroups) {
-      setAttrGroups(category.attrGroups);
+    
+    if (category) {
+      // 提取该分类的基础属性组
+      let baseAttrGroups: AttrGroup[] = [];
+      
+      if (category.attrGroups) {
+        // 筛选出类型为基础属性的属性组（通常type=1表示基础属性）
+        baseAttrGroups = category.attrGroups.filter(group => group.type === 1);
+      }
+      
+      setAttrGroups(baseAttrGroups);
+      
+      // 保存分类路径，用于提交表单时确定商品所属分类
+      let categoryPath: string[] = [];
+      let currentCat = category;
+      categoryPath.unshift(currentCat.id.toString());
+      
+      // 找出完整的分类路径
+      while (currentCat.parentId) {
+        const parentCat = findCategoryById(categories, currentCat.parentId);
+        if (parentCat) {
+          categoryPath.unshift(parentCat.id.toString());
+          currentCat = parentCat;
+        } else {
+          break;
+        }
+      }
+      
+      setSelectedCategoryPath(categoryPath);
     } else {
       setAttrGroups([]);
+      setSelectedCategoryPath([]);
     }
   };
 
   // 处理图片变化
-  const handleImageChange = ({ fileList }: { fileList: UploadFile[] }) => {
-    setFileList(fileList);
+  const handleImageChange = (info: any) => {
+    const { file, fileList: newFileList } = info;
+    console.log('文件变化:', file.status, file.name);
+    
+    // 根据文件状态更新文件列表
+    let updatedFileList = [...newFileList];
+    
+    // 过滤出有效的文件（成功上传或者上传中的）
+    updatedFileList = updatedFileList.filter(f => 
+      f.status === 'done' || f.status === 'uploading'
+    );
+    
+    // 确保每个文件都有URL
+    updatedFileList = updatedFileList.map(f => {
+      if (f.status === 'done' && f.response && !f.url) {
+        return {
+          ...f,
+          url: f.response.url
+        };
+      }
+      return f;
+    });
+    
+    // 更新文件列表状态
+    setFileList(updatedFileList);
+    
+    // 处理文件上传状态变化
+    if (file.status === 'done') {
+      // 成功时不再需要显示消息，因为handleUpload已经显示了
+    } else if (file.status === 'error') {
+      // 错误时不再需要显示消息，因为handleUpload已经显示了
+    }
   };
 
   return (

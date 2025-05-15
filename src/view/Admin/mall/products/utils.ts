@@ -1,7 +1,14 @@
 import { message } from 'antd';
 import type { Product, CategoryResponse, AttrGroup } from '../../../../api/apiService';
-import type { SpecCombination } from './types';
 import type { UploadFile } from 'antd/es/upload/interface';
+
+type SpecCombination = {
+  id: string;
+  specs: Record<string, string>;
+  price: number;
+  stock: number;
+  skuCode: string;
+};
 
 /**
  * 根据ID查找分类
@@ -118,18 +125,35 @@ export const processProductImages = (images?: string[]): UploadFile[] => {
 };
 
 /**
- * 从UploadFile数组中提取图片URL
+ * 从上传文件列表中提取图片URL
  * @param fileList 上传文件列表
  * @returns 图片URL数组
  */
 export const extractImageUrls = (fileList: UploadFile[]): string[] => {
   return fileList
+    .filter(file => file.status === 'done') // 只获取上传成功的
     .map(file => {
-      if (file.url) return file.url; // 已有图片URL
-      if (file.response) return file.response.url; // 上传后的响应URL
-      return ''; // 占位，实际上不会保存
+      // 优先使用文件的 URL
+      if (file.url) {
+        return file.url;
+      }
+      
+      // 如果没有URL但有响应数据
+      if (file.response) {
+        // 根据响应结构提取URL
+        if (typeof file.response === 'object') {
+          return file.response.url;
+        }
+      }
+      
+      // 后备选项
+      if (file.thumbUrl) {
+        return file.thumbUrl;
+      }
+      
+      return '';
     })
-    .filter(Boolean);
+    .filter(Boolean); // 过滤掉空字符串
 };
 
 /**
